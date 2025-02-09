@@ -30,7 +30,7 @@ public class TestEvent2 implements Listener {
                     Highlight.removeSelectionOnBlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
                 } else {
                     // Если нет, создаем новые дисплеи
-                    Highlight.createSides(location, HighlightStyle.BRONZE);
+                    Highlight.createSides(location, HighlightStyle.BRONZE, 200);
                 }
                 player.setCooldown(Material.COAL, 1);
             }
