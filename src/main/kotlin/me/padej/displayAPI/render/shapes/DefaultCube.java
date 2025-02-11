@@ -5,6 +5,7 @@ import me.padej.displayAPI.utils.AlignmentType;
 import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.BlockDisplay;
+import org.bukkit.entity.Display;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.Transformation;
 import org.joml.AxisAngle4f;
@@ -53,19 +54,18 @@ public abstract class DefaultCube extends Alignment {
             blockDisplay = null;
             return null;
         }
-
         blockDisplay = (BlockDisplay) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.BLOCK_DISPLAY);
         blockDisplay.setBlock(getBlock());
         blockDisplay.setRotation(0, 0);
-
         Vector3f offset = getOffset(alignmentType, getScale());
-
         blockDisplay.setTransformation(new Transformation(
                 offset,
                 new AxisAngle4f(),
                 new Vector3f(getScale(), getScale(), getScale()),
                 new AxisAngle4f()
         ));
+        blockDisplay.setInterpolationDuration(1);
+        blockDisplay.setTeleportDuration(1);
 
         return blockDisplay;
     }

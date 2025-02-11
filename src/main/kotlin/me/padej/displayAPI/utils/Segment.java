@@ -23,12 +23,12 @@ public class Segment {
     }
 
     public Location[] getMinMaxPoints() {
-        double minX = Math.min(pointA.getX(), pointB.getX());
-        double maxX = Math.max(pointA.getX(), pointB.getX());
-        double minY = Math.min(pointA.getY(), pointB.getY());
-        double maxY = Math.max(pointA.getY(), pointB.getY());
-        double minZ = Math.min(pointA.getZ(), pointB.getZ());
-        double maxZ = Math.max(pointA.getZ(), pointB.getZ());
+        double minX = java.lang.Math.min(pointA.getX(), pointB.getX());
+        double maxX = java.lang.Math.max(pointA.getX(), pointB.getX());
+        double minY = java.lang.Math.min(pointA.getY(), pointB.getY());
+        double maxY = java.lang.Math.max(pointA.getY(), pointB.getY());
+        double minZ = java.lang.Math.min(pointA.getZ(), pointB.getZ());
+        double maxZ = java.lang.Math.max(pointA.getZ(), pointB.getZ());
 
         Location minPoint = new Location(pointA.getWorld(), minX, minY, minZ);
         Location maxPoint = new Location(pointA.getWorld(), maxX, maxY, maxZ);

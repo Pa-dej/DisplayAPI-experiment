@@ -37,12 +37,12 @@ public class VertexUtil {
         double maxZ = -Double.MAX_VALUE;
 
         for (Location vertex : cubeVertexes) {
-            minX = Math.min(minX, vertex.getX());
-            maxX = Math.max(maxX, vertex.getX());
-            minY = Math.min(minY, vertex.getY());
-            maxY = Math.max(maxY, vertex.getY());
-            minZ = Math.min(minZ, vertex.getZ());
-            maxZ = Math.max(maxZ, vertex.getZ());
+            minX = java.lang.Math.min(minX, vertex.getX());
+            maxX = java.lang.Math.max(maxX, vertex.getX());
+            minY = java.lang.Math.min(minY, vertex.getY());
+            maxY = java.lang.Math.max(maxY, vertex.getY());
+            minZ = java.lang.Math.min(minZ, vertex.getZ());
+            maxZ = java.lang.Math.max(maxZ, vertex.getZ());
         }
 
         return targetLocation.getX() >= minX && targetLocation.getX() <= maxX &&
@@ -65,12 +65,12 @@ public class VertexUtil {
         double maxZ = -Double.MAX_VALUE;
 
         for (Location vertex : cubeVertexes) {
-            minX = Math.min(minX, vertex.getX());
-            maxX = Math.max(maxX, vertex.getX());
-            minY = Math.min(minY, vertex.getY());
-            maxY = Math.max(maxY, vertex.getY());
-            minZ = Math.min(minZ, vertex.getZ());
-            maxZ = Math.max(maxZ, vertex.getZ());
+            minX = java.lang.Math.min(minX, vertex.getX());
+            maxX = java.lang.Math.max(maxX, vertex.getX());
+            minY = java.lang.Math.min(minY, vertex.getY());
+            maxY = java.lang.Math.max(maxY, vertex.getY());
+            minZ = java.lang.Math.min(minZ, vertex.getZ());
+            maxZ = java.lang.Math.max(maxZ, vertex.getZ());
         }
 
         return (minPoint.getX() <= maxX && maxPoint.getX() >= minX) &&
