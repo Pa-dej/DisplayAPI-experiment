@@ -4,6 +4,8 @@ import me.padej.displayAPI.render.shapes.DefaultCube;
 import org.bukkit.Location;
 import org.joml.Vector3f;
 
+import static me.padej.displayAPI.render.shapes.DefaultDisplay.getOffset;
+
 public class VertexUtil {
 
     // Метод для получения координат углов куба
@@ -11,7 +13,7 @@ public class VertexUtil {
         float size = cube.getScale();
         Location[] corners = new Location[8];
 
-        Vector3f offset = Alignment.getOffset(cube.getAlignmentType(), size);
+        Vector3f offset = getOffset(cube.getAlignmentType(), size);
 
         for (int x = 0; x <= 1; x++) {
             for (int y = 0; y <= 1; y++) {

@@ -1,6 +1,5 @@
 package me.padej.displayAPI.render.shapes;
 
-import me.padej.displayAPI.utils.Alignment;
 import me.padej.displayAPI.utils.AlignmentType;
 import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
@@ -11,7 +10,7 @@ import org.bukkit.util.Transformation;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 
-public abstract class DefaultCube extends Alignment {
+public abstract class DefaultCube extends DefaultDisplay {
     private float scale;
     private BlockData block;
     private BlockDisplay blockDisplay;
@@ -48,6 +47,18 @@ public abstract class DefaultCube extends Alignment {
         this.block = block;
     }
 
+    public BlockDisplay getBlockDisplay() {
+        return blockDisplay;
+    }
+
+    public Transformation getTransformation() {
+        return blockDisplay != null ? blockDisplay.getTransformation() : emptyTransformation;
+    }
+
+    public Location getLocation() {
+        return blockDisplay != null ? blockDisplay.getLocation() : null;
+    }
+
     public BlockDisplay spawn(Location spawnLocation) {
         if (blockDisplay != null && !blockDisplay.isDead()) {
             blockDisplay.remove();
@@ -68,18 +79,6 @@ public abstract class DefaultCube extends Alignment {
         blockDisplay.setTeleportDuration(1);
 
         return blockDisplay;
-    }
-
-    public BlockDisplay getBlockDisplay() {
-        return blockDisplay;
-    }
-
-    public Transformation getTransformation() {
-        return blockDisplay != null ? blockDisplay.getTransformation() : new Transformation(new Vector3f(), new AxisAngle4f(), new Vector3f(), new AxisAngle4f());
-    }
-
-    public Location getLocation() {
-        return blockDisplay != null ? blockDisplay.getLocation() : null;
     }
 }
 
