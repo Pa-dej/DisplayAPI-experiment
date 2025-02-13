@@ -3,7 +3,6 @@ package me.padej.displayAPI.render.shapes;
 import me.padej.displayAPI.utils.ColorUtil;
 import org.bukkit.Color;
 import org.bukkit.Location;
-import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.TextDisplay;

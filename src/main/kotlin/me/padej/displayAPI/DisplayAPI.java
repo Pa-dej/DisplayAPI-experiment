@@ -11,6 +11,7 @@ import java.util.List;
 
 /*
 TODO:
+    Сделать CharDisplay
     Баги:
     - Точка вращения у left / right Rotation находится не в позиции, которую задает translation, а в минимальном углу
     Гизмо:
@@ -28,7 +29,8 @@ public class DisplayAPI extends JavaPlugin {
 //        getServer().getPluginManager().registerEvents(new TestEvent2(), this);
 //        getServer().getPluginManager().registerEvents(new TestEvent3(), this);
 //        getServer().getPluginManager().registerEvents(new TestEvent4(), this);
-        getServer().getPluginManager().registerEvents(new TestEvent5(), this);
+//        getServer().getPluginManager().registerEvents(new TestEvent5(), this);
+//        getServer().getPluginManager().registerEvents(new TestEvent6(), this);
 
         Highlight.removeAllSelections();
         Highlight.startColorUpdateTask();

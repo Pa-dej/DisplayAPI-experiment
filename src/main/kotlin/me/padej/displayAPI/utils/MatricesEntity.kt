@@ -1,7 +1,5 @@
 package me.padej.displayAPI.utils
 
-import me.padej.displayAPI.render.shapes.DefaultCube
-import org.bukkit.Location
 import org.bukkit.util.Transformation
 import org.bukkit.util.Vector
 import org.joml.Matrix4f
@@ -94,7 +92,7 @@ class MatricesEntity {
             val segmentLengthSquared = segment.lengthSquared()
             val dotProduct = pointVec.dot(segment)
 
-            return dotProduct >= 0 && dotProduct <= segmentLengthSquared
+            return dotProduct in 0.0..segmentLengthSquared.toDouble()
         }
     }
 }

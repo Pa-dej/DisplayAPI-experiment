@@ -5,8 +5,8 @@ import me.padej.displayAPI.render.shapes.DefaultCube;
 import me.padej.displayAPI.utils.AlignmentType;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.entity.BlockDisplay;
+import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -41,9 +41,10 @@ public class TestEvent3 implements Listener {
                     }
                 } else {
                     DefaultCube cube = new DefaultCube(0.25f,
-                            Material.EMERALD_BLOCK.createBlockData(),
+                            Material.SHROOMLIGHT.createBlockData(),
                             AlignmentType.CENTER) {};
                     cube.spawn(player.getLocation());
+                    cube.getBlockDisplay().setBrightness(new Display.Brightness(15, 15));
                     playerCubes.put(player, cube);
 
                     startOrbiting(player);

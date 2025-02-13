@@ -1,25 +1,20 @@
 package me.padej.displayAPI.render.particles;
 
-import me.padej.displayAPI.DisplayAPI;
 import me.padej.displayAPI.render.shapes.DefaultSquare;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
-import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
-import org.checkerframework.checker.units.qual.A;
-import org.joml.AxisAngle4f;
-import org.joml.Vector3f;
 
 import java.util.Random;
 
 import static me.padej.displayAPI.DisplayAPI.particles;
 
-public class ExampleParticle implements Particle {
+public class ExampleSquareParticle implements Particle {
     private int age;
     private static final Random random = new Random();
-    private static final int MIN_LIFE = 400;
-    private static final int MAX_LIFE = 600;
+    private static final int MIN_LIFE = 200;
+    private static final int MAX_LIFE = 300;
 
     private static final double GRAVITY_ACCELERATION = 0.002;
     private static final double AIR_DRAG_COEFFICIENT = 0.0015;
@@ -34,7 +29,7 @@ public class ExampleParticle implements Particle {
     private final DefaultSquare square;
     private final int maxAge;
 
-    public ExampleParticle(Location spawnLocation) {
+    public ExampleSquareParticle(Location spawnLocation) {
         this.age = 0;
         this.source = spawnLocation.clone();
         this.position = spawnLocation.clone();
@@ -43,8 +38,6 @@ public class ExampleParticle implements Particle {
         this.velocity = getInitialVelocity();
         this.square = new DefaultSquare(1.5f, getRandomColor(), 255, Display.Billboard.CENTER, false) {};
         square.spawn(spawnLocation);
-
-        particles.add(this);
     }
 
     private Vector getInitialVelocity() {
