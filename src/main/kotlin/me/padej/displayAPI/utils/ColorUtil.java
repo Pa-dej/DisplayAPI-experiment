@@ -21,7 +21,25 @@ public class ColorUtil {
                 {200, 173, 236},
                 {150, 112, 209},
                 {112, 224, 231},
-                {121, 180, 218},
+                {121, 180, 218}
+        };
+
+        int[] rgb = colors[new Random().nextInt(colors.length)];
+        return new java.awt.Color(rgb[0], rgb[1], rgb[2]); // Используем java.awt.Color
+    }
+
+    public static @NotNull java.awt.Color getRandomValentineRGBColor() {
+        int[][] colors = {
+                {139, 0, 0},
+                {171, 20, 21},
+                {201, 39, 28},
+                {212, 61, 50},
+                {220, 20, 60},
+                {252, 90, 159},
+                {253, 105, 147},
+                {255, 160, 180},
+                {253, 208, 213},
+                {255, 228, 232}
         };
 
         int[] rgb = colors[new Random().nextInt(colors.length)];

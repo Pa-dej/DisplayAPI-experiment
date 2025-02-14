@@ -25,12 +25,13 @@ public class DisplayAPI extends JavaPlugin {
 
     @Override
     public void onEnable() {
-//        getServer().getPluginManager().registerEvents(new TestEvent(), this);
-//        getServer().getPluginManager().registerEvents(new TestEvent2(), this);
-//        getServer().getPluginManager().registerEvents(new TestEvent3(), this);
-//        getServer().getPluginManager().registerEvents(new TestEvent4(), this);
-//        getServer().getPluginManager().registerEvents(new TestEvent5(), this);
-//        getServer().getPluginManager().registerEvents(new TestEvent6(), this);
+        getServer().getPluginManager().registerEvents(new TestEvent(), this);
+        getServer().getPluginManager().registerEvents(new TestEvent2(), this);
+        getServer().getPluginManager().registerEvents(new TestEvent3(), this);
+        getServer().getPluginManager().registerEvents(new TestEvent4(), this);
+        getServer().getPluginManager().registerEvents(new TestEvent5(), this);
+        getServer().getPluginManager().registerEvents(new TestEvent6(), this);
+        getServer().getPluginManager().registerEvents(new TestEvent7(), this);
 
         Highlight.removeAllSelections();
         Highlight.startColorUpdateTask();

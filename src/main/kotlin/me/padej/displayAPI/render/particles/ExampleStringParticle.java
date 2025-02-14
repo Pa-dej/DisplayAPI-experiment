@@ -1,14 +1,19 @@
 package me.padej.displayAPI.render.particles;
 
+import me.padej.displayAPI.DisplayAPI;
 import me.padej.displayAPI.render.shapes.DefaultSquare;
 import me.padej.displayAPI.render.shapes.StringRectangle;
+import me.padej.displayAPI.utils.Animation;
 import me.padej.displayAPI.utils.ColorUtil;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
+import org.joml.AxisAngle4f;
+import org.joml.Vector3f;
 
 import java.util.Random;
 
@@ -20,13 +25,13 @@ public class ExampleStringParticle implements Particle {
     private static final int MIN_LIFE = 200;
     private static final int MAX_LIFE = 300;
 
-    private static final double GRAVITY_ACCELERATION = 0.0015;
+    private static final double GRAVITY_ACCELERATION = 0.001;
     private static final double AIR_DRAG_COEFFICIENT = 0.0015;
-    private static final double SPEED_DAMPENING = 0.06;
+    private static final double SPEED_DAMPENING = 0.04;
     private static final double SWAY_AMPLITUDE = 0.005;
 
     private static final double MIN_SCALE = 0.5;
-    private static final double MAX_SCALE = 1.5;
+    private static float scale = (float) (random.nextDouble() + MIN_SCALE);
 
     private final Vector velocity;
     private final Location position;
@@ -44,13 +49,13 @@ public class ExampleStringParticle implements Particle {
 
         this.velocity = getInitialVelocity(player); // Используем скорость с разбросом
         this.square = new StringRectangle(
-                (float) (random.nextDouble() * (MAX_SCALE - MIN_SCALE) + MIN_SCALE), // Исправленная строка
+                0, // Исправленная строка
                 Color.BLACK, // background color
                 0, // background alpha
                 Display.Billboard.CENTER,
                 false,
                 getRandomColoredChar()
-        ) {};;
+        ) {};
         square.spawn(spawnLocation);
 
         square.getTextDisplay().setBrightness(new Display.Brightness(15, 15));
@@ -78,8 +83,19 @@ public class ExampleStringParticle implements Particle {
         return chars[random.nextInt(chars.length)];
     }
 
+    private String getValentineChar() {
+        String[] chars = {
+                "§l🥰", "§l😍", "§l😘", "§l💌", "§l💘",
+                "💝", "💖", "§l💗", "§l💓", "§l💞",
+                "§l💕", "§l💟", "❣", "❤", "§l🧡",
+                "§l💛", "§l💚", "§l💙", "§l🩵", "§l💜",
+                "§l🤎", "§l🖤", "§l🩶", "§l🤍", "❀",
+                "✿", "✦", "♥", "♡", "✯"};
+        return chars[random.nextInt(chars.length)];
+    }
+
     private String getRandomColoredChar() {
-        return ChatColor.of(ColorUtil.getRandomPartyPopperRGBColor()) + getRandomChar();
+        return ChatColor.of(ColorUtil.getRandomValentineRGBColor()) + getValentineChar();
     }
 
     @Override
@@ -92,16 +108,37 @@ public class ExampleStringParticle implements Particle {
         }
 
         // Первые 10 тиков с высокой скоростью
-        if (isRapidSpeed && age > 5) {
-            isRapidSpeed = false;  // После 10 тиков сбрасываем скорость на обычную
-            velocity.setX(velocity.getX() / 2).setY(velocity.getY() / 2).setZ(velocity.getZ() / 2);
+        if (isRapidSpeed && age > 1) {
+            isRapidSpeed = false;
+        }
+
+        if (age >= 10 && age <= 30) {
+            velocity.multiply(0.9);
+        }
+
+        if (age == 5) {
+            float scale = (float) (random.nextDouble() + MIN_SCALE);
+            Animation.applyTransformationWithInterpolation(square.getTextDisplay(), new Transformation(
+                    new Vector3f(),
+                    new AxisAngle4f(),
+                    new Vector3f(scale, scale, scale),
+                    new AxisAngle4f()
+            ), 5);
+        }
+
+        if (age == maxAge - 12) {
+            Animation.applyTransformationWithInterpolation(square.getTextDisplay(), new Transformation(
+                    new Vector3f(),
+                    new AxisAngle4f(),
+                    new Vector3f(0, 0, 0),
+                    new AxisAngle4f()
+            ), 5);
         }
 
         if (!position.clone().subtract(0, 0.1, 0).getBlock().getType().isSolid()) {
             velocity.setY(velocity.getY() - GRAVITY_ACCELERATION);
         } else {
             velocity.setX(0).setY(0).setZ(0);
-            age += 2;
             return;
         }
 

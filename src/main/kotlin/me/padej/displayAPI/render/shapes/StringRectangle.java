@@ -1,6 +1,5 @@
 package me.padej.displayAPI.render.shapes;
 
-import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
@@ -9,7 +8,7 @@ import org.bukkit.util.Transformation;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 
-public class StringRectangle extends DefaultSquare {
+public abstract class StringRectangle extends DefaultSquare {
     private String text;
 
     public StringRectangle(float scale, Color backgroundColor, int backgroundAlpha, Display.Billboard billboard, boolean ignoreCull, String text) {
