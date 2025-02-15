@@ -13,6 +13,7 @@ import org.bukkit.entity.TextDisplay;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
+import net.kyori.adventure.text.Component;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -265,7 +266,7 @@ public class Highlight {
                 new Vector3f(8f, 4f, 1f),
                 new AxisAngle4f()
         ));
-        textDisplay.setText(" ");
+        textDisplay.text(Component.text(" "));
         textDisplay.setBackgroundColor(currentColor);
         textDisplay.setBrightness(new Display.Brightness(15, 15));
         return textDisplay;

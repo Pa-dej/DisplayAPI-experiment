@@ -7,6 +7,7 @@ import org.bukkit.entity.TextDisplay;
 import org.bukkit.util.Transformation;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
+import net.kyori.adventure.text.Component;
 
 public abstract class StringRectangle extends DefaultSquare {
     private String text;
@@ -23,7 +24,7 @@ public abstract class StringRectangle extends DefaultSquare {
     public void setText(String text) {
         this.text = text;
         if (getTextDisplay() != null) {
-            getTextDisplay().setText(text);
+            getTextDisplay().text(Component.text(text));
         }
     }
 
@@ -31,7 +32,7 @@ public abstract class StringRectangle extends DefaultSquare {
     public TextDisplay spawn(Location spawnLocation) {
         TextDisplay display = super.spawn(spawnLocation);
         if (display != null) {
-            display.setText(text);
+            display.text(Component.text(text));
             display.setTransformation(new Transformation(
                     new Vector3f(-getScale() / 80f, -getScale() / 16f, 0), // 16 and 80 is const's. Idk. Mojang, why?
                     new AxisAngle4f(),

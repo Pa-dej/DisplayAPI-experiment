@@ -1,4 +1,4 @@
-package me.padej.displayAPI.event;
+package me.padej.displayAPI.test_events;
 
 import me.padej.displayAPI.render.particles.ExampleStringParticle;
 import org.bukkit.Location;
@@ -13,7 +13,7 @@ import org.bukkit.inventory.EquipmentSlot;
 
 import static me.padej.displayAPI.DisplayAPI.particles;
 
-public class TestEvent6 implements Listener {
+public class CreateDisplayParticleSecondTest implements Listener {
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
@@ -26,7 +26,7 @@ public class TestEvent6 implements Listener {
             Action action = event.getAction();
 
             if (action.isRightClick()) {
-                for (int i = 0; i < 300; i++) {
+                for (int i = 0; i < 40; i++) {
                     ExampleStringParticle particle = new ExampleStringParticle(player, spawnLocation); // Передаем игрока
                     particles.add(particle);
                 }

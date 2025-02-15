@@ -9,6 +9,7 @@ import org.bukkit.entity.TextDisplay;
 import org.bukkit.util.Transformation;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
+import net.kyori.adventure.text.Component;
 
 public abstract class DefaultSquare extends DefaultDisplay {
     private float scale;
@@ -88,7 +89,7 @@ public abstract class DefaultSquare extends DefaultDisplay {
         textDisplay = (TextDisplay) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.TEXT_DISPLAY);
         textDisplay.setRotation(0, 0);
         textDisplay.setBackgroundColor(ColorUtil.formARGBColor(backgroundAlpha, backgroundColor));
-        textDisplay.setText(" ");
+        textDisplay.text(Component.text(" "));
         textDisplay.setBillboard(billboard);
         textDisplay.setSeeThrough(ignoreCull);
         textDisplay.setTransformation(new Transformation(

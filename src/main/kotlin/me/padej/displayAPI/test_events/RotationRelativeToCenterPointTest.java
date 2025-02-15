@@ -1,4 +1,4 @@
-package me.padej.displayAPI.event;
+package me.padej.displayAPI.test_events;
 
 import me.padej.displayAPI.DisplayAPI;
 import me.padej.displayAPI.render.shapes.DefaultCube;
@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-public class TestEvent4 implements Listener {
+public class RotationRelativeToCenterPointTest implements Listener {
     private final Map<Player, DefaultCube> playerCubes = new HashMap<>();
     private final Map<Player, BukkitRunnable> playerTasks = new HashMap<>();
 

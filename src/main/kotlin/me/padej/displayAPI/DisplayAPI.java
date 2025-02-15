@@ -1,8 +1,8 @@
 package me.padej.displayAPI;
 
-import me.padej.displayAPI.event.*;
 import me.padej.displayAPI.render.particles.Particle;
 import me.padej.displayAPI.render.shapes.Highlight;
+import me.padej.displayAPI.test_events.SmoothMotionAndRotationTest;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -11,7 +11,6 @@ import java.util.List;
 
 /*
 TODO:
-    Сделать CharDisplay
     Баги:
     - Точка вращения у left / right Rotation находится не в позиции, которую задает translation, а в минимальном углу
     Гизмо:
@@ -25,13 +24,7 @@ public class DisplayAPI extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        getServer().getPluginManager().registerEvents(new TestEvent(), this);
-        getServer().getPluginManager().registerEvents(new TestEvent2(), this);
-        getServer().getPluginManager().registerEvents(new TestEvent3(), this);
-        getServer().getPluginManager().registerEvents(new TestEvent4(), this);
-        getServer().getPluginManager().registerEvents(new TestEvent5(), this);
-        getServer().getPluginManager().registerEvents(new TestEvent6(), this);
-        getServer().getPluginManager().registerEvents(new TestEvent7(), this);
+        getServer().getPluginManager().registerEvents(new SmoothMotionAndRotationTest(), this);
 
         Highlight.removeAllSelections();
         Highlight.startColorUpdateTask();

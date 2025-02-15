@@ -1,4 +1,4 @@
-package me.padej.displayAPI.event;
+package me.padej.displayAPI.test_events;
 
 import me.padej.displayAPI.render.particles.ExampleSquareParticle;
 import org.bukkit.Location;
@@ -12,7 +12,7 @@ import org.bukkit.inventory.EquipmentSlot;
 
 import static me.padej.displayAPI.DisplayAPI.particles;
 
-public class TestEvent5 implements Listener {
+public class CreateDisplayParticleFirstTest implements Listener {
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {

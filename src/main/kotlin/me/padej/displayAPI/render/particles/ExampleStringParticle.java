@@ -1,6 +1,5 @@
 package me.padej.displayAPI.render.particles;
 
-import me.padej.displayAPI.DisplayAPI;
 import me.padej.displayAPI.render.shapes.DefaultSquare;
 import me.padej.displayAPI.render.shapes.StringRectangle;
 import me.padej.displayAPI.utils.Animation;
@@ -31,7 +30,6 @@ public class ExampleStringParticle implements Particle {
     private static final double SWAY_AMPLITUDE = 0.005;
 
     private static final double MIN_SCALE = 0.5;
-    private static float scale = (float) (random.nextDouble() + MIN_SCALE);
 
     private final Vector velocity;
     private final Location position;

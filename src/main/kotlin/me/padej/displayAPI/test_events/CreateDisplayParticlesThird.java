@@ -1,4 +1,4 @@
-package me.padej.displayAPI.event;
+package me.padej.displayAPI.test_events;
 
 import me.padej.displayAPI.DisplayAPI;
 import me.padej.displayAPI.render.particles.PoisonParticle;
@@ -16,7 +16,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TestEvent7  implements Listener {
+public class CreateDisplayParticlesThird implements Listener {
     private final Map<Player, StringRectangle> playerCubes = new HashMap<>();
 
     @EventHandler

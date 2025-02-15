@@ -1,8 +1,9 @@
-package me.padej.displayAPI.event;
+package me.padej.displayAPI.test_events;
 
 import me.padej.displayAPI.DisplayAPI;
 import me.padej.displayAPI.render.shapes.DefaultCube;
 import me.padej.displayAPI.utils.AlignmentType;
+import me.padej.displayAPI.utils.Animation;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.BlockDisplay;
@@ -15,13 +16,14 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
+import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-public class TestEvent3 implements Listener {
+public class SmoothMotionAndRotationTest implements Listener {
     private final Map<Player, DefaultCube> playerCubes = new HashMap<>();
     private final Map<Player, BukkitRunnable> playerTasks = new HashMap<>();
 
@@ -40,7 +42,7 @@ public class TestEvent3 implements Listener {
                         stopOrbiting(player);
                     }
                 } else {
-                    DefaultCube cube = new DefaultCube(0.25f,
+                    DefaultCube cube = new DefaultCube(0.375f,
                             Material.SHROOMLIGHT.createBlockData(),
                             AlignmentType.CENTER) {};
                     cube.spawn(player.getLocation());
@@ -54,9 +56,11 @@ public class TestEvent3 implements Listener {
     }
 
     private void startOrbiting(Player player) {
-        final double radius = 1;  // Радиус орбиты
-        final double speed = 0.09; // Скорость вращения
-        final float rotationSpeed = 0.035f; // Скорость вращения вокруг осей
+        final double radius = 0;  // Радиус орбиты
+        final double speed = 0.05; // Скорость вращения
+        final float rotationSpeed = 0.05f; // Скорость вращения вокруг осей
+
+        Location center = player.getLocation().add(0, player.getHeight() / 2, 0);
 
         BukkitRunnable task = new BukkitRunnable() {
             private double angle = 0;
@@ -70,7 +74,7 @@ public class TestEvent3 implements Listener {
                     return;
                 }
 
-                Location center = player.getLocation().add(0, player.getHeight() / 2, 0); // Центр вращения — над головой игрока
+//                Location center = player.getLocation().add(0, player.getHeight() / 2, 0); // Центр вращения — над головой игрока
                 double x = center.getX() + radius * Math.cos(angle);
                 double z = center.getZ() + radius * Math.sin(angle);
                 double y = center.getY();
@@ -89,12 +93,12 @@ public class TestEvent3 implements Listener {
                         Quaternionf leftRotation = new Quaternionf().rotateXYZ(rotationAngle, rotationAngle * 0.5f, rotationAngle * 1.5f);
                         Quaternionf rightRotation = new Quaternionf().rotateXYZ(-rotationAngle * 1.5f, -rotationAngle, -rotationAngle * 0.5f);
 
-                        blockDisplay.setTransformation(new Transformation(
+                        Animation.applyTransformationWithInterpolation(blockDisplay, new Transformation(
                                 cube.getTransformation().getTranslation(),
                                 leftRotation,
                                 cube.getTransformation().getScale(),
-                                rightRotation
-                        ));
+                                rightRotation)
+                        );
                     }
                 }
 
