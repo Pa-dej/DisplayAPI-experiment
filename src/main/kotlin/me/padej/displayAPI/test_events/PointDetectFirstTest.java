@@ -3,8 +3,7 @@ package me.padej.displayAPI.test_events;
 import me.padej.displayAPI.DisplayAPI;
 import me.padej.displayAPI.render.shapes.DefaultCube;
 import me.padej.displayAPI.utils.AlignmentType;
-import me.padej.displayAPI.utils.Segment;
-import me.padej.displayAPI.utils.VertexUtil;
+import me.padej.displayAPI.utils.PointDetection;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.BlockDisplay;
@@ -15,6 +14,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,44 +38,43 @@ public class PointDetectFirstTest implements Listener {
 
                     if (removedDisplay == null) {
                         playerCubes.remove(player);
-                        // Останавливаем задачу для игрока
                         stopPlayerTask(player);
                     }
                 } else {
-                    DefaultCube cube = new DefaultCube(1 + 1e-3f,
+                    DefaultCube cube = new DefaultCube(1,
                             Material.WHITE_STAINED_GLASS.createBlockData(),
-                            AlignmentType.BOTTOM) {};
+                            AlignmentType.CENTER) {};
                     cube.spawn(spawnLocation);
                     playerCubes.put(player, cube);
 
-                    startPlayerTask(player, cube);
+                    startPlayerTask(player, cube, player);
                 }
             }
         }
     }
 
-    private void startPlayerTask(Player player, DefaultCube cube) {
+    private void startPlayerTask(Player player, DefaultCube cube, Player viewer) {
         BukkitRunnable task = new BukkitRunnable() {
             @Override
             public void run() {
-                Location pointA = player.getEyeLocation(); // Местоположение глаз игрока
-                Location pointB = pointA.clone().add(player.getLocation().getDirection().multiply(6));
-                Location[] cubeVertexes = VertexUtil.getCubeVertexes(cube);
-                boolean isCubeInSight = VertexUtil.doesSegmentIntersectArea(new Segment(pointA, pointB), cubeVertexes);
-
                 if (cube.getBlockDisplay() == null) return;
-                cube.getBlockDisplay().setBlock(isCubeInSight ? Material.RED_STAINED_GLASS.createBlockData() : Material.WHITE_STAINED_GLASS.createBlockData());
+
+                Vector eye = viewer.getEyeLocation().toVector();
+                Vector direction = viewer.getEyeLocation().getDirection();
+                Vector point = cube.getBlockDisplay().getLocation().toVector();
+                boolean isDetect = PointDetection.lookingAtPoint(eye, direction, point, .55);
+
+                cube.getBlockDisplay().setBlock(isDetect ? Material.RED_STAINED_GLASS.createBlockData() : Material.WHITE_STAINED_GLASS.createBlockData());
             }
         };
         task.runTaskTimer(DisplayAPI.getInstance(), 0, 1);
         playerTasks.put(player, task);
     }
 
-    // Метод для остановки задачи для игрока
     private void stopPlayerTask(Player player) {
         BukkitRunnable task = playerTasks.get(player);
         if (task != null) {
-            task.cancel(); // Останавливаем задачу
+            task.cancel();
             playerTasks.remove(player);
         }
     }
