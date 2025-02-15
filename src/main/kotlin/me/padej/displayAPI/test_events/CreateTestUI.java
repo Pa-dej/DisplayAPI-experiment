@@ -2,12 +2,8 @@ package me.padej.displayAPI.test_events;
 
 import me.padej.displayAPI.DisplayAPI;
 import me.padej.displayAPI.ui.Screen;
-import me.padej.displayAPI.ui.widgets.TextDisplayConfig;
-import me.padej.displayAPI.ui.widgets.WidgetConfig;
 import me.padej.displayAPI.utils.Animation;
 import me.padej.displayAPI.utils.ItemUtil;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -16,11 +12,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Transformation;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
-import java.awt.Color;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -57,8 +51,12 @@ public class CreateTestUI implements Listener {
                 " ",
                 0.1f
             );
-            
-            Bukkit.getScheduler().runTaskLater(DisplayAPI.getPlugin(DisplayAPI.class), () -> {
+
+            Bukkit.getScheduler().runTaskLater(DisplayAPI.getInstance(), () -> {
+                if (screen.getTextDisplay() == null) {
+                    return; // Не выполняем анимацию, если TextDisplay не создан
+                }
+
                 Animation.applyTransformationWithInterpolation(screen.getTextDisplay(), new Transformation(
                         new Vector3f(0, 0, 0),
                         new AxisAngle4f(),
@@ -69,14 +67,13 @@ public class CreateTestUI implements Listener {
                 screen.setOnClose(() -> playerScreens.remove(player));
                 screen.setupDefaultWidgets(player);
             }, 2);
-            
+
             playerScreens.put(player, screen);
             
             // Запускаем задачу обновления состояния кнопки
-            Bukkit.getScheduler().runTaskTimer(DisplayAPI.getPlugin(DisplayAPI.class), () -> {
-                if (playerScreens.containsKey(player)) {
-                    screen.update();
-                }
+            Bukkit.getScheduler().runTaskTimer(DisplayAPI.getInstance(), () -> {
+                if (!playerScreens.containsKey(player)) return;
+                screen.update();
             }, 0, 1);
         }
     }
