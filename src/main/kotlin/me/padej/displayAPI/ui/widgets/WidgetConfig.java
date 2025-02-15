@@ -2,6 +2,7 @@ package me.padej.displayAPI.ui.widgets;
 
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
+import org.bukkit.entity.ItemDisplay;
 
 public class WidgetConfig {
     private Material material;
@@ -11,6 +12,7 @@ public class WidgetConfig {
     private int tooltipDelay;
     private boolean hasTooltip;
     private WidgetPosition position;
+    private ItemDisplay.ItemDisplayTransform displayTransform = ItemDisplay.ItemDisplayTransform.NONE;
 
     public WidgetConfig(Material material, Runnable onClick) {
         this.material = material;
@@ -40,6 +42,11 @@ public class WidgetConfig {
         return this;
     }
 
+    public WidgetConfig setDisplayTransform(ItemDisplay.ItemDisplayTransform transform) {
+        this.displayTransform = transform;
+        return this;
+    }
+
     public Material getMaterial() {
         return material;
     }
@@ -66,5 +73,9 @@ public class WidgetConfig {
 
     public WidgetPosition getPosition() {
         return position;
+    }
+
+    public ItemDisplay.ItemDisplayTransform getDisplayTransform() {
+        return displayTransform;
     }
 } 

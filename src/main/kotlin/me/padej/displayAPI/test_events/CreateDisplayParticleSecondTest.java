@@ -1,6 +1,7 @@
 package me.padej.displayAPI.test_events;
 
 import me.padej.displayAPI.render.particles.ExampleStringParticle;
+import me.padej.displayAPI.utils.ItemUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -9,7 +10,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EquipmentSlot;
 
 import static me.padej.displayAPI.DisplayAPI.particles;
 
@@ -17,8 +17,8 @@ public class CreateDisplayParticleSecondTest implements Listener {
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if (event.getHand() == EquipmentSlot.HAND && event.getItem() != null && event.getItem().getType() == Material.PINK_DYE) {
-            Player player = event.getPlayer();
+        Player player = event.getPlayer();
+        if (player.getInventory().getItemInMainHand().getType() == Material.PINK_DYE && ItemUtil.isExperimental(player.getInventory().getItemInMainHand())) {
             Location eventLocation = event.getInteractionPoint();
             Location spawnLocation = (eventLocation != null)
                     ? eventLocation

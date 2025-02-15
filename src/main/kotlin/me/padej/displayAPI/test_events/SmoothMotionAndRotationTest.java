@@ -4,6 +4,7 @@ import me.padej.displayAPI.DisplayAPI;
 import me.padej.displayAPI.render.shapes.DefaultCube;
 import me.padej.displayAPI.utils.AlignmentType;
 import me.padej.displayAPI.utils.Animation;
+import me.padej.displayAPI.utils.ItemUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.BlockDisplay;
@@ -29,8 +30,8 @@ public class SmoothMotionAndRotationTest implements Listener {
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if (event.getHand() == EquipmentSlot.HAND && event.getItem() != null && event.getItem().getType() == Material.IRON_NUGGET) {
-            Player player = event.getPlayer();
+        Player player = event.getPlayer();
+        if (player.getInventory().getItemInMainHand().getType() == Material.IRON_NUGGET && ItemUtil.isExperimental(player.getInventory().getItemInMainHand())) {
             Action action = event.getAction();
             if (action.isRightClick()) {
                 if (playerCubes.containsKey(player)) {

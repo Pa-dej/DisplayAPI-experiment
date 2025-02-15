@@ -4,6 +4,7 @@ import me.padej.displayAPI.DisplayAPI;
 import me.padej.displayAPI.render.shapes.DefaultCube;
 import me.padej.displayAPI.utils.AlignmentType;
 import me.padej.displayAPI.utils.Animation;
+import me.padej.displayAPI.utils.ItemUtil;
 import me.padej.displayAPI.utils.PointDetection;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -52,7 +53,7 @@ public class GizmoTest implements Listener {
         if (event.getHand() != EquipmentSlot.HAND) return;
         
         Player player = event.getPlayer();
-        if (player.getInventory().getItemInMainHand().getType() != Material.CLAY_BALL) return;
+        if (!(player.getInventory().getItemInMainHand().getType() == Material.CLAY_BALL && ItemUtil.isExperimental(player.getInventory().getItemInMainHand()))) return;
 
         // Если у игрока уже есть гизмо, удаляем их
         if (playerGizmos.containsKey(player)) {

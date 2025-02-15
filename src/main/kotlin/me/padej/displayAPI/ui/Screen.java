@@ -7,6 +7,7 @@ import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
+import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.util.Vector;
@@ -24,10 +25,10 @@ public class Screen extends WidgetManager {
 
     private TextDisplayButtonWidget followButton;
     private TextDisplayButtonWidget saveButton;
-
+    
     public Screen(Player viewer, Location location, String text, float scale) {
         super(viewer, location);
-
+        
         // Создаем текстовый дисплей
         this.display = new StringRectangle(
                 scale,
@@ -37,10 +38,10 @@ public class Screen extends WidgetManager {
                 false,
                 text
         ) {};
-
+        
         spawn();
     }
-
+    
     private void spawn() {
         if (display != null) {
             TextDisplay textDisplay = display.spawn(location);
@@ -48,19 +49,37 @@ public class Screen extends WidgetManager {
                 textDisplay.setBrightness(new Display.Brightness(15, 15));
                 textDisplay.setVisibleByDefault(false); // Делаем невидимым по умолчанию
                 viewer.showEntity(DisplayAPI.getInstance(), textDisplay); // Показываем только создателю
-
+                
                 // Поворачиваем дисплей к игроку при создании
                 Location viewerLoc = viewer.getEyeLocation();
                 textDisplay.lookAt(viewerLoc.getX(), viewerLoc.getY(), viewerLoc.getZ(), LookAnchor.EYES);
             }
         }
     }
-
+    
     @Override
     public void remove() {
         if (isSaved && !isPlayerInSavedRange()) {
             return; // Блокируем удаление если активно сохранение и игрок далеко
         }
+
+        // Сбрасываем режимы перед удалением
+        isFollowing = false;
+        isSaved = false;
+        relativePosition = null;
+        savedPosition = null;
+
+        // Сбрасываем подсветку кнопок
+        if (followButton != null) {
+            followButton.getDisplay().setGlowing(false);
+        }
+        if (saveButton != null) {
+            saveButton.getDisplay().setGlowing(false);
+        }
+
+        // Возвращаем стандартный цвет фона
+        updateBackgroundColor(null);
+
         super.remove();
         if (display != null) {
             display.removeEntity();
@@ -137,49 +156,61 @@ public class Screen extends WidgetManager {
     }
 
     public void setupDefaultWidgets(Player player) {
-        // Предметные кнопки с красителями
-        createColorDyeButtons(player);
+        // Кнопки смены режима игры
+        createGamemodeButtons(player);
 
-        // Кнопка закрытия в виде кружка
+        // Кнопки управления в заголовке
         createTitleBarControlWidgets();
     }
 
-    private void createColorDyeButtons(Player player) {
-        WidgetPosition basePosition = new WidgetPosition(-0.44f, 0.92f);
-        float step = 0.22f;
+    private void createGamemodeButtons(Player player) {
+        WidgetPosition basePosition = new WidgetPosition(-0.42f, 0.3f);
+        float step = 0.15f;
 
         WidgetConfig[] itemButtons = {
-                new WidgetConfig(Material.RED_DYE, () -> {
-                    player.sendMessage("Красный краситель");
-                })
-                        .setTooltip("красный")
-                        .setTooltipDelay(10)
-                        .setPosition(basePosition.clone()),
+            new WidgetConfig(Material.GRASS_BLOCK, () -> {
+                player.performCommand("gamemode creative");
+                // Звук смены режима на креатив
+                player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1.5f);
+            })
+            .setTooltip("Творческий")
+            .setTooltipDelay(10)
+            .setPosition(basePosition.clone())
+            .setDisplayTransform(ItemDisplay.ItemDisplayTransform.GUI),
 
-                new WidgetConfig(Material.ORANGE_DYE, () -> {
-                    player.sendMessage("Оранжевый краситель");
-                })
-                        .setTooltip("оранжевый")
-                        .setTooltipDelay(10)
-                        .setPosition(basePosition.clone().addHorizontal(step)),
+            new WidgetConfig(Material.IRON_SWORD, () -> {
+                player.performCommand("gamemode survival");
+                // Звук смены режима на выживание
+                player.playSound(player.getLocation(), org.bukkit.Sound.ITEM_ARMOR_EQUIP_IRON, 0.5f, 1.0f);
+            })
+            .setTooltip("Выживание")
+            .setTooltipDelay(10)
+            .setPosition(basePosition.clone().addVertical(step)),
 
-                new WidgetConfig(Material.YELLOW_DYE, () -> {
-                    player.sendMessage("Желтый краситель");
-                })
-                        .setTooltip("желтый")
-                        .setTooltipDelay(10)
-                        .setPosition(basePosition.clone().addHorizontal(step * 2)),
+            new WidgetConfig(Material.FILLED_MAP, () -> {
+                player.performCommand("gamemode adventure");
+                // Звук смены режима на приключение
+                player.playSound(player.getLocation(), org.bukkit.Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1.0f);
+            })
+            .setTooltip("Приключение")
+            .setTooltipDelay(10)
+            .setPosition(basePosition.clone().addVertical(step * 2)),
 
-                new WidgetConfig(Material.LIME_DYE, () -> {
-                    player.sendMessage("Лаймовый краситель");
-                })
-                        .setTooltip("лаймовый")
-                        .setTooltipDelay(10)
-                        .setPosition(basePosition.clone().addHorizontal(step * 3))
+            new WidgetConfig(Material.ENDER_EYE, () -> {
+                player.performCommand("gamemode spectator");
+                // Звук смены режима на наблюдателя
+                player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_ENDERMAN_TELEPORT, 0.3f, 1.5f);
+            })
+            .setTooltip("Наблюдатель")
+            .setTooltipDelay(10)
+            .setPosition(basePosition.clone().addVertical(step * 3))
         };
 
         for (WidgetConfig config : itemButtons) {
-            createWidget(config);
+            ItemDisplayButtonWidget widget = createWidget(config);
+            if (config.getDisplayTransform() != ItemDisplay.ItemDisplayTransform.NONE) {
+                widget.setDisplayTransform(config.getDisplayTransform());
+            }
         }
     }
 
@@ -232,19 +263,23 @@ public class Screen extends WidgetManager {
             isSaved = false;
             savedPosition = null;
             saveButton.getDisplay().setGlowing(false);
-            updateBackgroundColor(null); // Сбрасываем цвет фона
+            updateBackgroundColor(null);
         }
-
+        
         isFollowing = !isFollowing;
         followButton.getDisplay().setGlowing(isFollowing);
-
+        
         if (isFollowing) {
             Vector playerPos = viewer.getLocation().toVector();
             Vector displayPos = location.toVector();
             relativePosition = displayPos.subtract(playerPos);
-            updateBackgroundColor("#f9c22b"); // Оранжевый цвет для режима следования
+            updateBackgroundColor("#f9c22b");
+            // Звук активации следования
+            viewer.playSound(viewer.getLocation(), org.bukkit.Sound.BLOCK_NOTE_BLOCK_PLING, 0.5f, 2.0f);
         } else {
-            updateBackgroundColor(null); // Сбрасываем цвет фона при отключении
+            updateBackgroundColor(null);
+            // Звук деактивации следования
+            viewer.playSound(viewer.getLocation(), org.bukkit.Sound.BLOCK_NOTE_BLOCK_PLING, 0.5f, 0.5f);
         }
     }
 
@@ -253,17 +288,21 @@ public class Screen extends WidgetManager {
             isFollowing = false;
             relativePosition = null;
             followButton.getDisplay().setGlowing(false);
-            updateBackgroundColor(null); // Сбрасываем цвет фона
+            updateBackgroundColor(null);
         }
-
+        
         isSaved = !isSaved;
         saveButton.getDisplay().setGlowing(isSaved);
-
+        
         if (isSaved) {
             savedPosition = location.toVector();
-            updateBackgroundColor("#29e64d"); // Зеленый цвет для режима сохранения
+            updateBackgroundColor("#29e64d");
+            // Звук активации сохранения
+            viewer.playSound(viewer.getLocation(), org.bukkit.Sound.BLOCK_ANVIL_USE, 0.5f, 2.0f);
         } else {
-            updateBackgroundColor(null); // Сбрасываем цвет фона при отключении
+            updateBackgroundColor(null);
+            // Звук деактивации сохранения
+            viewer.playSound(viewer.getLocation(), org.bukkit.Sound.BLOCK_ANVIL_LAND, 0.3f, 1.5f);
         }
     }
 
@@ -287,14 +326,16 @@ public class Screen extends WidgetManager {
     }
 
     private void tryClose() {
-        if (isSaved) return;
-        if (isPlayerInSavedRange()) {
+        if (!isSaved || isPlayerInSavedRange()) {
+            // Звук успешного закрытия
+            viewer.playSound(viewer.getLocation(), org.bukkit.Sound.BLOCK_WOODEN_DOOR_CLOSE, 0.5f, 1.0f);
             this.remove();
             if (onClose != null) onClose.run();
         } else {
-            // Отправляем сообщение игроку, что нужно вернуться к сохраненной позиции
+            // Звук ошибки при попытке закрыть
+            viewer.playSound(viewer.getLocation(), org.bukkit.Sound.ENTITY_VILLAGER_NO, 0.5f, 1.0f);
             viewer.sendMessage(Component.text("Вернитесь к сохраненной позиции для закрытия!")
-                    .color(TextColor.fromHexString("#ef2142")));
+                .color(TextColor.fromHexString("#ef2142")));
         }
     }
 

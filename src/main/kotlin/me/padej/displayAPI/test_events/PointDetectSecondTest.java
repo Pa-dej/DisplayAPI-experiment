@@ -4,6 +4,7 @@ import me.padej.displayAPI.DisplayAPI;
 import me.padej.displayAPI.render.shapes.DefaultCube;
 import me.padej.displayAPI.utils.AlignmentType;
 import me.padej.displayAPI.utils.Animation;
+import me.padej.displayAPI.utils.ItemUtil;
 import me.padej.displayAPI.utils.PointDetection;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -64,8 +65,7 @@ public class PointDetectSecondTest implements Listener {
             return;
         }
 
-        if (event.getHand() == EquipmentSlot.HAND && event.getItem() != null &&
-            event.getItem().getType() == Material.SPECTRAL_ARROW && action.isRightClick()) {
+        if (player.getInventory().getItemInMainHand().getType() == Material.SPECTRAL_ARROW && ItemUtil.isExperimental(player.getInventory().getItemInMainHand()) && action.isRightClick()) {
 
             if (spawnLocation == null) return;
 

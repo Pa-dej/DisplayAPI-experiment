@@ -5,6 +5,7 @@ import me.padej.displayAPI.ui.Screen;
 import me.padej.displayAPI.ui.widgets.TextDisplayConfig;
 import me.padej.displayAPI.ui.widgets.WidgetConfig;
 import me.padej.displayAPI.utils.Animation;
+import me.padej.displayAPI.utils.ItemUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
@@ -30,7 +31,6 @@ public class CreateTestUI implements Listener {
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        ItemStack item = event.getItem();
 
         if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
             Screen screen = playerScreens.get(player);
@@ -44,7 +44,7 @@ public class CreateTestUI implements Listener {
             return;
         }
 
-        if (item != null && item.getType() == Material.BLUE_DYE && event.getAction().isRightClick()) {
+        if (player.getInventory().getItemInMainHand().getType() == Material.BLUE_DYE && ItemUtil.isExperimental(player.getInventory().getItemInMainHand()) && event.getAction().isRightClick()) {
             // Удаляем предыдущий экран, если он существует
             if (playerScreens.containsKey(player)) {
                 playerScreens.get(player).remove();

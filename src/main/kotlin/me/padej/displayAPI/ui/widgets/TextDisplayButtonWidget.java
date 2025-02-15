@@ -6,6 +6,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.entity.Player;
@@ -149,6 +150,8 @@ public class TextDisplayButtonWidget implements Widget {
     
     public void handleClick() {
         if (isHovered) {
+            // Проигрываем звук клика
+            viewer.playSound(viewer.getLocation(), Sound.BLOCK_DISPENSER_FAIL, 0.5f, 2.0f);
             onClick.run();
         }
     }

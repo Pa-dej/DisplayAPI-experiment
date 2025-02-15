@@ -3,6 +3,7 @@ package me.padej.displayAPI.test_events;
 import me.padej.displayAPI.DisplayAPI;
 import me.padej.displayAPI.render.shapes.DefaultCube;
 import me.padej.displayAPI.utils.AlignmentType;
+import me.padej.displayAPI.utils.ItemUtil;
 import me.padej.displayAPI.utils.PointDetection;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -25,8 +26,8 @@ public class PointDetectFirstTest implements Listener {
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if (event.getHand() == EquipmentSlot.HAND && event.getItem() != null && event.getItem().getType() == Material.SPECTRAL_ARROW) {
-            Player player = event.getPlayer();
+        Player player = event.getPlayer();
+        if (player.getInventory().getItemInMainHand().getType() == Material.SPECTRAL_ARROW && ItemUtil.isExperimental(player.getInventory().getItemInMainHand())) {
             Location spawnLocation = event.getInteractionPoint();
             Action action = event.getAction();
             if (spawnLocation == null) return;

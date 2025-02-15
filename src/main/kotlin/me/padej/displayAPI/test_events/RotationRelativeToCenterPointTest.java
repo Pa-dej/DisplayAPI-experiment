@@ -3,6 +3,7 @@ package me.padej.displayAPI.test_events;
 import me.padej.displayAPI.DisplayAPI;
 import me.padej.displayAPI.render.shapes.DefaultCube;
 import me.padej.displayAPI.utils.AlignmentType;
+import me.padej.displayAPI.utils.ItemUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.BlockDisplay;
@@ -27,8 +28,8 @@ public class RotationRelativeToCenterPointTest implements Listener {
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if (event.getHand() == EquipmentSlot.HAND && event.getItem() != null && event.getItem().getType() == Material.IRON_INGOT) {
-            Player player = event.getPlayer();
+        Player player = event.getPlayer();
+        if (player.getInventory().getItemInMainHand().getType() == Material.IRON_INGOT && ItemUtil.isExperimental(player.getInventory().getItemInMainHand())) {
             Location spawnLocation = event.getInteractionPoint();
             Action action = event.getAction();
             if (spawnLocation == null) return;

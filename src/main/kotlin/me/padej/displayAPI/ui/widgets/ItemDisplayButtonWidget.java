@@ -30,9 +30,10 @@ public class ItemDisplayButtonWidget implements Widget {
     private TextColor tooltipColor = TextColor.fromHexString("#fcd720"); // Цвет по умолчанию
     private float scaleX = .15f;
     private float scaleY = .15f;
-    private float scaleZ = .01f;
+    private float scaleZ = 1e-6f;
     private double tolerance = 0.06;
     private WidgetPosition position;
+    private ItemDisplay.ItemDisplayTransform displayTransform = ItemDisplay.ItemDisplayTransform.NONE;
     
     private ItemDisplayButtonWidget() {} // Приватный конструктор
     
@@ -51,7 +52,8 @@ public class ItemDisplayButtonWidget implements Widget {
         
         display.setItemStack(new ItemStack(itemType));
         display.setBrightness(new Display.Brightness(15, 15));
-        display.setTransformationMatrix(new Matrix4f().scale(scaleX, scaleY, scaleZ));
+        display.setTransformationMatrix(new Matrix4f().translate(0, 0, -0.001f).scale(scaleX, scaleY, scaleZ));
+        display.setItemDisplayTransform(displayTransform);
         
         // Настройка длительности анимаций
         display.setInterpolationDuration(1);
@@ -129,6 +131,8 @@ public class ItemDisplayButtonWidget implements Widget {
     
     public void handleClick() {
         if (isHovered) {
+            // Проигрываем звук клика
+            viewer.playSound(viewer.getLocation(), org.bukkit.Sound.UI_BUTTON_CLICK, 0.5f, 1.0f);
             onClick.run();
         }
     }
@@ -167,5 +171,13 @@ public class ItemDisplayButtonWidget implements Widget {
     
     public void setPosition(WidgetPosition position) {
         this.position = position;
+    }
+    
+    public ItemDisplayButtonWidget setDisplayTransform(ItemDisplay.ItemDisplayTransform transform) {
+        this.displayTransform = transform;
+        if (display != null) {
+            display.setItemDisplayTransform(transform);
+        }
+        return this;
     }
 }

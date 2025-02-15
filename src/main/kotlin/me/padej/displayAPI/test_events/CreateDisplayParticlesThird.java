@@ -3,6 +3,7 @@ package me.padej.displayAPI.test_events;
 import me.padej.displayAPI.DisplayAPI;
 import me.padej.displayAPI.render.particles.PoisonParticle;
 import me.padej.displayAPI.render.shapes.StringRectangle;
+import me.padej.displayAPI.utils.ItemUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -21,8 +22,8 @@ public class CreateDisplayParticlesThird implements Listener {
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if (event.getHand() == EquipmentSlot.HAND && event.getItem() != null && event.getItem().getType() == Material.TURTLE_SCUTE) {
-            Player player = event.getPlayer();
+        Player player = event.getPlayer();
+        if (player.getInventory().getItemInMainHand().getType() == Material.TURTLE_SCUTE && ItemUtil.isExperimental(player.getInventory().getItemInMainHand())) {
             Location spawnLocation = event.getInteractionPoint();
             Action action = event.getAction();
             if (spawnLocation == null) return;
