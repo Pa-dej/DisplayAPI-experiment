@@ -22,12 +22,11 @@ import java.util.Map;
 
 import me.padej.displayAPI.api.events.DisplayClickEvent;
 import me.padej.displayAPI.ui.widgets.Widget;
+import me.padej.displayAPI.ui.UIManager;
 
 public class CreateTestUI implements Listener {
-    private final Map<Player, Screen> playerScreens = new HashMap<>();
     private static boolean wasInSettingsScreen = false;
 
-    // Добавляем сеттер для wasInSettingsScreen
     public static void setWasInSettingsScreen(boolean value) {
         wasInSettingsScreen = value;
     }
@@ -36,24 +35,17 @@ public class CreateTestUI implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
 
-        if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
-            Screen screen = playerScreens.get(player);
-            if (screen != null) {
-                if (screen.isLookingAtWidget()) {
-                    event.setCancelled(true);
-                    screen.handleClick();
-                }
-            }
-            return;
-        }
-
         if (player.getInventory().getItemInMainHand().getType() == Material.BLUE_DYE && 
             ItemUtil.isExperimental(player.getInventory().getItemInMainHand()) && 
             event.getAction().isRightClick()) {
             
-            // Удаляем предыдущий экран, если он существует
-            if (playerScreens.containsKey(player)) {
-                playerScreens.get(player).remove();
+            // Сохраняем состояние предыдущего экрана
+            wasInSettingsScreen = ChangeScreen.isSettingsScreen();
+            
+            // Получаем текущий экран из UIManager
+            Screen currentScreen = UIManager.getInstance().getActiveScreen(player);
+            if (currentScreen != null) {
+                currentScreen.remove();
             }
 
             Screen screen = new Screen(
@@ -79,35 +71,29 @@ public class CreateTestUI implements Listener {
                     5
                 );
 
-                screen.setOnClose(() -> playerScreens.remove(player));
+                screen.setOnClose(() -> UIManager.getInstance().unregisterScreen(player));
                 screen.setupDefaultWidgets(player);
                 
-                // Если предыдущий экран был экраном настроек, открываем его снова
                 if (wasInSettingsScreen) {
                     new ChangeScreen(screen).changeToSettingsScreen(player);
                 }
             }, 2);
 
-            playerScreens.put(player, screen);
-            
-            Bukkit.getScheduler().runTaskTimer(DisplayAPI.getInstance(), () -> {
-                if (playerScreens.containsKey(player)) {
-                    screen.update();
-                }
-            }, 0, 1);
+            // Регистрируем экран в UIManager
+            UIManager.getInstance().registerScreen(player, screen);
         }
     }
     
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-        Screen screen = playerScreens.get(player);
+        Screen screen = UIManager.getInstance().getActiveScreen(player);
         
         if (screen != null) {
             if (Screen.isSaved) return;
             if (!screen.isPlayerInRange()) {
                 screen.remove();
-                playerScreens.remove(player);
+                UIManager.getInstance().unregisterScreen(player);
             } else {
                 screen.updatePosition();
             }

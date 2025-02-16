@@ -3,6 +3,7 @@ package me.padej.displayAPI;
 import me.padej.displayAPI.render.particles.Particle;
 import me.padej.displayAPI.render.shapes.Highlight;
 import me.padej.displayAPI.test_events.*;
+import me.padej.displayAPI.ui.UIManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -16,6 +17,10 @@ public class DisplayAPI extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        // Инициализируем UIManager
+        UIManager.getInstance();
+
+        // Регистрируем остальные слушатели
         getServer().getPluginManager().registerEvents(new ApplyHighlightToBlockTest(), this);
         getServer().getPluginManager().registerEvents(new CreateDisplayParticleFirstTest(), this);
         getServer().getPluginManager().registerEvents(new CreateDisplayParticleSecondTest(), this);
@@ -30,6 +35,20 @@ public class DisplayAPI extends JavaPlugin {
         Highlight.removeAllSelections();
         Highlight.startColorUpdateTask();
         startParticleTask();
+    }
+
+    @Override
+    public void onDisable() {
+        // Очищаем все активные UI элементы
+        UIManager manager = UIManager.getInstance();
+        if (manager.hasActiveScreens()) {
+            getLogger().info("Cleaning up active UI screens...");
+            manager.cleanup();
+        }
+        
+        // Очищаем другие ресурсы плагина
+        Highlight.removeAllSelections();
+        particles.clear();
     }
 
     public static JavaPlugin getInstance() {

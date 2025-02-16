@@ -158,11 +158,39 @@ public class ItemDisplayButtonWidget implements Widget {
         }
     }
     
+    @Override
     public void remove() {
-        if (isShowingTooltip) {
-            hideTooltip();
+        if (display != null) {
+            if (isShowingTooltip) {
+                hideTooltip();
+            }
+            display.remove();
         }
-        display.remove();
+    }
+    
+    @Override
+    public void removeWithAnimation(int ticks) {
+        if (display != null) {
+            // Анимация исчезновения
+            Animation.applyTransformationWithInterpolation(
+                display,
+                new Transformation(
+                    display.getTransformation().getTranslation(),
+                    display.getTransformation().getLeftRotation(),
+                    new Vector3f(0, 0, 0), // Нулевой масштаб
+                    display.getTransformation().getRightRotation()
+                ),
+                ticks
+            );
+            
+            // Удаляем после анимации
+            Bukkit.getScheduler().runTaskLater(DisplayAPI.getInstance(), () -> {
+                if (isShowingTooltip) {
+                    hideTooltip();
+                }
+                display.remove();
+            }, ticks);
+        }
     }
     
     public ItemDisplay getDisplay() {

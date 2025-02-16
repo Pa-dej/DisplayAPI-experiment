@@ -7,6 +7,7 @@ import me.padej.displayAPI.test_events.CreateTestUI;
 import me.padej.displayAPI.ui.annotations.Persistent;
 import me.padej.displayAPI.ui.screens.ChangeScreen;
 import me.padej.displayAPI.ui.widgets.*;
+import me.padej.displayAPI.utils.Animation;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
@@ -17,7 +18,10 @@ import org.bukkit.entity.Display;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
+import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
+import org.bukkit.Bukkit;
+import org.joml.Vector3f;
 
 import java.util.List;
 
@@ -72,10 +76,10 @@ public class Screen extends WidgetManager {
     @Override
     public void remove() {
         if (isSaved && !isPlayerInSavedRange()) {
-            return; // Блокируем удаление если активно сохранение и игрок далеко
+            return;
         }
 
-        // Сбрасываем режимы перед удалением
+        // Сбрасываем режимы и состояния
         isFollowing = false;
         isSaved = false;
         relativePosition = null;
@@ -92,9 +96,62 @@ public class Screen extends WidgetManager {
         // Возвращаем стандартный цвет фона
         updateBackgroundColor(null);
 
-        super.remove();
+        // Мгновенное удаление всех виджетов и дисплея
+        for (Widget widget : children) {
+            widget.remove();
+        }
         if (display != null) {
             display.removeEntity();
+        }
+        super.remove();
+    }
+
+    // Новый метод для удаления с анимацией
+    public void removeWithAnimation() {
+        if (isSaved && !isPlayerInSavedRange()) {
+            return;
+        }
+
+        // Сбрасываем режимы и состояния
+        isFollowing = false;
+        isSaved = false;
+        relativePosition = null;
+        savedPosition = null;
+
+        // Сбрасываем подсветку кнопок
+        if (followButton != null) {
+            followButton.getDisplay().setGlowing(false);
+        }
+        if (saveButton != null) {
+            saveButton.getDisplay().setGlowing(false);
+        }
+
+        // Возвращаем стандартный цвет фона
+        updateBackgroundColor(null);
+
+        // Анимация исчезновения основного дисплея и всех виджетов
+        if (display != null && display.getTextDisplay() != null) {
+            Animation.applyTransformationWithInterpolation(
+                display.getTextDisplay(),
+                new Transformation(
+                    display.getTextDisplay().getTransformation().getTranslation(),
+                    display.getTextDisplay().getTransformation().getLeftRotation(),
+                    new Vector3f(0, 0, 0),
+                    display.getTextDisplay().getTransformation().getRightRotation()
+                ),
+                5
+            );
+            
+            // Удаляем все виджеты с анимацией
+            for (Widget widget : children) {
+                widget.removeWithAnimation(5);
+            }
+            
+            // Удаляем основной дисплей после анимации
+            Bukkit.getScheduler().runTaskLater(DisplayAPI.getInstance(), () -> {
+                super.remove();
+                display.removeEntity();
+            }, 5);
         }
     }
 
@@ -381,7 +438,10 @@ public class Screen extends WidgetManager {
             
             // Звук закрытия для обоих экранов
             viewer.playSound(viewer.getLocation(), org.bukkit.Sound.BLOCK_WOODEN_DOOR_CLOSE, 0.5f, 1.0f);
-            this.remove();
+            
+            // Используем удаление с анимацией
+            this.removeWithAnimation();
+            
             if (onClose != null) onClose.run();
         } else {
             // Звук ошибки при попытке закрыть

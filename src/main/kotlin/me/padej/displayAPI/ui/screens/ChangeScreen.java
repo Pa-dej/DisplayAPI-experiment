@@ -43,7 +43,7 @@ public class ChangeScreen {
     public void changeToSettingsScreen(Player player) {
         if (isSettingsScreen) return;
 
-        // Удаляем только не-persistent виджеты
+        // Удаляем только не-persistent виджеты без анимации
         List<Widget> widgetsToRemove = new ArrayList<>();
         for (Widget widget : screen.getChildren()) {
             if (!persistentWidgets.contains(widget)) {
@@ -52,7 +52,7 @@ public class ChangeScreen {
         }
         
         for (Widget widget : widgetsToRemove) {
-            widget.remove();
+            widget.remove(); // Мгновенное удаление
             screen.getChildren().remove(widget);
         }
 
@@ -90,11 +90,11 @@ public class ChangeScreen {
     public void returnToMainScreen(Player player) {
         if (!isSettingsScreen) return;
 
-        // Удаляем только не-persistent виджеты
+        // Удаляем только не-persistent виджеты без анимации
         List<Widget> currentWidgets = new ArrayList<>(screen.getChildren());
         for (Widget widget : currentWidgets) {
             if (!persistentWidgets.contains(widget)) {
-                widget.remove();
+                widget.remove(); // Мгновенное удаление
                 screen.getChildren().remove(widget);
             }
         }
