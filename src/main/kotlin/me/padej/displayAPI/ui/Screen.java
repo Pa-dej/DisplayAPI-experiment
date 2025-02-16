@@ -4,6 +4,7 @@ import io.papermc.paper.entity.LookAnchor;
 import me.padej.displayAPI.DisplayAPI;
 import me.padej.displayAPI.render.shapes.StringRectangle;
 import me.padej.displayAPI.test_events.CreateTestUI;
+import me.padej.displayAPI.ui.annotations.Main;
 import me.padej.displayAPI.ui.annotations.Persistent;
 import me.padej.displayAPI.ui.screens.ChangeScreen;
 import me.padej.displayAPI.ui.widgets.*;
@@ -27,6 +28,7 @@ import java.util.List;
 
 public class Screen extends WidgetManager {
     private final StringRectangle display;
+    private Class<? extends Screen> currentScreenClass;
 
     // Делаем состояния статическими, чтобы они были общими для всех экранов
     private static boolean isFollowing = false;
@@ -40,10 +42,11 @@ public class Screen extends WidgetManager {
     private TextDisplayButtonWidget saveButton;
     @Persistent("Control buttons")
     private TextDisplayButtonWidget closeButton;
-    private TextDisplayButtonWidget returnButton; // Не помечаем как @Persistent
+    private TextDisplayButtonWidget returnButton;
     
     public Screen(Player viewer, Location location, String text, float scale) {
         super(viewer, location);
+        this.currentScreenClass = this.getClass();
         
         // Создаем текстовый дисплей
         this.display = new StringRectangle(
@@ -285,8 +288,11 @@ public class Screen extends WidgetManager {
         }
     }
 
-    private void createTitleBarControlWidgets() {
+    protected void createTitleBarControlWidgets() {
         WidgetPosition basePosition = new WidgetPosition(0.52, 0.92);
+
+        // Проверяем, является ли текущий экран главным
+        boolean isMainScreen = this.getClass().isAnnotationPresent(Main.class);
 
         // Кнопка закрытия (красная)
         TextDisplayConfig closeConfig = new TextDisplayConfig(
@@ -300,23 +306,7 @@ public class Screen extends WidgetManager {
                 .setBackgroundColor(org.bukkit.Color.fromRGB(30, 30, 30), 0)
                 .setHoveredBackgroundColor(org.bukkit.Color.fromRGB(60, 60, 60), 0);
 
-        // Кнопка возврата (синий круг)
-        if (ChangeScreen.isSettingsScreen()) {
-            TextDisplayConfig returnConfig = new TextDisplayConfig(
-                    Component.text("⏴").color(TextColor.fromHexString("#fafeff")),
-                    Component.text("⏴").color(TextColor.fromHexString("#aaaeaf")),
-                    () -> new ChangeScreen(this).returnToMainScreen(viewer)
-            )
-                    .setPosition(basePosition.clone().addHorizontal(-0.28))
-                    .setScale(0.75f, 0.75f, 0.75f)
-                    .setTolerance(0.035)
-                    .setBackgroundColor(org.bukkit.Color.fromRGB(30, 30, 30), 0)
-                    .setHoveredBackgroundColor(org.bukkit.Color.fromRGB(60, 60, 60), 0);
-
-            this.returnButton = createTextWidget(returnConfig);
-        }
-
-        // Кнопка следования
+        // Кнопка следования (желтая)
         TextDisplayConfig followConfig = new TextDisplayConfig(
                 Component.text("⏺").color(TextColor.fromHexString("#ffc72c")),
                 Component.text("⏺").color(TextColor.fromHexString("#af802b")),
@@ -328,7 +318,7 @@ public class Screen extends WidgetManager {
                 .setBackgroundColor(org.bukkit.Color.fromRGB(30, 30, 30), 0)
                 .setHoveredBackgroundColor(org.bukkit.Color.fromRGB(60, 60, 60), 0);
 
-        // Кнопка сохранения
+        // Кнопка сохранения (зеленая)
         TextDisplayConfig saveConfig = new TextDisplayConfig(
                 Component.text("⏺").color(TextColor.fromHexString("#2aff55")),
                 Component.text("⏺").color(TextColor.fromHexString("#29af48")),
@@ -428,7 +418,7 @@ public class Screen extends WidgetManager {
         }
     }
 
-    private void tryClose() {
+    public void tryClose() {
         if (!isSaved || isPlayerInSavedRange()) {
             // Сохраняем состояние текущего экрана перед закрытием
             CreateTestUI.setWasInSettingsScreen(ChangeScreen.isSettingsScreen());
@@ -537,30 +527,45 @@ public class Screen extends WidgetManager {
         return children;
     }
 
-    // Обновляем метод для управления кнопкой возврата
-    public void updateReturnButton() {
-        // Удаляем старую кнопку возврата, если она есть
-        if (returnButton != null) {
-            returnButton.remove();
-            children.remove(returnButton);
-            returnButton = null;
+    // Добавляем геттер для location
+    public Location getLocation() {
+        return location;
+    }
+
+    // Добавляем protected конструктор для создания временного экрана
+    protected Screen() {
+        super(null, null);
+        this.display = null;
+    }
+
+    // Добавляем геттер для получения текущего класса экрана
+    public Class<? extends Screen> getCurrentScreenClass() {
+        return currentScreenClass;
+    }
+
+    // Метод для удаления только виджетов, сохраняя фон
+    public void removeWidgetsOnly() {
+        // Сбрасываем режимы и состояния
+        isFollowing = false;
+        isSaved = false;
+        relativePosition = null;
+        savedPosition = null;
+
+        // Сбрасываем подсветку кнопок
+        if (followButton != null) {
+            followButton.getDisplay().setGlowing(false);
+        }
+        if (saveButton != null) {
+            saveButton.getDisplay().setGlowing(false);
         }
 
-        // Создаем новую кнопку, если мы на экране настроек
-        if (ChangeScreen.isSettingsScreen()) {
-            WidgetPosition basePosition = new WidgetPosition(0.52, 0.92);
-            TextDisplayConfig returnConfig = new TextDisplayConfig(
-                    Component.text("⏴").color(TextColor.fromHexString("#fafeff")),
-                    Component.text("⏴").color(TextColor.fromHexString("#aaaeaf")),
-                    () -> new ChangeScreen(this).returnToMainScreen(viewer)
-            )
-                    .setPosition(basePosition.clone().addHorizontal(-0.28))
-                    .setScale(0.75f, 0.75f, 0.75f)
-                    .setTolerance(0.035)
-                    .setBackgroundColor(org.bukkit.Color.fromRGB(30, 30, 30), 0)
-                    .setHoveredBackgroundColor(org.bukkit.Color.fromRGB(60, 60, 60), 0);
+        // Возвращаем стандартный цвет фона
+        updateBackgroundColor(null);
 
-            this.returnButton = createTextWidget(returnConfig);
+        // Удаляем только виджеты, сохраняя фон
+        for (Widget widget : children) {
+            widget.remove();
         }
+        children.clear();
     }
 }

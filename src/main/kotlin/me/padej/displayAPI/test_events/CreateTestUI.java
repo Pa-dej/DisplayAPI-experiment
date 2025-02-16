@@ -23,6 +23,7 @@ import java.util.Map;
 import me.padej.displayAPI.api.events.DisplayClickEvent;
 import me.padej.displayAPI.ui.widgets.Widget;
 import me.padej.displayAPI.ui.UIManager;
+import me.padej.displayAPI.ui.screens.MainScreen;
 
 public class CreateTestUI implements Listener {
     private static boolean wasInSettingsScreen = false;
@@ -48,7 +49,7 @@ public class CreateTestUI implements Listener {
                 currentScreen.remove();
             }
 
-            Screen screen = new Screen(
+            Screen screen = new MainScreen(
                 player,
                 player.getEyeLocation().add(player.getLocation().getDirection().multiply(1)),
                 " ",
