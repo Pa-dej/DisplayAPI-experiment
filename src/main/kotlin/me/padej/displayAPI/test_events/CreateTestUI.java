@@ -2,6 +2,7 @@ package me.padej.displayAPI.test_events;
 
 import me.padej.displayAPI.DisplayAPI;
 import me.padej.displayAPI.ui.Screen;
+import me.padej.displayAPI.ui.screens.ChangeScreen;
 import me.padej.displayAPI.utils.Animation;
 import me.padej.displayAPI.utils.ItemUtil;
 import org.bukkit.Bukkit;
@@ -19,8 +20,17 @@ import org.joml.Vector3f;
 import java.util.HashMap;
 import java.util.Map;
 
+import me.padej.displayAPI.api.events.DisplayClickEvent;
+import me.padej.displayAPI.ui.widgets.Widget;
+
 public class CreateTestUI implements Listener {
     private final Map<Player, Screen> playerScreens = new HashMap<>();
+    private static boolean wasInSettingsScreen = false;
+
+    // Добавляем сеттер для wasInSettingsScreen
+    public static void setWasInSettingsScreen(boolean value) {
+        wasInSettingsScreen = value;
+    }
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
@@ -29,22 +39,23 @@ public class CreateTestUI implements Listener {
         if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
             Screen screen = playerScreens.get(player);
             if (screen != null) {
-                // Проверяем, смотрит ли игрок на какой-либо виджет
                 if (screen.isLookingAtWidget()) {
-                    event.setCancelled(true); // Отменяем событие если смотрим на виджет
+                    event.setCancelled(true);
+                    screen.handleClick();
                 }
-                screen.handleClick();
             }
             return;
         }
 
-        if (player.getInventory().getItemInMainHand().getType() == Material.BLUE_DYE && ItemUtil.isExperimental(player.getInventory().getItemInMainHand()) && event.getAction().isRightClick()) {
+        if (player.getInventory().getItemInMainHand().getType() == Material.BLUE_DYE && 
+            ItemUtil.isExperimental(player.getInventory().getItemInMainHand()) && 
+            event.getAction().isRightClick()) {
+            
             // Удаляем предыдущий экран, если он существует
             if (playerScreens.containsKey(player)) {
                 playerScreens.get(player).remove();
             }
 
-            // Создаем новый экран перед игроком
             Screen screen = new Screen(
                 player,
                 player.getEyeLocation().add(player.getLocation().getDirection().multiply(1)),
@@ -54,26 +65,35 @@ public class CreateTestUI implements Listener {
 
             Bukkit.getScheduler().runTaskLater(DisplayAPI.getInstance(), () -> {
                 if (screen.getTextDisplay() == null) {
-                    return; // Не выполняем анимацию, если TextDisplay не создан
+                    return;
                 }
 
-                Animation.applyTransformationWithInterpolation(screen.getTextDisplay(), new Transformation(
+                Animation.applyTransformationWithInterpolation(
+                    screen.getTextDisplay(),
+                    new Transformation(
                         new Vector3f(0, 0, 0),
                         new AxisAngle4f(),
                         new Vector3f(10, 4, 1),
                         new AxisAngle4f()
-                ), 5);
+                    ),
+                    5
+                );
 
                 screen.setOnClose(() -> playerScreens.remove(player));
                 screen.setupDefaultWidgets(player);
+                
+                // Если предыдущий экран был экраном настроек, открываем его снова
+                if (wasInSettingsScreen) {
+                    new ChangeScreen(screen).changeToSettingsScreen(player);
+                }
             }, 2);
 
             playerScreens.put(player, screen);
             
-            // Запускаем задачу обновления состояния кнопки
             Bukkit.getScheduler().runTaskTimer(DisplayAPI.getInstance(), () -> {
-                if (!playerScreens.containsKey(player)) return;
-                screen.update();
+                if (playerScreens.containsKey(player)) {
+                    screen.update();
+                }
             }, 0, 1);
         }
     }
@@ -91,6 +111,17 @@ public class CreateTestUI implements Listener {
             } else {
                 screen.updatePosition();
             }
+        }
+    }
+
+    @EventHandler
+    public void onDisplayClick(DisplayClickEvent event) {
+        Player player = event.getPlayer();
+        Widget widget = event.getWidget();
+        
+        if (!player.hasPermission("display.interact")) {
+            event.setCancelled(true);
+            player.sendMessage("У вас нет прав для взаимодействия с этим элементом!");
         }
     }
 }

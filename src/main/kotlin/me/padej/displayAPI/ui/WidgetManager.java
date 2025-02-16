@@ -1,6 +1,8 @@
 package me.padej.displayAPI.ui;
 
+import me.padej.displayAPI.api.events.DisplayClickEvent;
 import me.padej.displayAPI.ui.widgets.Widget;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -29,7 +31,14 @@ public class WidgetManager {
     public void handleClick() {
         new ArrayList<>(children).forEach(child -> {
             if (child.isHovered()) {
-                child.handleClick();
+                // Создаем и вызываем событие клика
+                DisplayClickEvent event = new DisplayClickEvent(viewer, child);
+                Bukkit.getPluginManager().callEvent(event);
+                
+                // Если событие не отменено, обрабатываем клик
+                if (!event.isCancelled()) {
+                    child.handleClick();
+                }
             }
         });
     }

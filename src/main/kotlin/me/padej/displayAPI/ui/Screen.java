@@ -1,30 +1,42 @@
 package me.padej.displayAPI.ui;
 
 import io.papermc.paper.entity.LookAnchor;
+import me.padej.displayAPI.DisplayAPI;
 import me.padej.displayAPI.render.shapes.StringRectangle;
+import me.padej.displayAPI.test_events.CreateTestUI;
+import me.padej.displayAPI.ui.annotations.Persistent;
+import me.padej.displayAPI.ui.screens.ChangeScreen;
 import me.padej.displayAPI.ui.widgets.*;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.util.Vector;
-import org.bukkit.Material;
-import me.padej.displayAPI.DisplayAPI;
-import net.kyori.adventure.text.Component;
+
+import java.util.List;
 
 public class Screen extends WidgetManager {
     private final StringRectangle display;
 
-    private boolean isFollowing = false;
+    // Делаем состояния статическими, чтобы они были общими для всех экранов
+    private static boolean isFollowing = false;
     public static boolean isSaved = false;
-    private Vector relativePosition;  // Позиция дисплея относительно игрока
-    private Vector savedPosition;  // Позиция для режима сохранения
+    private static Vector relativePosition;  // Позиция дисплея относительно игрока
+    private static Vector savedPosition;  // Позиция для режима сохранения
 
+    @Persistent("Control buttons")
     private TextDisplayButtonWidget followButton;
+    @Persistent("Control buttons")
     private TextDisplayButtonWidget saveButton;
+    @Persistent("Control buttons")
+    private TextDisplayButtonWidget closeButton;
+    private TextDisplayButtonWidget returnButton; // Не помечаем как @Persistent
     
     public Screen(Player viewer, Location location, String text, float scale) {
         super(viewer, location);
@@ -156,54 +168,56 @@ public class Screen extends WidgetManager {
     }
 
     public void setupDefaultWidgets(Player player) {
-        // Кнопки смены режима игры
+        // Создаем кнопки геймода
         createGamemodeButtons(player);
 
-        // Кнопки управления в заголовке
-        createTitleBarControlWidgets();
+        // Создаем кнопки заголовка только при первом создании экрана
+        if (followButton == null || saveButton == null || closeButton == null) {
+            createTitleBarControlWidgets();
+        }
     }
 
-    private void createGamemodeButtons(Player player) {
+    public void createGamemodeButtons(Player player) {
         WidgetPosition basePosition = new WidgetPosition(-0.42f, 0.3f);
         float step = 0.15f;
+        int tooltipDelay = 30;
 
         WidgetConfig[] itemButtons = {
             new WidgetConfig(Material.GRASS_BLOCK, () -> {
-                player.performCommand("gamemode creative");
+                player.setGameMode(GameMode.CREATIVE);
                 // Звук смены режима на креатив
                 player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1.5f);
             })
             .setTooltip("Творческий")
-            .setTooltipDelay(10)
+            .setTooltipDelay(tooltipDelay)
             .setPosition(basePosition.clone())
             .setDisplayTransform(ItemDisplay.ItemDisplayTransform.GUI),
 
             new WidgetConfig(Material.IRON_SWORD, () -> {
-                player.performCommand("gamemode survival");
+                player.setGameMode(GameMode.SURVIVAL);
                 // Звук смены режима на выживание
                 player.playSound(player.getLocation(), org.bukkit.Sound.ITEM_ARMOR_EQUIP_IRON, 0.5f, 1.0f);
             })
             .setTooltip("Выживание")
-            .setTooltipDelay(10)
+            .setTooltipDelay(tooltipDelay)
             .setPosition(basePosition.clone().addVertical(step)),
 
             new WidgetConfig(Material.FILLED_MAP, () -> {
-                player.performCommand("gamemode adventure");
+                player.setGameMode(GameMode.ADVENTURE);
                 // Звук смены режима на приключение
                 player.playSound(player.getLocation(), org.bukkit.Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1.0f);
             })
             .setTooltip("Приключение")
-            .setTooltipDelay(10)
+            .setTooltipDelay(tooltipDelay)
             .setPosition(basePosition.clone().addVertical(step * 2)),
 
-            new WidgetConfig(Material.ENDER_EYE, () -> {
-                player.performCommand("gamemode spectator");
-                // Звук смены режима на наблюдателя
+            new WidgetConfig(Material.ENDER_PEARL, () -> {
+                new ChangeScreen(this).changeToSettingsScreen(player);
                 player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_ENDERMAN_TELEPORT, 0.3f, 1.5f);
             })
-            .setTooltip("Наблюдатель")
-            .setTooltipDelay(10)
-            .setPosition(basePosition.clone().addVertical(step * 3))
+            .setTooltip("Настройки")
+            .setTooltipDelay(tooltipDelay)
+            .setPosition(basePosition.clone().addVertical(step * 4))
         };
 
         for (WidgetConfig config : itemButtons) {
@@ -217,10 +231,10 @@ public class Screen extends WidgetManager {
     private void createTitleBarControlWidgets() {
         WidgetPosition basePosition = new WidgetPosition(0.52, 0.92);
 
-        // Кнопка закрытия
-        TextDisplayConfig closeButton = new TextDisplayConfig(
-                Component.text("⏺").color(TextColor.fromHexString("#ef2142")),
-                Component.text("⏺").color(TextColor.fromHexString("#9a080f")),
+        // Кнопка закрытия (красная)
+        TextDisplayConfig closeConfig = new TextDisplayConfig(
+                Component.text("⏺").color(TextColor.fromHexString("#ff2147")),
+                Component.text("⏺").color(TextColor.fromHexString("#af2141")),
                 this::tryClose
         )
                 .setPosition(basePosition.clone().addHorizontal(0.14))
@@ -229,10 +243,26 @@ public class Screen extends WidgetManager {
                 .setBackgroundColor(org.bukkit.Color.fromRGB(30, 30, 30), 0)
                 .setHoveredBackgroundColor(org.bukkit.Color.fromRGB(60, 60, 60), 0);
 
+        // Кнопка возврата (синий круг)
+        if (ChangeScreen.isSettingsScreen()) {
+            TextDisplayConfig returnConfig = new TextDisplayConfig(
+                    Component.text("⏴").color(TextColor.fromHexString("#fafeff")),
+                    Component.text("⏴").color(TextColor.fromHexString("#aaaeaf")),
+                    () -> new ChangeScreen(this).returnToMainScreen(viewer)
+            )
+                    .setPosition(basePosition.clone().addHorizontal(-0.28))
+                    .setScale(0.75f, 0.75f, 0.75f)
+                    .setTolerance(0.035)
+                    .setBackgroundColor(org.bukkit.Color.fromRGB(30, 30, 30), 0)
+                    .setHoveredBackgroundColor(org.bukkit.Color.fromRGB(60, 60, 60), 0);
+
+            this.returnButton = createTextWidget(returnConfig);
+        }
+
         // Кнопка следования
         TextDisplayConfig followConfig = new TextDisplayConfig(
-                Component.text("⏺").color(TextColor.fromHexString("#f9c22b")),
-                Component.text("⏺").color(TextColor.fromHexString("#fb6b1d")),
+                Component.text("⏺").color(TextColor.fromHexString("#ffc72c")),
+                Component.text("⏺").color(TextColor.fromHexString("#af802b")),
                 this::toggleFollow
         )
                 .setPosition(basePosition.clone())
@@ -243,8 +273,8 @@ public class Screen extends WidgetManager {
 
         // Кнопка сохранения
         TextDisplayConfig saveConfig = new TextDisplayConfig(
-                Component.text("⏺").color(TextColor.fromHexString("#29e64d")),
-                Component.text("⏺").color(TextColor.fromHexString("#11aa38")),
+                Component.text("⏺").color(TextColor.fromHexString("#2aff55")),
+                Component.text("⏺").color(TextColor.fromHexString("#29af48")),
                 this::toggleSave
         )
                 .setPosition(basePosition.clone().addHorizontal(-0.14))
@@ -253,55 +283,71 @@ public class Screen extends WidgetManager {
                 .setBackgroundColor(org.bukkit.Color.fromRGB(30, 30, 30), 0)
                 .setHoveredBackgroundColor(org.bukkit.Color.fromRGB(60, 60, 60), 0);
 
-        createTextWidget(closeButton);
+        this.closeButton = createTextWidget(closeConfig);
         this.followButton = createTextWidget(followConfig);
         this.saveButton = createTextWidget(saveConfig);
+
+        // Устанавливаем начальное состояние кнопок в соответствии с глобальными флагами
+        if (followButton != null) {
+            followButton.getDisplay().setGlowing(isFollowing);
+        }
+        if (saveButton != null) {
+            saveButton.getDisplay().setGlowing(isSaved);
+        }
     }
 
     private void toggleFollow() {
+        // Если включен безопасный режим, выключаем его
         if (isSaved) {
             isSaved = false;
             savedPosition = null;
-            saveButton.getDisplay().setGlowing(false);
-            updateBackgroundColor(null);
+            if (saveButton != null) {
+                saveButton.getDisplay().setGlowing(false);
+            }
         }
         
+        // Переключаем режим следования
         isFollowing = !isFollowing;
-        followButton.getDisplay().setGlowing(isFollowing);
+        if (followButton != null) {
+            followButton.getDisplay().setGlowing(isFollowing);
+        }
         
+        // Обновляем цвет фона и проигрываем звук
         if (isFollowing) {
             Vector playerPos = viewer.getLocation().toVector();
             Vector displayPos = location.toVector();
             relativePosition = displayPos.subtract(playerPos);
             updateBackgroundColor("#f9c22b");
-            // Звук активации следования
             viewer.playSound(viewer.getLocation(), org.bukkit.Sound.BLOCK_NOTE_BLOCK_PLING, 0.5f, 2.0f);
         } else {
             updateBackgroundColor(null);
-            // Звук деактивации следования
             viewer.playSound(viewer.getLocation(), org.bukkit.Sound.BLOCK_NOTE_BLOCK_PLING, 0.5f, 0.5f);
         }
     }
 
     private void toggleSave() {
+        // Если включен режим следования, выключаем его
         if (isFollowing) {
             isFollowing = false;
             relativePosition = null;
-            followButton.getDisplay().setGlowing(false);
-            updateBackgroundColor(null);
+            if (followButton != null) {
+                followButton.getDisplay().setGlowing(false);
+            }
         }
         
+        // Переключаем безопасный режим
         isSaved = !isSaved;
-        saveButton.getDisplay().setGlowing(isSaved);
+        if (saveButton != null) {
+            saveButton.getDisplay().setGlowing(isSaved);
+        }
         
+        // Обновляем цвет фона и проигрываем звук
         if (isSaved) {
             savedPosition = location.toVector();
             updateBackgroundColor("#29e64d");
-            // Звук активации сохранения
             viewer.playSound(viewer.getLocation(), org.bukkit.Sound.BLOCK_ANVIL_USE, 0.5f, 2.0f);
         } else {
             updateBackgroundColor(null);
-            // Звук деактивации сохранения
             viewer.playSound(viewer.getLocation(), org.bukkit.Sound.BLOCK_ANVIL_LAND, 0.3f, 1.5f);
         }
     }
@@ -327,7 +373,13 @@ public class Screen extends WidgetManager {
 
     private void tryClose() {
         if (!isSaved || isPlayerInSavedRange()) {
-            // Звук успешного закрытия
+            // Сохраняем состояние текущего экрана перед закрытием
+            CreateTestUI.setWasInSettingsScreen(ChangeScreen.isSettingsScreen());
+            
+            // Сбрасываем флаг текущего экрана
+            ChangeScreen.setSettingsScreen(false);
+            
+            // Звук закрытия для обоих экранов
             viewer.playSound(viewer.getLocation(), org.bukkit.Sound.BLOCK_WOODEN_DOOR_CLOSE, 0.5f, 1.0f);
             this.remove();
             if (onClose != null) onClose.run();
@@ -418,5 +470,37 @@ public class Screen extends WidgetManager {
 
     public void setOnClose(Runnable callback) {
         this.onClose = callback;
+    }
+
+    // Геттер для доступа к списку виджетов
+    public List<Widget> getChildren() {
+        return children;
+    }
+
+    // Обновляем метод для управления кнопкой возврата
+    public void updateReturnButton() {
+        // Удаляем старую кнопку возврата, если она есть
+        if (returnButton != null) {
+            returnButton.remove();
+            children.remove(returnButton);
+            returnButton = null;
+        }
+
+        // Создаем новую кнопку, если мы на экране настроек
+        if (ChangeScreen.isSettingsScreen()) {
+            WidgetPosition basePosition = new WidgetPosition(0.52, 0.92);
+            TextDisplayConfig returnConfig = new TextDisplayConfig(
+                    Component.text("⏴").color(TextColor.fromHexString("#fafeff")),
+                    Component.text("⏴").color(TextColor.fromHexString("#aaaeaf")),
+                    () -> new ChangeScreen(this).returnToMainScreen(viewer)
+            )
+                    .setPosition(basePosition.clone().addHorizontal(-0.28))
+                    .setScale(0.75f, 0.75f, 0.75f)
+                    .setTolerance(0.035)
+                    .setBackgroundColor(org.bukkit.Color.fromRGB(30, 30, 30), 0)
+                    .setHoveredBackgroundColor(org.bukkit.Color.fromRGB(60, 60, 60), 0);
+
+            this.returnButton = createTextWidget(returnConfig);
+        }
     }
 }

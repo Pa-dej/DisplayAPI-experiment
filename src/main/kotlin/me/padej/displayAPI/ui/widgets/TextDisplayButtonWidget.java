@@ -15,6 +15,8 @@ import org.bukkit.util.Transformation;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 import net.kyori.adventure.title.Title;
+import org.bukkit.Bukkit;
+import me.padej.displayAPI.utils.Animation;
 
 import java.time.Duration;
 
@@ -30,7 +32,7 @@ public class TextDisplayButtonWidget implements Widget {
     private boolean isShowingTooltip = false;
     private int tooltipDelay = 0;
     private int hoverTicks = 0;
-    private TextColor tooltipColor = TextColor.fromHexString("#fcd720");
+    private TextColor tooltipColor = TextColor.fromHexString("#868788");
     private Color backgroundColor;
     private int backgroundAlpha;
     private Color hoveredBackgroundColor;
@@ -84,14 +86,14 @@ public class TextDisplayButtonWidget implements Widget {
         ));
         display.setBrightness(new Display.Brightness(15, 15));
         
-        // Создаем трансформацию с центрированием по Y
-        Transformation transformation = new Transformation(
-            new Vector3f(0, -scaleY / 8, 0),  // Смещение для центрирования
-            new AxisAngle4f(),                // Поворот
-            new Vector3f(scaleX, scaleY, scaleZ), // Масштаб
-            new AxisAngle4f()                 // Поворот после масштабирования
+        // Начальная трансформация с нулевым масштабом
+        Transformation initialTransform = new Transformation(
+            new Vector3f(0, 0, 0),
+            new AxisAngle4f(),
+            new Vector3f(0, 0, 0),
+            new AxisAngle4f()
         );
-        display.setTransformation(transformation);
+        display.setTransformation(initialTransform);
         
         // Настройка длительности анимаций
         display.setInterpolationDuration(1);
@@ -100,6 +102,20 @@ public class TextDisplayButtonWidget implements Widget {
         display.setBillboard(Display.Billboard.FIXED);
         display.setVisibleByDefault(false);
         viewer.showEntity(DisplayAPI.getInstance(), display);
+
+        // Анимация появления
+        Bukkit.getScheduler().runTaskLater(DisplayAPI.getInstance(), () -> {
+            Animation.applyTransformationWithInterpolation(
+                display,
+                new Transformation(
+                    new Vector3f(0, -scaleY / 8, 0),
+                    new AxisAngle4f(),
+                    new Vector3f(scaleX, scaleY, scaleZ),
+                    new AxisAngle4f()
+                ),
+                5
+            );
+        }, 1);
     }
     
     public void update() {

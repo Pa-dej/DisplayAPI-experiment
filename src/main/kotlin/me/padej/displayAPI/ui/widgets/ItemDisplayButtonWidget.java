@@ -1,18 +1,23 @@
 package me.padej.displayAPI.ui.widgets;
 
 import me.padej.displayAPI.DisplayAPI;
+import me.padej.displayAPI.utils.Animation;
 import me.padej.displayAPI.utils.PointDetection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.title.Title;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
+import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 import java.time.Duration;
 
@@ -27,7 +32,7 @@ public class ItemDisplayButtonWidget implements Widget {
     private int hoverTicks = 0;
     private Material itemType;
     private Location location;
-    private TextColor tooltipColor = TextColor.fromHexString("#fcd720"); // Цвет по умолчанию
+    private TextColor tooltipColor = TextColor.fromHexString("#868788"); // Цвет по умолчанию
     private float scaleX = .15f;
     private float scaleY = .15f;
     private float scaleZ = 1e-6f;
@@ -52,7 +57,9 @@ public class ItemDisplayButtonWidget implements Widget {
         
         display.setItemStack(new ItemStack(itemType));
         display.setBrightness(new Display.Brightness(15, 15));
-        display.setTransformationMatrix(new Matrix4f().translate(0, 0, -0.001f).scale(scaleX, scaleY, scaleZ));
+        
+        // Начальная трансформация с нулевым масштабом
+        display.setTransformationMatrix(new Matrix4f().translate(0, 0, -0.001f).scale(0, 0, 0));
         display.setItemDisplayTransform(displayTransform);
         
         // Настройка длительности анимаций
@@ -62,6 +69,20 @@ public class ItemDisplayButtonWidget implements Widget {
         // Делаем виджет видимым только для создателя
         display.setVisibleByDefault(false);
         viewer.showEntity(DisplayAPI.getInstance(), display);
+
+        // Анимация появления
+        Bukkit.getScheduler().runTaskLater(DisplayAPI.getInstance(), () -> {
+            Animation.applyTransformationWithInterpolation(
+                display,
+                new Transformation(
+                    new Vector3f(0, 0, -0.001f),
+                    new AxisAngle4f(),
+                    new Vector3f(scaleX, scaleY, scaleZ),
+                    new AxisAngle4f()
+                ),
+                5
+            );
+        }, 1);
     }
     
     public void update() {

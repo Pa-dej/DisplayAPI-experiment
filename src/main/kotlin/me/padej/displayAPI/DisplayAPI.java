@@ -9,14 +9,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
-TODO:
-    Баги:
-    - Точка вращения у left / right Rotation находится не в позиции, которую задает translation, а в минимальном углу
-    Гизмо:
-    - Если у игрока в руке спектральная стрела, то он видит простое белое гизмо
-    Анимированный setBlock
- */
 @SuppressWarnings("unused")
 public class DisplayAPI extends JavaPlugin {
 
