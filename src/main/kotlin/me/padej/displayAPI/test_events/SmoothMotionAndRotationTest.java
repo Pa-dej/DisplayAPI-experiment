@@ -14,10 +14,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
-import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 
 import java.util.HashMap;
@@ -57,7 +55,7 @@ public class SmoothMotionAndRotationTest implements Listener {
     }
 
     private void startOrbiting(Player player) {
-        final double radius = 0;  // Радиус орбиты
+        final double radius = 1.2;  // Радиус орбиты
         final double speed = 0.05; // Скорость вращения
         final float rotationSpeed = 0.05f; // Скорость вращения вокруг осей
 

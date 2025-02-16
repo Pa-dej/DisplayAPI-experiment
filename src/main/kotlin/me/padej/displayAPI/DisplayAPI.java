@@ -24,11 +24,16 @@ public class DisplayAPI extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        getServer().getPluginManager().registerEvents(new SmoothMotionAndRotationTest(), this);
-//        getServer().getPluginManager().registerEvents(new PointDetectFirstTest(), this);
-//        getServer().getPluginManager().registerEvents(new PointDetectSecondTest(), this);
-//        getServer().getPluginManager().registerEvents(new GizmoTest(), this);
+        getServer().getPluginManager().registerEvents(new ApplyHighlightToBlockTest(), this);
+        getServer().getPluginManager().registerEvents(new CreateDisplayParticleFirstTest(), this);
+        getServer().getPluginManager().registerEvents(new CreateDisplayParticleSecondTest(), this);
+        getServer().getPluginManager().registerEvents(new CreateDisplayParticleThirdTest(), this);
         getServer().getPluginManager().registerEvents(new CreateTestUI(), this);
+        getServer().getPluginManager().registerEvents(new GizmoTest(), this);
+        getServer().getPluginManager().registerEvents(new PointDetectFirstTest(), this);
+        getServer().getPluginManager().registerEvents(new PointDetectSecondTest(), this);
+        getServer().getPluginManager().registerEvents(new RotationRelativeToCenterPointTest(), this);
+        getServer().getPluginManager().registerEvents(new SmoothMotionAndRotationTest(), this);
 
         Highlight.removeAllSelections();
         Highlight.startColorUpdateTask();
