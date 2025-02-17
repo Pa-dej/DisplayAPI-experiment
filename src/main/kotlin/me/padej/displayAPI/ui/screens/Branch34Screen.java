@@ -1,7 +1,6 @@
 package me.padej.displayAPI.ui.screens;
 
 import me.padej.displayAPI.ui.Screen;
-import me.padej.displayAPI.ui.annotations.Branch;
 import me.padej.displayAPI.ui.annotations.ParentUI;
 import me.padej.displayAPI.ui.widgets.WidgetConfig;
 import me.padej.displayAPI.ui.widgets.WidgetPosition;
@@ -9,8 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
-@Branch(parent = MainScreen.class, layer = 1)
-@ParentUI(MainScreen.class)
+@ParentUI(Branch12Screen.class)
 public class Branch34Screen extends Screen {
     public Branch34Screen() {
         super(); // Используем конструктор для временных экранов
@@ -21,10 +19,12 @@ public class Branch34Screen extends Screen {
     }
 
     @Override
-    public void setupDefaultWidgets(Player player) {
-        // Убираем создание кнопок заголовка, они уже существуют
-        // createTitleBarControlWidgets();
+    public Class<? extends Screen> getParentScreen() {
+        return Branch12Screen.class;
+    }
 
+    @Override
+    protected void createScreenWidgets(Player player) {
         // Создаем кнопки подветвей
         WidgetPosition basePosition = new WidgetPosition(-0.42f, 0.3f);
         float step = 0.15f;

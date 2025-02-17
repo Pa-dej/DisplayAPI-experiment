@@ -19,11 +19,8 @@ public class MainScreen extends Screen {
     }
 
     @Override
-    public void setupDefaultWidgets(Player player) {
-        // Создаем кнопки заголовка
-        createTitleBarControlWidgets();
-
-        // Создаем кнопки ветвления вместо кнопок геймода
+    protected void createScreenWidgets(Player player) {
+        // Создаем кнопки ветвления
         WidgetPosition basePosition = new WidgetPosition(-0.42f, 0.3f);
         float step = 0.15f;
 

@@ -1,16 +1,13 @@
 package me.padej.displayAPI.ui.screens;
 
 import me.padej.displayAPI.ui.Screen;
-import me.padej.displayAPI.ui.annotations.Branch;
 import me.padej.displayAPI.ui.annotations.ParentUI;
-import me.padej.displayAPI.ui.widgets.ItemDisplayButtonWidget;
 import me.padej.displayAPI.ui.widgets.WidgetConfig;
 import me.padej.displayAPI.ui.widgets.WidgetPosition;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
-@Branch(parent = MainScreen.class, layer = 1)
 @ParentUI(MainScreen.class)
 public class Branch12Screen extends Screen {
     public Branch12Screen() {
@@ -45,5 +42,10 @@ public class Branch12Screen extends Screen {
         for (WidgetConfig config : branchButtons) {
             createWidget(config);
         }
+    }
+
+    @Override
+    public Class<? extends Screen> getParentScreen() {
+        return MainScreen.class;
     }
 } 

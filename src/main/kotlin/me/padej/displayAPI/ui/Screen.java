@@ -26,7 +26,7 @@ import org.joml.Vector3f;
 
 import java.util.List;
 
-public class Screen extends WidgetManager {
+public abstract class Screen extends WidgetManager {
     private final StringRectangle display;
     private Class<? extends Screen> currentScreenClass;
 
@@ -228,13 +228,18 @@ public class Screen extends WidgetManager {
     }
 
     public void setupDefaultWidgets(Player player) {
-        // Создаем кнопки геймода
-        createGamemodeButtons(player);
-
         // Создаем кнопки заголовка только при первом создании экрана
         if (followButton == null || saveButton == null || closeButton == null) {
             createTitleBarControlWidgets();
         }
+        
+        // Создаем основные виджеты экрана
+        createScreenWidgets(player);
+    }
+
+    // Новый метод для создания виджетов конкретного экрана
+    protected void createScreenWidgets(Player player) {
+        // По умолчанию пустой, переопределяется в подклассах
     }
 
     public void createGamemodeButtons(Player player) {
@@ -567,5 +572,13 @@ public class Screen extends WidgetManager {
             widget.remove();
         }
         children.clear();
+    }
+
+    /**
+     * Возвращает класс родительского экрана.
+     * Если экран является главным, возвращает null.
+     */
+    public Class<? extends Screen> getParentScreen() {
+        return null; // По умолчанию null - для главного экрана
     }
 }

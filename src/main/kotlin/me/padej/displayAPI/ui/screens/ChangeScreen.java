@@ -1,22 +1,16 @@
 package me.padej.displayAPI.ui.screens;
 
-import me.padej.displayAPI.DisplayAPI;
 import me.padej.displayAPI.ui.Screen;
-import me.padej.displayAPI.ui.UIManager;
-import me.padej.displayAPI.ui.WidgetManager;
 import me.padej.displayAPI.ui.annotations.Main;
 import me.padej.displayAPI.ui.annotations.Persistent;
-import me.padej.displayAPI.ui.annotations.ParentUI;
-import me.padej.displayAPI.ui.widgets.*;
+import me.padej.displayAPI.ui.widgets.TextDisplayConfig;
+import me.padej.displayAPI.ui.widgets.Widget;
+import me.padej.displayAPI.ui.widgets.WidgetConfig;
+import me.padej.displayAPI.ui.widgets.WidgetPosition;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.Location;
-import org.bukkit.Bukkit;
-import org.bukkit.util.Transformation;
-import org.joml.AxisAngle4f;
-import org.joml.Vector3f;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -24,11 +18,13 @@ import java.util.List;
 
 public class ChangeScreen {
     private final Screen screen;
+    private Class<? extends Screen> currentScreenClass;
     private final List<Widget> persistentWidgets = new ArrayList<>();
     private static boolean isSettingsScreen = false;
 
     public ChangeScreen(Screen screen) {
         this.screen = screen;
+        this.currentScreenClass = screen.getClass();
         savePersistentWidgets();
     }
 
@@ -111,11 +107,13 @@ public class ChangeScreen {
                 }
             }
 
+            // Обновляем текущий класс экрана
+            this.currentScreenClass = branchClass;
+
             // Если это не главный экран, добавляем кнопку возврата
             if (!branchClass.isAnnotationPresent(Main.class)) {
                 createReturnButton(player);
             }
-            
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -133,32 +131,32 @@ public class ChangeScreen {
         screen.getChildren().removeAll(widgetsToRemove);
 
         try {
-            // 2. Создаем виджеты главного экрана
-            WidgetPosition basePosition = new WidgetPosition(-0.42f, 0.3f);
-            float step = 0.15f;
-
-            WidgetConfig[] mainButtons = {
-                new WidgetConfig(Material.COMPASS, () -> {
-                    new ChangeScreen(screen).changeToBranch(player, Branch12Screen.class);
-                })
-                .setTooltip("Ветка 1-2")
-                .setTooltipDelay(30)
-                .setPosition(basePosition.clone()),
-
-                new WidgetConfig(Material.MAP, () -> {
-                    new ChangeScreen(screen).changeToBranch(player, Branch34Screen.class);
-                })
-                .setTooltip("Ветка 3-4")
-                .setTooltipDelay(30)
-                .setPosition(basePosition.clone().addVertical(step))
-            };
-
-            for (WidgetConfig config : mainButtons) {
-                screen.createWidget(config);
-            }
+            // Создаем временный экземпляр текущего экрана для получения родительского класса
+            Screen currentScreen = currentScreenClass.getDeclaredConstructor().newInstance();
+            Class<? extends Screen> parentClass = currentScreen.getParentScreen();
             
+            if (parentClass != null) {
+                // Создаем временный экземпляр родительского экрана
+                Screen parentScreen = parentClass.getDeclaredConstructor().newInstance();
+                
+                // Обновляем текущий класс экрана на родительский
+                this.currentScreenClass = parentClass;
+                
+                // Копируем виджеты из родительского экрана
+                parentScreen.setupDefaultWidgets(player);
+                
+                for (Widget widget : parentScreen.getChildren()) {
+                    screen.addDrawableChild(widget);
+                }
+            } else {
+                // Если parentClass == null, значит мы вернулись на главный экран
+                screen.setupDefaultWidgets(player);
+                this.currentScreenClass = MainScreen.class;
+            }
         } catch (Exception e) {
             e.printStackTrace();
+            // В случае ошибки тоже пытаемся установить виджеты
+            screen.setupDefaultWidgets(player);
         }
     }
 
