@@ -9,6 +9,7 @@ import me.padej.displayAPI.ui.widgets.WidgetConfig;
 import me.padej.displayAPI.ui.widgets.WidgetPosition;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -57,54 +58,13 @@ public class ChangeScreen {
         screen.getChildren().removeAll(widgetsToRemove);
 
         try {
-            if (branchClass == Branch12Screen.class) {
-                // Создаем виджеты для Branch12Screen
-                WidgetPosition basePosition = new WidgetPosition(-0.42f, 0.3f);
-                float step = 0.15f;
+            // Создаем временный экземпляр нового экрана для получения виджетов
+            Screen branchScreen = branchClass.getDeclaredConstructor().newInstance();
 
-                WidgetConfig[] branchButtons = {
-                    new WidgetConfig(Material.REDSTONE, () -> {
-                        player.sendMessage("Ветка 1");
-                    })
-                    .setTooltip("Подветка 1")
-                    .setTooltipDelay(30)
-                    .setPosition(basePosition.clone()),
-
-                    new WidgetConfig(Material.GLOWSTONE_DUST, () -> {
-                        player.sendMessage("Ветка 2");
-                    })
-                    .setTooltip("Подветка 2")
-                    .setTooltipDelay(30)
-                    .setPosition(basePosition.clone().addVertical(step))
-                };
-
-                for (WidgetConfig config : branchButtons) {
-                    screen.createWidget(config);
-                }
-            } else if (branchClass == Branch34Screen.class) {
-                // Создаем виджеты для Branch34Screen
-                WidgetPosition basePosition = new WidgetPosition(-0.42f, 0.3f);
-                float step = 0.15f;
-
-                WidgetConfig[] branchButtons = {
-                    new WidgetConfig(Material.DIAMOND, () -> {
-                        player.sendMessage("Ветка 3");
-                    })
-                    .setTooltip("Подветка 3")
-                    .setTooltipDelay(30)
-                    .setPosition(basePosition.clone()),
-
-                    new WidgetConfig(Material.EMERALD, () -> {
-                        player.sendMessage("Ветка 4");
-                    })
-                    .setTooltip("Подветка 4")
-                    .setTooltipDelay(30)
-                    .setPosition(basePosition.clone().addVertical(step))
-                };
-
-                for (WidgetConfig config : branchButtons) {
-                    screen.createWidget(config);
-                }
+            // Получаем и создаем виджеты для нового экрана
+            WidgetConfig[] branchWidgets = branchScreen.getBranchWidgets(player);
+            for (WidgetConfig config : branchWidgets) {
+                screen.createWidget(config);
             }
 
             // Обновляем текущий класс экрана
@@ -120,6 +80,9 @@ public class ChangeScreen {
     }
 
     public void returnToParentScreen(Player player) {
+        // Сначала устанавливаем viewer
+        screen.viewer = player;
+        
         // 1. Удаляем все не-persistent виджеты
         List<Widget> widgetsToRemove = new ArrayList<>();
         for (Widget widget : screen.getChildren()) {
@@ -134,7 +97,7 @@ public class ChangeScreen {
             // Создаем временный экземпляр текущего экрана для получения родительского класса
             Screen currentScreen = currentScreenClass.getDeclaredConstructor().newInstance();
             Class<? extends Screen> parentClass = currentScreen.getParentScreen();
-            
+
             if (parentClass != null) {
                 // Создаем временный экземпляр родительского экрана
                 Screen parentScreen = parentClass.getDeclaredConstructor().newInstance();
@@ -142,16 +105,24 @@ public class ChangeScreen {
                 // Обновляем текущий класс экрана на родительский
                 this.currentScreenClass = parentClass;
                 
-                // Копируем виджеты из родительского экрана
-                parentScreen.setupDefaultWidgets(player);
-                
-                for (Widget widget : parentScreen.getChildren()) {
-                    screen.addDrawableChild(widget);
+                // Получаем и создаем виджеты для родительского экрана
+                if (parentClass == MainScreen.class) {
+                    screen.setupDefaultWidgets(player);
+                } else {
+                    WidgetConfig[] parentWidgets = parentScreen.getBranchWidgets(player);
+                    for (WidgetConfig config : parentWidgets) {
+                        screen.createWidget(config);
+                    }
                 }
             } else {
                 // Если parentClass == null, значит мы вернулись на главный экран
                 screen.setupDefaultWidgets(player);
                 this.currentScreenClass = MainScreen.class;
+            }
+
+            // Если это не главный экран, добавляем кнопку возврата
+            if (currentScreenClass != MainScreen.class) {
+                createReturnButton(player);
             }
         } catch (Exception e) {
             e.printStackTrace();

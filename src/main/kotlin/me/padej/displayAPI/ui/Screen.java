@@ -4,24 +4,20 @@ import io.papermc.paper.entity.LookAnchor;
 import me.padej.displayAPI.DisplayAPI;
 import me.padej.displayAPI.render.shapes.StringRectangle;
 import me.padej.displayAPI.test_events.CreateTestUI;
-import me.padej.displayAPI.ui.annotations.Main;
 import me.padej.displayAPI.ui.annotations.Persistent;
 import me.padej.displayAPI.ui.screens.ChangeScreen;
 import me.padej.displayAPI.ui.widgets.*;
 import me.padej.displayAPI.utils.Animation;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.Display;
-import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
-import org.bukkit.Bukkit;
 import org.joml.Vector3f;
 
 import java.util.List;
@@ -42,7 +38,6 @@ public abstract class Screen extends WidgetManager {
     private TextDisplayButtonWidget saveButton;
     @Persistent("Control buttons")
     private TextDisplayButtonWidget closeButton;
-    private TextDisplayButtonWidget returnButton;
     
     public Screen(Player viewer, Location location, String text, float scale) {
         super(viewer, location);
@@ -166,7 +161,7 @@ public abstract class Screen extends WidgetManager {
         return display != null ? display.getTextDisplay() : null;
     }
 
-    public ItemDisplayButtonWidget createWidget(WidgetConfig config) {
+    public void createWidget(WidgetConfig config) {
         Location buttonLoc = location.clone();
         Vector direction = buttonLoc.getDirection();
         Vector right = direction.getCrossProduct(new Vector(0, 1, 0)).normalize();
@@ -193,10 +188,14 @@ public abstract class Screen extends WidgetManager {
                     .setTooltipDelay(config.getTooltipDelay());
         }
 
-        return addDrawableChild(widget);
+        addDrawableChild(widget);
     }
 
     public TextDisplayButtonWidget createTextWidget(TextDisplayConfig config) {
+        if (location == null) {
+            return null;
+        }
+        
         Location buttonLoc = location.clone();
         Vector direction = buttonLoc.getDirection();
         Vector right = direction.getCrossProduct(new Vector(0, 1, 0)).normalize();
@@ -228,6 +227,10 @@ public abstract class Screen extends WidgetManager {
     }
 
     public void setupDefaultWidgets(Player player) {
+        if (location == null) {
+            return; // Пропускаем создание виджетов, если нет location
+        }
+        
         // Создаем кнопки заголовка только при первом создании экрана
         if (followButton == null || saveButton == null || closeButton == null) {
             createTitleBarControlWidgets();
@@ -238,66 +241,16 @@ public abstract class Screen extends WidgetManager {
     }
 
     // Новый метод для создания виджетов конкретного экрана
-    protected void createScreenWidgets(Player player) {
+    public void createScreenWidgets(Player player) {
         // По умолчанию пустой, переопределяется в подклассах
     }
 
-    public void createGamemodeButtons(Player player) {
-        WidgetPosition basePosition = new WidgetPosition(-0.42f, 0.3f);
-        float step = 0.15f;
-        int tooltipDelay = 30;
-
-        WidgetConfig[] itemButtons = {
-            new WidgetConfig(Material.GRASS_BLOCK, () -> {
-                player.setGameMode(GameMode.CREATIVE);
-                // Звук смены режима на креатив
-                player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1.5f);
-            })
-            .setTooltip("Творческий")
-            .setTooltipDelay(tooltipDelay)
-            .setPosition(basePosition.clone())
-            .setDisplayTransform(ItemDisplay.ItemDisplayTransform.GUI),
-
-            new WidgetConfig(Material.IRON_SWORD, () -> {
-                player.setGameMode(GameMode.SURVIVAL);
-                // Звук смены режима на выживание
-                player.playSound(player.getLocation(), org.bukkit.Sound.ITEM_ARMOR_EQUIP_IRON, 0.5f, 1.0f);
-            })
-            .setTooltip("Выживание")
-            .setTooltipDelay(tooltipDelay)
-            .setPosition(basePosition.clone().addVertical(step)),
-
-            new WidgetConfig(Material.FILLED_MAP, () -> {
-                player.setGameMode(GameMode.ADVENTURE);
-                // Звук смены режима на приключение
-                player.playSound(player.getLocation(), org.bukkit.Sound.ITEM_BOOK_PAGE_TURN, 0.5f, 1.0f);
-            })
-            .setTooltip("Приключение")
-            .setTooltipDelay(tooltipDelay)
-            .setPosition(basePosition.clone().addVertical(step * 2)),
-
-            new WidgetConfig(Material.ENDER_PEARL, () -> {
-                new ChangeScreen(this).changeToSettingsScreen(player);
-                player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_ENDERMAN_TELEPORT, 0.3f, 1.5f);
-            })
-            .setTooltip("Настройки")
-            .setTooltipDelay(tooltipDelay)
-            .setPosition(basePosition.clone().addVertical(step * 4))
-        };
-
-        for (WidgetConfig config : itemButtons) {
-            ItemDisplayButtonWidget widget = createWidget(config);
-            if (config.getDisplayTransform() != ItemDisplay.ItemDisplayTransform.NONE) {
-                widget.setDisplayTransform(config.getDisplayTransform());
-            }
-        }
-    }
-
     protected void createTitleBarControlWidgets() {
+        if (location == null) {
+            return; // Пропускаем создание кнопок, если нет location
+        }
+        
         WidgetPosition basePosition = new WidgetPosition(0.52, 0.92);
-
-        // Проверяем, является ли текущий экран главным
-        boolean isMainScreen = this.getClass().isAnnotationPresent(Main.class);
 
         // Кнопка закрытия (красная)
         TextDisplayConfig closeConfig = new TextDisplayConfig(
@@ -357,13 +310,13 @@ public abstract class Screen extends WidgetManager {
                 saveButton.getDisplay().setGlowing(false);
             }
         }
-        
+
         // Переключаем режим следования
         isFollowing = !isFollowing;
         if (followButton != null) {
             followButton.getDisplay().setGlowing(isFollowing);
         }
-        
+
         // Обновляем цвет фона и проигрываем звук
         if (isFollowing) {
             Vector playerPos = viewer.getLocation().toVector();
@@ -386,13 +339,13 @@ public abstract class Screen extends WidgetManager {
                 followButton.getDisplay().setGlowing(false);
             }
         }
-        
+
         // Переключаем безопасный режим
         isSaved = !isSaved;
         if (saveButton != null) {
             saveButton.getDisplay().setGlowing(isSaved);
         }
-        
+
         // Обновляем цвет фона и проигрываем звук
         if (isSaved) {
             savedPosition = location.toVector();
@@ -427,16 +380,16 @@ public abstract class Screen extends WidgetManager {
         if (!isSaved || isPlayerInSavedRange()) {
             // Сохраняем состояние текущего экрана перед закрытием
             CreateTestUI.setWasInSettingsScreen(ChangeScreen.isSettingsScreen());
-            
+
             // Сбрасываем флаг текущего экрана
             ChangeScreen.setSettingsScreen(false);
-            
+
             // Звук закрытия для обоих экранов
             viewer.playSound(viewer.getLocation(), org.bukkit.Sound.BLOCK_WOODEN_DOOR_CLOSE, 0.5f, 1.0f);
-            
+
             // Используем удаление с анимацией
             this.removeWithAnimation();
-            
+
             if (onClose != null) onClose.run();
         } else {
             // Звук ошибки при попытке закрыть
@@ -537,41 +490,31 @@ public abstract class Screen extends WidgetManager {
         return location;
     }
 
-    // Добавляем protected конструктор для создания временного экрана
+    // Добавляем метод для установки location
+    public void setLocation(Location location) {
+        this.location = location;
+        if (display != null && display.getTextDisplay() != null) {
+            display.getTextDisplay().teleport(location);
+        }
+    }
+
+    // Изменяем protected конструктор
     protected Screen() {
-        super(null, null);
+        super(null, new Location(Bukkit.getWorlds().get(0), 0, 0, 0)); // Используем дефолтную локацию
         this.display = null;
+        this.currentScreenClass = this.getClass();
+    }
+
+    // Добавляем новый конструктор с viewer
+    protected Screen(Player viewer, Location location) {
+        super(viewer, location);
+        this.display = null;
+        this.currentScreenClass = this.getClass();
     }
 
     // Добавляем геттер для получения текущего класса экрана
     public Class<? extends Screen> getCurrentScreenClass() {
         return currentScreenClass;
-    }
-
-    // Метод для удаления только виджетов, сохраняя фон
-    public void removeWidgetsOnly() {
-        // Сбрасываем режимы и состояния
-        isFollowing = false;
-        isSaved = false;
-        relativePosition = null;
-        savedPosition = null;
-
-        // Сбрасываем подсветку кнопок
-        if (followButton != null) {
-            followButton.getDisplay().setGlowing(false);
-        }
-        if (saveButton != null) {
-            saveButton.getDisplay().setGlowing(false);
-        }
-
-        // Возвращаем стандартный цвет фона
-        updateBackgroundColor(null);
-
-        // Удаляем только виджеты, сохраняя фон
-        for (Widget widget : children) {
-            widget.remove();
-        }
-        children.clear();
     }
 
     /**
@@ -580,5 +523,14 @@ public abstract class Screen extends WidgetManager {
      */
     public Class<? extends Screen> getParentScreen() {
         return null; // По умолчанию null - для главного экрана
+    }
+
+    /**
+     * Возвращает конфигурации виджетов для данного экрана
+     * @param player Игрок, для которого создаются виджеты
+     * @return Массив конфигураций виджетов
+     */
+    public WidgetConfig[] getBranchWidgets(Player player) {
+        return new WidgetConfig[0]; // По умолчанию пустой массив
     }
 }

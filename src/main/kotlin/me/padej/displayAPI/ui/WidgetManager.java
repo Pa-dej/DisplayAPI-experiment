@@ -11,7 +11,7 @@ import java.util.List;
 
 public class WidgetManager {
     protected final List<Widget> children = new ArrayList<>();
-    protected Player viewer;
+    public Player viewer;
     protected Location location;
     
     public WidgetManager(Player viewer, Location location) {

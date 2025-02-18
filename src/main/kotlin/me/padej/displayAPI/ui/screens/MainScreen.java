@@ -19,7 +19,7 @@ public class MainScreen extends Screen {
     }
 
     @Override
-    protected void createScreenWidgets(Player player) {
+    public void createScreenWidgets(Player player) {
         // Создаем кнопки ветвления
         WidgetPosition basePosition = new WidgetPosition(-0.42f, 0.3f);
         float step = 0.15f;
@@ -43,5 +43,34 @@ public class MainScreen extends Screen {
         for (WidgetConfig config : branchButtons) {
             createWidget(config);
         }
+    }
+
+    @Override
+    public WidgetConfig[] getBranchWidgets(Player player) {
+        WidgetPosition basePosition = new WidgetPosition(-0.42f, 0.3f);
+        float step = 0.15f;
+
+        return new WidgetConfig[] {
+            new WidgetConfig(Material.DIAMOND_SWORD, () -> {
+                new ChangeScreen(this).changeToBranch(player, Branch12Screen.class);
+            })
+            .setTooltip("Ветки 1-2")
+            .setTooltipDelay(30)
+            .setPosition(basePosition.clone()),
+
+            new WidgetConfig(Material.DIAMOND_PICKAXE, () -> {
+                new ChangeScreen(this).changeToBranch(player, Branch34Screen.class);
+            })
+            .setTooltip("Ветки 3-4")
+            .setTooltipDelay(30)
+            .setPosition(basePosition.clone().addVertical(step)),
+
+            new WidgetConfig(Material.REDSTONE_BLOCK, () -> {
+                new ChangeScreen(this).changeToSettingsScreen(player);
+            })
+            .setTooltip("Настройки")
+            .setTooltipDelay(30)
+            .setPosition(basePosition.clone().addVertical(step * 2))
+        };
     }
 } 
