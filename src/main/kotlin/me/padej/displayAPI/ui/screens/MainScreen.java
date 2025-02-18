@@ -26,51 +26,29 @@ public class MainScreen extends Screen {
 
         WidgetConfig[] branchButtons = {
             new WidgetConfig(Material.COMPASS, () -> {
-                new ChangeScreen(this).changeToBranch(player, Branch12Screen.class);
+                new ChangeScreen(this).changeToBranch(player, Branch1Screen.class);
             })
-            .setTooltip("Ветка 1-2")
+            .setTooltip("Ветка 1")
             .setTooltipDelay(30)
             .setPosition(basePosition.clone()),
 
             new WidgetConfig(Material.MAP, () -> {
-                new ChangeScreen(this).changeToBranch(player, Branch34Screen.class);
+                new ChangeScreen(this).changeToBranch(player, Branch2Screen.class);
             })
-            .setTooltip("Ветка 3-4")
+            .setTooltip("Ветка 2")
             .setTooltipDelay(30)
-            .setPosition(basePosition.clone().addVertical(step))
+            .setPosition(basePosition.clone().addVertical(step)),
+
+            new WidgetConfig(Material.CLOCK, () -> {
+                new ChangeScreen(this).changeToBranch(player, Branch3Screen.class);
+            })
+            .setTooltip("Ветка 3")
+            .setTooltipDelay(30)
+            .setPosition(basePosition.clone().addVertical(step * 2))
         };
 
         for (WidgetConfig config : branchButtons) {
             createWidget(config);
         }
-    }
-
-    @Override
-    public WidgetConfig[] getBranchWidgets(Player player) {
-        WidgetPosition basePosition = new WidgetPosition(-0.42f, 0.3f);
-        float step = 0.15f;
-
-        return new WidgetConfig[] {
-            new WidgetConfig(Material.DIAMOND_SWORD, () -> {
-                new ChangeScreen(this).changeToBranch(player, Branch12Screen.class);
-            })
-            .setTooltip("Ветки 1-2")
-            .setTooltipDelay(30)
-            .setPosition(basePosition.clone()),
-
-            new WidgetConfig(Material.DIAMOND_PICKAXE, () -> {
-                new ChangeScreen(this).changeToBranch(player, Branch34Screen.class);
-            })
-            .setTooltip("Ветки 3-4")
-            .setTooltipDelay(30)
-            .setPosition(basePosition.clone().addVertical(step)),
-
-            new WidgetConfig(Material.REDSTONE_BLOCK, () -> {
-                new ChangeScreen(this).changeToSettingsScreen(player);
-            })
-            .setTooltip("Настройки")
-            .setTooltipDelay(30)
-            .setPosition(basePosition.clone().addVertical(step * 2))
-        };
     }
 } 

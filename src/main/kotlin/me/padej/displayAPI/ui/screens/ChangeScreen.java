@@ -9,8 +9,8 @@ import me.padej.displayAPI.ui.widgets.WidgetConfig;
 import me.padej.displayAPI.ui.widgets.WidgetPosition;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
@@ -18,10 +18,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ChangeScreen {
+    private static final Logger LOGGER = LogManager.getLogger(ChangeScreen.class);
     private final Screen screen;
     private Class<? extends Screen> currentScreenClass;
     private final List<Widget> persistentWidgets = new ArrayList<>();
-    private static boolean isSettingsScreen = false;
 
     public ChangeScreen(Screen screen) {
         this.screen = screen;
@@ -30,7 +30,6 @@ public class ChangeScreen {
     }
 
     private void savePersistentWidgets() {
-        // Сохраняем виджеты с аннотацией @Persistent
         for (Field field : Screen.class.getDeclaredFields()) {
             if (field.isAnnotationPresent(Persistent.class)) {
                 field.setAccessible(true);
@@ -40,102 +39,100 @@ public class ChangeScreen {
                         persistentWidgets.add((Widget) widget);
                     }
                 } catch (IllegalAccessException e) {
-                    e.printStackTrace();
+                    LOGGER.error("Ошибка при сохранении постоянных виджетов в классе {}", screen.getClass().getSimpleName(), e);
                 }
             }
+        }
+    }
+
+    private void removeNonPersistentWidgets() {
+        List<Widget> widgetsToRemove = new ArrayList<>();
+        for (Widget widget : screen.getChildren()) {
+            if (!persistentWidgets.contains(widget)) {
+                widgetsToRemove.add(widget);
+                widget.remove();
+            }
+        }
+        screen.getChildren().removeAll(widgetsToRemove);
+    }
+
+    private void createBranchWidgets(Player player, Screen branchScreen) {
+        WidgetConfig[] branchWidgets = branchScreen.getBranchWidgets(player);
+        for (WidgetConfig config : branchWidgets) {
+            screen.createWidget(config);
         }
     }
 
     public void changeToBranch(Player player, Class<? extends Screen> branchClass) {
-        // 1. Удаляем все не-persistent виджеты
-        List<Widget> widgetsToRemove = new ArrayList<>();
-        for (Widget widget : screen.getChildren()) {
-            if (!persistentWidgets.contains(widget)) {
-                widgetsToRemove.add(widget);
-                widget.remove();
-            }
-        }
-        screen.getChildren().removeAll(widgetsToRemove);
+        removeNonPersistentWidgets();
 
         try {
-            // Создаем временный экземпляр нового экрана для получения виджетов
             Screen branchScreen = branchClass.getDeclaredConstructor().newInstance();
-
-            // Получаем и создаем виджеты для нового экрана
-            WidgetConfig[] branchWidgets = branchScreen.getBranchWidgets(player);
-            for (WidgetConfig config : branchWidgets) {
-                screen.createWidget(config);
-            }
-
-            // Обновляем текущий класс экрана
+            createBranchWidgets(player, branchScreen);
             this.currentScreenClass = branchClass;
 
-            // Если это не главный экран, добавляем кнопку возврата
             if (!branchClass.isAnnotationPresent(Main.class)) {
                 createReturnButton(player);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Ошибка при смене экрана на {}", branchClass.getSimpleName(), e);
         }
     }
 
     public void returnToParentScreen(Player player) {
-        // Сначала устанавливаем viewer
         screen.viewer = player;
-        
-        // 1. Удаляем все не-persistent виджеты
-        List<Widget> widgetsToRemove = new ArrayList<>();
-        for (Widget widget : screen.getChildren()) {
-            if (!persistentWidgets.contains(widget)) {
-                widgetsToRemove.add(widget);
-                widget.remove();
-            }
-        }
-        screen.getChildren().removeAll(widgetsToRemove);
+        removeNonPersistentWidgets();
 
         try {
-            // Создаем временный экземпляр текущего экрана для получения родительского класса
             Screen currentScreen = currentScreenClass.getDeclaredConstructor().newInstance();
             Class<? extends Screen> parentClass = currentScreen.getParentScreen();
 
-            if (parentClass != null) {
-                // Создаем временный экземпляр родительского экрана
-                Screen parentScreen = parentClass.getDeclaredConstructor().newInstance();
-                
-                // Обновляем текущий класс экрана на родительский
-                this.currentScreenClass = parentClass;
-                
-                // Получаем и создаем виджеты для родительского экрана
-                if (parentClass == MainScreen.class) {
-                    screen.setupDefaultWidgets(player);
-                } else {
-                    WidgetConfig[] parentWidgets = parentScreen.getBranchWidgets(player);
-                    for (WidgetConfig config : parentWidgets) {
-                        screen.createWidget(config);
-                    }
-                }
-            } else {
-                // Если parentClass == null, значит мы вернулись на главный экран
-                screen.setupDefaultWidgets(player);
-                this.currentScreenClass = MainScreen.class;
-            }
-
-            // Если это не главный экран, добавляем кнопку возврата
-            if (currentScreenClass != MainScreen.class) {
-                createReturnButton(player);
-            }
+            setupParentScreenWidgets(player, parentClass);
+            addReturnButtonIfNeeded(player);
         } catch (Exception e) {
-            e.printStackTrace();
-            // В случае ошибки тоже пытаемся установить виджеты
-            screen.setupDefaultWidgets(player);
+            handleReturnError(player, e);
         }
     }
 
+    private void setupParentScreenWidgets(Player player, Class<? extends Screen> parentClass) throws ReflectiveOperationException {
+        if (parentClass == null) {
+            screen.setupDefaultWidgets(player);
+            this.currentScreenClass = MainScreen.class;
+            return;
+        }
+
+        Screen parentScreen = parentClass.getDeclaredConstructor().newInstance();
+        this.currentScreenClass = parentClass;
+
+        if (parentClass == MainScreen.class) {
+            screen.setupDefaultWidgets(player);
+        } else {
+            createBranchWidgets(player, parentScreen);
+        }
+    }
+
+    private void addReturnButtonIfNeeded(Player player) {
+        if (currentScreenClass != MainScreen.class) {
+            createReturnButton(player);
+        }
+    }
+
+    private void handleReturnError(Player player, Exception e) {
+        LOGGER.error("Ошибка при возврате на родительский экран {}", currentScreenClass.getSimpleName(), e);
+        screen.setupDefaultWidgets(player);
+    }
+
     private void createReturnButton(Player player) {
+        TextDisplayConfig returnConfig = createReturnButtonConfig(player);
+        screen.createTextWidget(returnConfig);
+    }
+
+    private TextDisplayConfig createReturnButtonConfig(Player player) {
         WidgetPosition basePosition = new WidgetPosition(0.52, 0.92);
-        TextDisplayConfig returnConfig = new TextDisplayConfig(
-                Component.text("⏴").color(TextColor.fromHexString("#fafeff")),
-                Component.text("⏴").color(TextColor.fromHexString("#aaaeaf")),
+
+        return new TextDisplayConfig(
+                createReturnButtonText(),
+                createReturnButtonHoverText(),
                 () -> returnToParentScreen(player)
         )
                 .setPosition(basePosition.clone().addHorizontal(-0.28))
@@ -143,63 +140,13 @@ public class ChangeScreen {
                 .setTolerance(0.035)
                 .setBackgroundColor(org.bukkit.Color.fromRGB(30, 30, 30), 0)
                 .setHoveredBackgroundColor(org.bukkit.Color.fromRGB(60, 60, 60), 0);
-
-        screen.createTextWidget(returnConfig);
     }
 
-    public void changeToSettingsScreen(Player player) {
-        if (isSettingsScreen) return;
-
-        // 1. Удаляем все не-persistent виджеты
-        List<Widget> widgetsToRemove = new ArrayList<>();
-        for (Widget widget : screen.getChildren()) {
-            if (!persistentWidgets.contains(widget)) {
-                widgetsToRemove.add(widget);
-            }
-        }
-        
-        for (Widget widget : widgetsToRemove) {
-            widget.remove();
-            screen.getChildren().remove(widget);
-        }
-
-        // 2. Создаем виджеты для экрана настроек
-        WidgetPosition basePosition = new WidgetPosition(-0.42f, 0.3f);
-        float step = 0.15f;
-
-        WidgetConfig[] settingsButtons = {
-            new WidgetConfig(Material.REDSTONE, () -> {
-                if (!isSettingsScreen) return;
-                player.sendMessage("Настройка 1");
-            })
-            .setTooltip("Настройка 1")
-            .setTooltipDelay(30)
-            .setPosition(basePosition.clone()),
-
-            new WidgetConfig(Material.GLOWSTONE_DUST, () -> {
-                if (!isSettingsScreen) return;
-                player.sendMessage("Настройка 2");
-            })
-            .setTooltip("Настройка 2")
-            .setTooltipDelay(30)
-            .setPosition(basePosition.clone().addVertical(step))
-        };
-
-        for (WidgetConfig config : settingsButtons) {
-            screen.createWidget(config);
-        }
-
-        isSettingsScreen = true;
-        createReturnButton(player);
+    private Component createReturnButtonText() {
+        return Component.text("⏴").color(TextColor.fromHexString("#fafeff"));
     }
 
-    // Геттер для проверки текущего экрана
-    public static boolean isSettingsScreen() {
-        return isSettingsScreen;
-    }
-
-    // Сеттер для установки флага экрана настроек
-    public static void setSettingsScreen(boolean value) {
-        isSettingsScreen = value;
+    private Component createReturnButtonHoverText() {
+        return Component.text("⏴").color(TextColor.fromHexString("#aaaeaf"));
     }
 } 
