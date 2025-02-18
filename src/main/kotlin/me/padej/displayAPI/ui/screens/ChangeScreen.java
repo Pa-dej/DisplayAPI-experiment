@@ -57,9 +57,16 @@ public class ChangeScreen {
     }
 
     private void createBranchWidgets(Player player, Screen branchScreen) {
+        // Обработка обычных виджетов
         WidgetConfig[] branchWidgets = branchScreen.getBranchWidgets(player);
         for (WidgetConfig config : branchWidgets) {
             screen.createWidget(config);
+        }
+
+        // Обработка текстовых виджетов
+        TextDisplayConfig[] textWidgets = branchScreen.getTextWidgets(player);
+        for (TextDisplayConfig config : textWidgets) {
+            screen.createTextWidget(config);
         }
     }
 
@@ -138,8 +145,10 @@ public class ChangeScreen {
                 .setPosition(basePosition.clone().addHorizontal(-0.28))
                 .setScale(0.75f, 0.75f, 0.75f)
                 .setTolerance(0.035)
-                .setBackgroundColor(org.bukkit.Color.fromRGB(30, 30, 30), 0)
-                .setHoveredBackgroundColor(org.bukkit.Color.fromRGB(60, 60, 60), 0);
+                .setBackgroundColor(org.bukkit.Color.fromRGB(30, 30, 30))
+                .setBackgroundAlpha(0)
+                .setHoveredBackgroundAlpha(0)
+                .setHoveredBackgroundColor(org.bukkit.Color.fromRGB(60, 60, 60));
     }
 
     private Component createReturnButtonText() {

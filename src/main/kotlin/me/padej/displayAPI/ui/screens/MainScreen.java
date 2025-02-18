@@ -44,7 +44,14 @@ public class MainScreen extends Screen {
             })
             .setTooltip("Ветка 3")
             .setTooltipDelay(30)
-            .setPosition(basePosition.clone().addVertical(step * 2))
+            .setPosition(basePosition.clone().addVertical(step * 2)),
+
+            new WidgetConfig(Material.AMETHYST_SHARD, () -> {
+                new ChangeScreen(this).changeToBranch(player, Branch4Screen.class);
+            })
+            .setTooltip("Ветка 4")
+            .setTooltipDelay(30)
+            .setPosition(basePosition.clone().addVertical(step * 3))
         };
 
         for (WidgetConfig config : branchButtons) {

@@ -24,11 +24,10 @@ public abstract class Screen extends WidgetManager {
     private final StringRectangle display;
     private final Class<? extends Screen> CURRENT_SCREEN_CLASS;
 
-    // Делаем состояния статическими, чтобы они были общими для всех экранов
     private static boolean isFollowing = false;
     public static boolean isSaved = false;
-    private static Vector relativePosition;  // Позиция дисплея относительно игрока
-    private static Vector savedPosition;  // Позиция для режима сохранения
+    private static Vector relativePosition;
+    private static Vector savedPosition;
 
     @Persistent("Control buttons")
     private TextDisplayButtonWidget followButton;
@@ -240,8 +239,10 @@ public abstract class Screen extends WidgetManager {
                 .setPosition(basePosition.clone().addHorizontal(0.14))
                 .setScale(0.75f, 0.75f, 0.75f)
                 .setTolerance(0.035)
-                .setBackgroundColor(org.bukkit.Color.fromRGB(30, 30, 30), 0)
-                .setHoveredBackgroundColor(org.bukkit.Color.fromRGB(60, 60, 60), 0);
+                .setBackgroundColor(org.bukkit.Color.fromRGB(30, 30, 30))
+                .setBackgroundAlpha(0)
+                .setHoveredBackgroundAlpha(0)
+                .setHoveredBackgroundColor(org.bukkit.Color.fromRGB(60, 60, 60));
 
         TextDisplayConfig followConfig = new TextDisplayConfig(
                 Component.text("⏺").color(TextColor.fromHexString("#ffc72c")),
@@ -251,8 +252,10 @@ public abstract class Screen extends WidgetManager {
                 .setPosition(basePosition.clone())
                 .setScale(0.75f, 0.75f, 0.75f)
                 .setTolerance(0.035)
-                .setBackgroundColor(org.bukkit.Color.fromRGB(30, 30, 30), 0)
-                .setHoveredBackgroundColor(org.bukkit.Color.fromRGB(60, 60, 60), 0);
+                .setBackgroundColor(org.bukkit.Color.fromRGB(30, 30, 30))
+                .setBackgroundAlpha(0)
+                .setHoveredBackgroundAlpha(0)
+                .setHoveredBackgroundColor(org.bukkit.Color.fromRGB(60, 60, 60));
 
         TextDisplayConfig saveConfig = new TextDisplayConfig(
                 Component.text("⏺").color(TextColor.fromHexString("#2aff55")),
@@ -262,8 +265,10 @@ public abstract class Screen extends WidgetManager {
                 .setPosition(basePosition.clone().addHorizontal(-0.14))
                 .setScale(0.75f, 0.75f, 0.75f)
                 .setTolerance(0.035)
-                .setBackgroundColor(org.bukkit.Color.fromRGB(30, 30, 30), 0)
-                .setHoveredBackgroundColor(org.bukkit.Color.fromRGB(60, 60, 60), 0);
+                .setBackgroundColor(org.bukkit.Color.fromRGB(30, 30, 30))
+                .setBackgroundAlpha(0)
+                .setHoveredBackgroundAlpha(0)
+                .setHoveredBackgroundColor(org.bukkit.Color.fromRGB(60, 60, 60));
 
         this.closeButton = createTextWidget(closeConfig);
         this.followButton = createTextWidget(followConfig);
@@ -473,5 +478,9 @@ public abstract class Screen extends WidgetManager {
      */
     public WidgetConfig[] getBranchWidgets(Player player) {
         return new WidgetConfig[0];
+    }
+
+    public TextDisplayConfig[] getTextWidgets(Player player) {
+        return new TextDisplayConfig[0];
     }
 }
