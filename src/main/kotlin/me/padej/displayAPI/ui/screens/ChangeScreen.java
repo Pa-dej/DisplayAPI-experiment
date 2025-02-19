@@ -46,28 +46,33 @@ public class ChangeScreen {
     }
 
     private void removeNonPersistentWidgets() {
-        List<Widget> widgetsToRemove = new ArrayList<>();
-        for (Widget widget : screen.getChildren()) {
-            if (!persistentWidgets.contains(widget)) {
-                widgetsToRemove.add(widget);
-                widget.remove();
-            }
+        List<Widget> widgetsToRemove = new ArrayList<>(screen.getChildren());
+        widgetsToRemove.removeAll(persistentWidgets);
+        
+        for (Widget widget : widgetsToRemove) {
+            widget.remove();
         }
         screen.getChildren().removeAll(widgetsToRemove);
     }
 
     private void createBranchWidgets(Player player, Screen branchScreen) {
+        LOGGER.debug("Создание виджетов для экрана: {}", branchScreen.getClass().getSimpleName());
+        
         // Обработка обычных виджетов
         WidgetConfig[] branchWidgets = branchScreen.getBranchWidgets(player);
+        LOGGER.debug("Количество branch виджетов: {}", branchWidgets.length);
         for (WidgetConfig config : branchWidgets) {
             screen.createWidget(config);
         }
 
         // Обработка текстовых виджетов
         TextDisplayConfig[] textWidgets = branchScreen.getTextWidgets(player);
+        LOGGER.debug("Количество текстовых виджетов: {}", textWidgets.length);
         for (TextDisplayConfig config : textWidgets) {
             screen.createTextWidget(config);
         }
+        
+        LOGGER.debug("Общее количество виджетов после создания: {}", screen.getChildren().size());
     }
 
     public void changeToBranch(Player player, Class<? extends Screen> branchClass) {
@@ -75,6 +80,13 @@ public class ChangeScreen {
 
         try {
             Screen branchScreen = branchClass.getDeclaredConstructor().newInstance();
+            branchScreen.viewer = player;
+            branchScreen.location = screen.getLocation();
+            
+            // Копируем все необходимые свойства из branchScreen в screen
+            screen.viewer = branchScreen.viewer;
+            screen.location = branchScreen.location;
+            
             createBranchWidgets(player, branchScreen);
             this.currentScreenClass = branchClass;
 
@@ -109,6 +121,8 @@ public class ChangeScreen {
         }
 
         Screen parentScreen = parentClass.getDeclaredConstructor().newInstance();
+        parentScreen.viewer = player;
+        parentScreen.location = screen.getLocation();
         this.currentScreenClass = parentClass;
 
         if (parentClass == MainScreen.class) {

@@ -51,7 +51,12 @@ public class MainScreen extends Screen {
             })
             .setTooltip("Ветка 4")
             .setTooltipDelay(30)
-            .setPosition(basePosition.clone().addVertical(step * 3))
+            .setPosition(basePosition.clone().addVertical(step * 3)),
+
+            new WidgetConfig(Material.GOLD_INGOT, () -> {
+                new ChangeScreen(this).changeToBranch(player, Branch5Screen.class);
+            })
+            .setPosition(basePosition.clone().addVertical(-step))
         };
 
         for (WidgetConfig config : branchButtons) {

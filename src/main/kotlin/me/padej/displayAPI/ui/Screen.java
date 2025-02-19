@@ -36,8 +36,11 @@ public abstract class Screen extends WidgetManager {
     @Persistent("Control buttons")
     private TextDisplayButtonWidget closeButton;
     
+    public Player viewer;
+
     public Screen(Player viewer, Location location, String text, float scale) {
         super(viewer, location);
+        this.viewer = viewer;
         CURRENT_SCREEN_CLASS = this.getClass();
 
         display = new StringRectangle(
@@ -452,13 +455,15 @@ public abstract class Screen extends WidgetManager {
     }
 
     protected Screen() {
-        super(null, new Location(Bukkit.getWorlds().get(0), 0, 0, 0)); // Используем дефолтную локацию
+        super(null, new Location(Bukkit.getWorlds().get(0), 0, 0, 0));
+        this.viewer = null;
         display = null;
         CURRENT_SCREEN_CLASS = this.getClass();
     }
 
     protected Screen(Player viewer, Location location) {
         super(viewer, location);
+        this.viewer = viewer;
         display = null;
         CURRENT_SCREEN_CLASS = this.getClass();
     }

@@ -12,7 +12,7 @@ import java.util.List;
 public class WidgetManager {
     protected final List<Widget> children = new ArrayList<>();
     public Player viewer;
-    protected Location location;
+    public Location location;
     
     public WidgetManager(Player viewer, Location location) {
         this.viewer = viewer;
