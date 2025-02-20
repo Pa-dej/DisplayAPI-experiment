@@ -1,11 +1,11 @@
 package me.padej.displayAPI.ui;
 
-import io.papermc.paper.entity.LookAnchor;
 import me.padej.displayAPI.DisplayAPI;
 import me.padej.displayAPI.render.shapes.StringRectangle;
 import me.padej.displayAPI.ui.annotations.Persistent;
 import me.padej.displayAPI.ui.widgets.*;
 import me.padej.displayAPI.utils.Animation;
+import me.padej.displayAPI.utils.DisplayUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
@@ -65,7 +65,7 @@ public abstract class Screen extends WidgetManager {
                 
                 // Поворачиваем дисплей к игроку при создании
                 Location viewerLoc = viewer.getEyeLocation();
-                textDisplay.lookAt(viewerLoc.getX(), viewerLoc.getY(), viewerLoc.getZ(), LookAnchor.EYES);
+                DisplayUtils.lookAtPos(textDisplay, viewerLoc);
             }
         }
     }
