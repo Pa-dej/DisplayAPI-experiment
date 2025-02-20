@@ -4,6 +4,7 @@ import me.padej.displayAPI.DisplayAPI;
 import me.padej.displayAPI.render.shapes.StringRectangle;
 import me.padej.displayAPI.ui.annotations.Main;
 import me.padej.displayAPI.ui.annotations.Persistent;
+import me.padej.displayAPI.ui.annotations.AlwaysOnScreen;
 import me.padej.displayAPI.ui.screens.ChangeScreen;
 import me.padej.displayAPI.ui.widgets.*;
 import me.padej.displayAPI.utils.Animation;
@@ -31,13 +32,13 @@ public abstract class Screen extends WidgetManager {
     private static Vector relativePosition;
     private static Vector savedPosition;
 
-    @Persistent("Control buttons")
+    @AlwaysOnScreen(Screen.class)
     private TextDisplayButtonWidget followButton;
-    @Persistent("Control buttons")
+    @AlwaysOnScreen(Screen.class)
     private TextDisplayButtonWidget saveButton;
-    @Persistent("Control buttons")
+    @AlwaysOnScreen(Screen.class)
     private TextDisplayButtonWidget closeButton;
-    
+
     public Player viewer;
 
     public Screen(Player viewer, Location location, String text, float scale) {
@@ -52,11 +53,12 @@ public abstract class Screen extends WidgetManager {
                 Display.Billboard.FIXED,
                 false,
                 text
-        ) {};
-        
+        ) {
+        };
+
         spawn();
     }
-    
+
     private void spawn() {
         if (display != null) {
             TextDisplay textDisplay = display.spawn(location);
@@ -64,34 +66,36 @@ public abstract class Screen extends WidgetManager {
                 textDisplay.setBrightness(new Display.Brightness(15, 15));
                 textDisplay.setVisibleByDefault(false); // Делаем невидимым по умолчанию
                 viewer.showEntity(DisplayAPI.getInstance(), textDisplay); // Показываем только создателю
-                
+
                 // Поворачиваем дисплей к игроку при создании
                 Location viewerLoc = viewer.getEyeLocation();
                 DisplayUtils.lookAtPos(textDisplay, viewerLoc);
             }
         }
     }
-    
+
     @Override
     public void remove() {
         if (isSaved && !isPlayerInSavedRange()) {
             return;
         }
 
-        isFollowing = false;
-        isSaved = false;
-        relativePosition = null;
-        savedPosition = null;
+        resetVarsAndBackground();
 
-        if (followButton != null) {
-            followButton.getDisplay().setGlowing(false);
+        softRemove();
+        super.remove();
+    }
+
+    public void removeWithAnimation() {
+        if (isSaved && !isPlayerInSavedRange()) {
+            return;
         }
-        if (saveButton != null) {
-            saveButton.getDisplay().setGlowing(false);
-        }
+        resetVarsAndBackground();
 
-        updateBackgroundColor(null);
+        softRemoveWithAnimation();
+    }
 
+    public void softRemove() {
         for (Widget widget : children) {
             widget.remove();
         }
@@ -101,36 +105,17 @@ public abstract class Screen extends WidgetManager {
         super.remove();
     }
 
-    public void removeWithAnimation() {
-        if (isSaved && !isPlayerInSavedRange()) {
-            return;
-        }
-
-        isFollowing = false;
-        isSaved = false;
-        relativePosition = null;
-        savedPosition = null;
-
-        if (followButton != null) {
-            followButton.getDisplay().setGlowing(false);
-        }
-
-        if (saveButton != null) {
-            saveButton.getDisplay().setGlowing(false);
-        }
-
-        updateBackgroundColor(null);
-
+    public void softRemoveWithAnimation() {
         if (display != null && display.getTextDisplay() != null) {
             Animation.applyTransformationWithInterpolation(
-                display.getTextDisplay(),
-                new Transformation(
-                    display.getTextDisplay().getTransformation().getTranslation(),
-                    display.getTextDisplay().getTransformation().getLeftRotation(),
-                    new Vector3f(0, 0, 0),
-                    display.getTextDisplay().getTransformation().getRightRotation()
-                ),
-                5
+                    display.getTextDisplay(),
+                    new Transformation(
+                            display.getTextDisplay().getTransformation().getTranslation().add(0, 0.5f, -1f),
+                            display.getTextDisplay().getTransformation().getLeftRotation(),
+                            new Vector3f(0, 0, 0),
+                            display.getTextDisplay().getTransformation().getRightRotation()
+                    ),
+                    5
             );
 
             for (Widget widget : children) {
@@ -142,6 +127,15 @@ public abstract class Screen extends WidgetManager {
                 display.removeEntity();
             }, 5);
         }
+    }
+
+    private void resetVarsAndBackground() {
+        isFollowing = false;
+        isSaved = false;
+        relativePosition = null;
+        savedPosition = null;
+
+        updateBackgroundColor(null);
     }
 
     public boolean isPlayerInRange() {
@@ -186,7 +180,7 @@ public abstract class Screen extends WidgetManager {
         if (location == null) {
             return null;
         }
-        
+
         Location buttonLoc = location.clone();
         Vector direction = buttonLoc.getDirection();
         Vector right = direction.getCrossProduct(new Vector(0, 1, 0)).normalize();
@@ -227,13 +221,14 @@ public abstract class Screen extends WidgetManager {
         createScreenWidgets(player);
     }
 
-    public void createScreenWidgets(Player player) {}
+    public void createScreenWidgets(Player player) {
+    }
 
     protected void createTitleBarControlWidgets() {
         if (location == null) {
             return;
         }
-        
+
         WidgetPosition basePosition = new WidgetPosition(0.52, 0.92);
 
         // Добавляем кнопку возврата для экранов без аннотации @Main
@@ -503,6 +498,7 @@ public abstract class Screen extends WidgetManager {
 
     /**
      * Возвращает конфигурации виджетов для данного экрана
+     *
      * @param player Игрок, для которого создаются виджеты
      * @return Массив конфигураций виджетов
      */
