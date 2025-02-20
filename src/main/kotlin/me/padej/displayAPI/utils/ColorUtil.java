@@ -15,7 +15,7 @@ public class ColorUtil {
         return Color.fromARGB(alpha, r, g, b);
     }
 
-    public static @NotNull java.awt.Color getRandomPartyPopperRGBColor() {
+    public static java.awt.Color getRandomPartyPopperRGBColor() {
         int[][] colors = {
                 {221, 220, 245},
                 {200, 173, 236},

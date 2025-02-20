@@ -1,6 +1,6 @@
 package me.padej.displayAPI.test_events;
 
-import me.padej.displayAPI.render.particles.ExampleStringParticle;
+import me.padej.displayAPI.render.particles.ExampleComponentParticle;
 import me.padej.displayAPI.utils.ItemUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -27,7 +27,7 @@ public class CreateDisplayParticleSecondTest implements Listener {
 
             if (action.isRightClick()) {
                 for (int i = 0; i < 40; i++) {
-                    ExampleStringParticle particle = new ExampleStringParticle(player, spawnLocation); // Передаем игрока
+                    ExampleComponentParticle particle = new ExampleComponentParticle(player, spawnLocation); // Передаем игрока
                     particles.add(particle);
                 }
                 player.getWorld().spawnParticle(Particle.EXPLOSION, spawnLocation, 1, 0, 0, 0, 0);
