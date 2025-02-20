@@ -2,7 +2,9 @@ package me.padej.displayAPI.ui;
 
 import me.padej.displayAPI.DisplayAPI;
 import me.padej.displayAPI.render.shapes.StringRectangle;
+import me.padej.displayAPI.ui.annotations.Main;
 import me.padej.displayAPI.ui.annotations.Persistent;
+import me.padej.displayAPI.ui.screens.ChangeScreen;
 import me.padej.displayAPI.ui.widgets.*;
 import me.padej.displayAPI.utils.Animation;
 import me.padej.displayAPI.utils.DisplayUtils;
@@ -233,6 +235,29 @@ public abstract class Screen extends WidgetManager {
         }
         
         WidgetPosition basePosition = new WidgetPosition(0.52, 0.92);
+
+        // Добавляем кнопку возврата для экранов без аннотации @Main
+        if (!this.getClass().isAnnotationPresent(Main.class)) {
+            TextDisplayConfig returnConfig = new TextDisplayConfig(
+                    Component.text("⏴").color(TextColor.fromHexString("#fafeff")),
+                    Component.text("⏴").color(TextColor.fromHexString("#aaaeaf")),
+                    () -> {
+                        Screen currentScreen = UIManager.getInstance().getActiveScreen(viewer);
+                        if (currentScreen != null) {
+                            ChangeScreen.switchToParent(viewer, currentScreen.getCurrentScreenClass());
+                        }
+                    }
+            )
+                    .setPosition(basePosition.clone().addHorizontal(-0.28))
+                    .setScale(0.75f, 0.75f, 0.75f)
+                    .setTolerance(0.035)
+                    .setBackgroundColor(org.bukkit.Color.fromRGB(30, 30, 30))
+                    .setBackgroundAlpha(0)
+                    .setHoveredBackgroundAlpha(0)
+                    .setHoveredBackgroundColor(org.bukkit.Color.fromRGB(60, 60, 60));
+
+            createTextWidget(returnConfig);
+        }
 
         TextDisplayConfig closeConfig = new TextDisplayConfig(
                 Component.text("⏺").color(TextColor.fromHexString("#ff2147")),

@@ -16,18 +16,29 @@ public class Branch5Screen extends Screen {
         super(viewer, location);
     }
 
+    public Branch5Screen(Player viewer, Location location, String text, float scale) {
+        super(viewer, location, text, scale);
+    }
+
     @Override
     public Class<? extends Screen> getParentScreen() {
         return MainScreen.class;
     }
 
     @Override
-    public WidgetConfig[] getBranchWidgets(Player player) {
+    public void createScreenWidgets(Player player) {
         WidgetPosition basePosition = new WidgetPosition(-0.42f, 0.3f);
+        float step = 0.15f;
 
-        return new WidgetConfig[]{
-                new WidgetConfig(Material.DIAMOND, () -> new ChangeScreen(this).changeToBranch(player, Branch51Screen.class))
-                        .setPosition(basePosition.clone())
+        WidgetConfig[] branchButtons = {
+                new WidgetConfig(Material.NETHER_STAR, () -> {
+                    ChangeScreen.switchTo(player, Branch5Screen.class, Branch51Screen.class);
+                })
+                        .setPosition(basePosition.clone().addHorizontal(step))
         };
+
+        for (WidgetConfig config : branchButtons) {
+            createWidget(config);
+        }
     }
 }

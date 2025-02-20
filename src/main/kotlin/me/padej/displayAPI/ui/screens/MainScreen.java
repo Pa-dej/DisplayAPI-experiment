@@ -26,35 +26,35 @@ public class MainScreen extends Screen {
 
         WidgetConfig[] branchButtons = {
             new WidgetConfig(Material.COMPASS, () -> {
-                new ChangeScreen(this).changeToBranch(player, Branch1Screen.class);
+                ChangeScreen.switchTo(player, MainScreen.class, Branch1Screen.class);
             })
             .setTooltip("Ветка 1")
             .setTooltipDelay(30)
             .setPosition(basePosition.clone()),
 
             new WidgetConfig(Material.MAP, () -> {
-                new ChangeScreen(this).changeToBranch(player, Branch2Screen.class);
+                ChangeScreen.switchTo(player, MainScreen.class, Branch2Screen.class);
             })
             .setTooltip("Ветка 2")
             .setTooltipDelay(30)
             .setPosition(basePosition.clone().addVertical(step)),
 
             new WidgetConfig(Material.CLOCK, () -> {
-                new ChangeScreen(this).changeToBranch(player, Branch3Screen.class);
+                ChangeScreen.switchTo(player, MainScreen.class, Branch3Screen.class);
             })
             .setTooltip("Ветка 3")
             .setTooltipDelay(30)
             .setPosition(basePosition.clone().addVertical(step * 2)),
 
             new WidgetConfig(Material.AMETHYST_SHARD, () -> {
-                new ChangeScreen(this).changeToBranch(player, Branch4Screen.class);
+                ChangeScreen.switchTo(player, MainScreen.class, Branch4Screen.class);
             })
             .setTooltip("Ветка 4")
             .setTooltipDelay(30)
             .setPosition(basePosition.clone().addVertical(step * 3)),
 
             new WidgetConfig(Material.GOLD_INGOT, () -> {
-                new ChangeScreen(this).changeToBranch(player, Branch5Screen.class);
+                ChangeScreen.switchTo(player, MainScreen.class, Branch5Screen.class);
             })
             .setPosition(basePosition.clone().addVertical(-step))
         };
