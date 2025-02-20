@@ -1,7 +1,7 @@
 package me.padej.displayAPI.ui.screens;
 
 import me.padej.displayAPI.ui.Screen;
-import me.padej.displayAPI.ui.widgets.WidgetConfig;
+import me.padej.displayAPI.ui.widgets.ItemDisplayButtonConfig;
 import me.padej.displayAPI.ui.widgets.WidgetPosition;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -9,7 +9,11 @@ import org.bukkit.entity.Player;
 
 public class Branch1Screen extends Screen {
     public Branch1Screen() {
-        super(); // Используем конструктор для временных экранов
+        super();
+    }
+
+    public Branch1Screen(Player viewer, Location location) {
+        super(viewer, location);
     }
 
     public Branch1Screen(Player viewer, Location location, String text, float scale) {
@@ -17,19 +21,19 @@ public class Branch1Screen extends Screen {
     }
 
     @Override
-    public void setupDefaultWidgets(Player player) {
+    public void createScreenWidgets(Player player) {
         WidgetPosition basePosition = new WidgetPosition(-0.42f, 0.3f);
         float step = 0.15f;
 
-        WidgetConfig[] branchButtons = {
-                new WidgetConfig(Material.REDSTONE, () -> {
+        ItemDisplayButtonConfig[] branchButtons = {
+                new ItemDisplayButtonConfig(Material.REDSTONE, () -> {
                     player.sendMessage("Ветка 1");
                 })
                         .setTooltip("Подветка 1")
                         .setTooltipDelay(30)
                         .setPosition(basePosition.clone()),
 
-                new WidgetConfig(Material.GLOWSTONE_DUST, () -> {
+                new ItemDisplayButtonConfig(Material.GLOWSTONE_DUST, () -> {
                     player.sendMessage("Ветка 2");
                 })
                         .setTooltip("Подветка 2")
@@ -37,7 +41,7 @@ public class Branch1Screen extends Screen {
                         .setPosition(basePosition.clone().addVertical(step))
         };
 
-        for (WidgetConfig config : branchButtons) {
+        for (ItemDisplayButtonConfig config : branchButtons) {
             createWidget(config);
         }
     }
@@ -45,27 +49,5 @@ public class Branch1Screen extends Screen {
     @Override
     public Class<? extends Screen> getParentScreen() {
         return MainScreen.class;
-    }
-
-    @Override
-    public WidgetConfig[] getBranchWidgets(Player player) {
-        WidgetPosition basePosition = new WidgetPosition(-0.42f, 0.3f);
-        float step = 0.15f;
-
-        return new WidgetConfig[]{
-                new WidgetConfig(Material.REDSTONE, () -> {
-                    player.sendMessage("Ветка 1");
-                })
-                        .setTooltip("Подветка 1")
-                        .setTooltipDelay(30)
-                        .setPosition(basePosition.clone()),
-
-                new WidgetConfig(Material.GLOWSTONE_DUST, () -> {
-                    player.sendMessage("Ветка 2");
-                })
-                        .setTooltip("Подветка 2")
-                        .setTooltipDelay(30)
-                        .setPosition(basePosition.clone().addVertical(step))
-        };
     }
 } 

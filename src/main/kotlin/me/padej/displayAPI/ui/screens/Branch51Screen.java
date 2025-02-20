@@ -1,7 +1,7 @@
 package me.padej.displayAPI.ui.screens;
 
 import me.padej.displayAPI.ui.Screen;
-import me.padej.displayAPI.ui.widgets.WidgetConfig;
+import me.padej.displayAPI.ui.widgets.ItemDisplayButtonConfig;
 import me.padej.displayAPI.ui.widgets.WidgetPosition;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -30,14 +30,14 @@ public class Branch51Screen extends Screen {
         WidgetPosition basePosition = new WidgetPosition(-0.42f, 0.3f);
         float step = 0.15f;
 
-        WidgetConfig[] branchButtons = {
-                new WidgetConfig(Material.EMERALD, () -> {
+        ItemDisplayButtonConfig[] branchButtons = {
+                new ItemDisplayButtonConfig(Material.EMERALD, () -> {
                     ChangeScreen.switchTo(player, Branch5Screen.class, Branch51Screen.class);
                 })
                         .setPosition(basePosition.clone())
         };
 
-        for (WidgetConfig config : branchButtons) {
+        for (ItemDisplayButtonConfig config : branchButtons) {
             createWidget(config);
         }
     }

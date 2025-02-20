@@ -1,8 +1,7 @@
 package me.padej.displayAPI.ui.screens;
 
 import me.padej.displayAPI.ui.Screen;
-import me.padej.displayAPI.ui.widgets.TextDisplayButtonWidget;
-import me.padej.displayAPI.ui.widgets.TextDisplayConfig;
+import me.padej.displayAPI.ui.widgets.TextDisplayButtonConfig;
 import me.padej.displayAPI.ui.widgets.WidgetPosition;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
@@ -20,19 +19,23 @@ public class Branch4Screen extends Screen {
         super(viewer, location);
     }
 
+    public Branch4Screen(Player viewer, Location location, String text, float scale) {
+        super(viewer, location, text, scale);
+    }
+
     @Override
     public Class<? extends Screen> getParentScreen() {
         return MainScreen.class;
     }
 
     @Override
-    public TextDisplayConfig[] getTextWidgets(Player player) {
+    public void createScreenWidgets(Player player) {
         WidgetPosition basePosition = new WidgetPosition(-0.42f, 0.3f);
         TextColor defaultColor = TextColor.fromHexString("#FFFFFF");
         TextColor hoverColor = TextColor.fromHexString("#FCD720");
-        
-        return new TextDisplayConfig[] {
-                new TextDisplayConfig(
+
+        TextDisplayButtonConfig[] branchButtons = {
+                new TextDisplayButtonConfig(
                         Component.text("Выживание").color(defaultColor),
                         Component.text("Выживание").color(hoverColor),
                         () -> player.setGameMode(GameMode.SURVIVAL))
@@ -44,7 +47,7 @@ public class Branch4Screen extends Screen {
                         .setHoveredBackgroundColor(Color.fromRGB(60, 60, 60))
                         .setHoveredBackgroundAlpha(180),
 
-                new TextDisplayConfig(
+                new TextDisplayButtonConfig(
                         Component.text("Креатив").color(defaultColor),
                         Component.text("Креатив").color(hoverColor),
                         () -> player.setGameMode(GameMode.CREATIVE))
@@ -56,7 +59,7 @@ public class Branch4Screen extends Screen {
                         .setHoveredBackgroundColor(Color.fromRGB(60, 60, 60))
                         .setHoveredBackgroundAlpha(180),
 
-                new TextDisplayConfig(
+                new TextDisplayButtonConfig(
                         Component.text("Приключение").color(defaultColor),
                         Component.text("Приключение").color(hoverColor),
                         () -> player.setGameMode(GameMode.ADVENTURE))
@@ -68,7 +71,7 @@ public class Branch4Screen extends Screen {
                         .setHoveredBackgroundColor(Color.fromRGB(60, 60, 60))
                         .setHoveredBackgroundAlpha(180),
 
-                new TextDisplayConfig(
+                new TextDisplayButtonConfig(
                         Component.text("Наблюдатель").color(defaultColor),
                         Component.text("Наблюдатель").color(hoverColor),
                         () -> player.setGameMode(GameMode.SPECTATOR))
@@ -81,5 +84,9 @@ public class Branch4Screen extends Screen {
                         .setHoveredBackgroundAlpha(180)
                         .setHoveredBackgroundAlpha(180)
         };
+
+        for (TextDisplayButtonConfig config : branchButtons) {
+            createTextWidget(config);
+        }
     }
 } 

@@ -1,10 +1,11 @@
 package me.padej.displayAPI.ui.widgets;
 
 import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.ItemDisplay;
 
-public class WidgetConfig {
+public class ItemDisplayButtonConfig {
     private Material material;
     private Runnable onClick;
     private String tooltip;
@@ -12,38 +13,54 @@ public class WidgetConfig {
     private int tooltipDelay;
     private boolean hasTooltip;
     private WidgetPosition position;
-    private ItemDisplay.ItemDisplayTransform displayTransform = ItemDisplay.ItemDisplayTransform.NONE;
+    private ItemDisplay.ItemDisplayTransform displayTransform = ItemDisplay.ItemDisplayTransform.GUI;
+    private float scaleX = .15f;
+    private float scaleY = .15f;
+    private float scaleZ = 1e-6f;
+    private Color glowColor;
 
-    public WidgetConfig(Material material, Runnable onClick) {
+    public ItemDisplayButtonConfig(Material material, Runnable onClick) {
         this.material = material;
         this.onClick = onClick;
         this.hasTooltip = false;
         this.tooltipColor = TextColor.fromHexString("#fcd720"); // Цвет по умолчанию
     }
 
-    public WidgetConfig setTooltip(String tooltip) {
+    public ItemDisplayButtonConfig setTooltip(String tooltip) {
         this.tooltip = tooltip;
         this.hasTooltip = true;
         return this;
     }
 
-    public WidgetConfig setTooltipColor(TextColor color) {
+    public ItemDisplayButtonConfig setTooltipColor(TextColor color) {
         this.tooltipColor = color;
         return this;
     }
 
-    public WidgetConfig setTooltipDelay(int ticks) {
+    public ItemDisplayButtonConfig setTooltipDelay(int ticks) {
         this.tooltipDelay = ticks;
         return this;
     }
 
-    public WidgetConfig setPosition(WidgetPosition position) {
+    public ItemDisplayButtonConfig setPosition(WidgetPosition position) {
         this.position = position;
         return this;
     }
 
-    public WidgetConfig setDisplayTransform(ItemDisplay.ItemDisplayTransform transform) {
+    public ItemDisplayButtonConfig setDisplayTransform(ItemDisplay.ItemDisplayTransform transform) {
         this.displayTransform = transform;
+        return this;
+    }
+
+    public ItemDisplayButtonConfig setScale(float x, float y, float z) {
+        this.scaleX = x;
+        this.scaleY = y;
+        this.scaleZ = z;
+        return this;
+    }
+
+    public ItemDisplayButtonConfig setGlowColor(Color color) {
+        this.glowColor = color;
         return this;
     }
 
@@ -77,5 +94,21 @@ public class WidgetConfig {
 
     public ItemDisplay.ItemDisplayTransform getDisplayTransform() {
         return displayTransform;
+    }
+
+    public float getScaleX() {
+        return scaleX;
+    }
+
+    public float getScaleY() {
+        return scaleY;
+    }
+
+    public float getScaleZ() {
+        return scaleZ;
+    }
+
+    public Color getGlowColor() {
+        return glowColor;
     }
 } 

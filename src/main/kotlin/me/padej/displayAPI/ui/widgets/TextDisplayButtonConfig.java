@@ -4,7 +4,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
 
-public class TextDisplayConfig {
+public class TextDisplayButtonConfig {
     private Component text;
     private Component hoveredText;
     private Runnable onClick;
@@ -21,66 +21,66 @@ public class TextDisplayConfig {
     private float scaleZ = .15f;
     private double tolerance = 0.06;
 
-    public TextDisplayConfig(Component text, Component hoveredText, Runnable onClick) {
+    public TextDisplayButtonConfig(Component text, Component hoveredText, Runnable onClick) {
         this.text = text;
         this.hoveredText = hoveredText;
         this.onClick = onClick;
         this.tooltipColor = TextColor.fromHexString("#868788");
     }
 
-    public TextDisplayConfig setTooltip(String tooltip) {
+    public TextDisplayButtonConfig setTooltip(String tooltip) {
         this.tooltip = Component.text(tooltip);
         return this;
     }
 
-    public TextDisplayConfig setTooltip(Component tooltip) {
+    public TextDisplayButtonConfig setTooltip(Component tooltip) {
         this.tooltip = tooltip;
         return this;
     }
 
-    public TextDisplayConfig setTooltipColor(TextColor color) {
+    public TextDisplayButtonConfig setTooltipColor(TextColor color) {
         this.tooltipColor = color;
         return this;
     }
 
-    public TextDisplayConfig setTooltipDelay(int ticks) {
+    public TextDisplayButtonConfig setTooltipDelay(int ticks) {
         this.tooltipDelay = ticks;
         return this;
     }
 
-    public TextDisplayConfig setPosition(WidgetPosition position) {
+    public TextDisplayButtonConfig setPosition(WidgetPosition position) {
         this.position = position;
         return this;
     }
 
-    public TextDisplayConfig setBackgroundColor(Color color) {
+    public TextDisplayButtonConfig setBackgroundColor(Color color) {
         this.backgroundColor = color;
         return this;
     }
 
-    public TextDisplayConfig setBackgroundAlpha(int alpha) {
+    public TextDisplayButtonConfig setBackgroundAlpha(int alpha) {
         this.backgroundAlpha = alpha;
         return this;
     }
 
-    public TextDisplayConfig setHoveredBackgroundColor(Color color) {
+    public TextDisplayButtonConfig setHoveredBackgroundColor(Color color) {
         this.hoveredBackgroundColor = color;
         return this;
     }
 
-    public TextDisplayConfig setHoveredBackgroundAlpha(int alpha) {
+    public TextDisplayButtonConfig setHoveredBackgroundAlpha(int alpha) {
         this.hoveredBackgroundAlpha = alpha;
         return this;
     }
 
-    public TextDisplayConfig setScale(float x, float y, float z) {
+    public TextDisplayButtonConfig setScale(float x, float y, float z) {
         this.scaleX = x;
         this.scaleY = y;
         this.scaleZ = z;
         return this;
     }
 
-    public TextDisplayConfig setTolerance(double tolerance) {
+    public TextDisplayButtonConfig setTolerance(double tolerance) {
         this.tolerance = tolerance;
         return this;
     }

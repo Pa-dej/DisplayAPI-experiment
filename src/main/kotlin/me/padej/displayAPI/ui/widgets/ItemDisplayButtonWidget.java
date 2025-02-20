@@ -52,15 +52,43 @@ public class ItemDisplayButtonWidget implements Widget {
         return widget;
     }
     
+    public static ItemDisplayButtonWidget create(Location location, Player viewer, ItemDisplayButtonConfig config) {
+        ItemDisplayButtonWidget widget = new ItemDisplayButtonWidget();
+        widget.location = location;
+        widget.viewer = viewer;
+        widget.onClick = config.getOnClick();
+        widget.itemType = config.getMaterial();
+        widget.scaleX = config.getScaleX();
+        widget.scaleY = config.getScaleY();
+        widget.scaleZ = config.getScaleZ();
+        widget.displayTransform = config.getDisplayTransform();
+        
+        widget.spawn();
+        
+        if (config.getGlowColor() != null) {
+            widget.setGlowColor(config.getGlowColor());
+        }
+        
+        if (config.hasTooltip()) {
+            widget.setTooltip(config.getTooltip())
+                 .setTooltipColor(config.getTooltipColor())
+                 .setTooltipDelay(config.getTooltipDelay());
+        }
+        
+        widget.setPosition(config.getPosition());
+        
+        return widget;
+    }
+    
     private void spawn() {
         this.display = location.getWorld().spawn(location, ItemDisplay.class);
         
         display.setItemStack(new ItemStack(itemType));
         display.setBrightness(new Display.Brightness(15, 15));
+        display.setItemDisplayTransform(displayTransform); // Устанавливаем transform до трансформации
         
         // Начальная трансформация с нулевым масштабом
-        display.setTransformationMatrix(new Matrix4f().translate(0, 0, -0.001f).scale(0, 0, 0));
-        display.setItemDisplayTransform(displayTransform);
+        display.setTransformationMatrix(new Matrix4f().translate(0, 0, 0.017f).scale(0, 0, 0));
         
         // Настройка длительности анимаций
         display.setInterpolationDuration(1);
@@ -70,7 +98,7 @@ public class ItemDisplayButtonWidget implements Widget {
         display.setVisibleByDefault(false);
         viewer.showEntity(DisplayAPI.getInstance(), display);
 
-        // Анимация появления
+        // Анимация появления с правильным масштабом
         Bukkit.getScheduler().runTaskLater(DisplayAPI.getInstance(), () -> {
             Animation.applyTransformationWithInterpolation(
                 display,
@@ -201,11 +229,24 @@ public class ItemDisplayButtonWidget implements Widget {
         return isHovered;
     }
     
+    @Override
     public ItemDisplayButtonWidget setScale(float x, float y, float z) {
         this.scaleX = x;
         this.scaleY = y;
         this.scaleZ = z;
-        display.setTransformationMatrix(new Matrix4f().scale(scaleX, scaleY, scaleZ));
+        
+        if (display != null) {
+            Animation.applyTransformationWithInterpolation(
+                display,
+                new Transformation(
+                    new Vector3f(0, 0, -0.001f),
+                    new AxisAngle4f(),
+                    new Vector3f(x, y, z),
+                    new AxisAngle4f()
+                ),
+                5
+            );
+        }
         return this;
     }
     
@@ -226,6 +267,13 @@ public class ItemDisplayButtonWidget implements Widget {
         this.displayTransform = transform;
         if (display != null) {
             display.setItemDisplayTransform(transform);
+        }
+        return this;
+    }
+    
+    public ItemDisplayButtonWidget setGlowColor(org.bukkit.Color color) {
+        if (display != null) {
+            display.setGlowColorOverride(color);
         }
         return this;
     }

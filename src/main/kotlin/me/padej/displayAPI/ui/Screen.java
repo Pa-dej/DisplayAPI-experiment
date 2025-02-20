@@ -27,7 +27,7 @@ public abstract class Screen extends WidgetManager {
     private final StringRectangle display;
     private final Class<? extends Screen> CURRENT_SCREEN_CLASS;
 
-    private static boolean isFollowing = false;
+    public static boolean isFollowing = false;
     public static boolean isSaved = false;
     private static Vector relativePosition;
     private static Vector savedPosition;
@@ -146,7 +146,7 @@ public abstract class Screen extends WidgetManager {
         return display != null ? display.getTextDisplay() : null;
     }
 
-    public void createWidget(WidgetConfig config) {
+    public void createWidget(ItemDisplayButtonConfig config) {
         Location buttonLoc = location.clone();
         Vector direction = buttonLoc.getDirection();
         Vector right = direction.getCrossProduct(new Vector(0, 1, 0)).normalize();
@@ -161,22 +161,13 @@ public abstract class Screen extends WidgetManager {
         ItemDisplayButtonWidget widget = ItemDisplayButtonWidget.create(
                 buttonLoc,
                 viewer,
-                config.getMaterial(),
-                config.getOnClick()
+                config
         );
-
-        widget.setPosition(position);
-
-        if (config.hasTooltip()) {
-            widget.setTooltip(config.getTooltip())
-                    .setTooltipColor(config.getTooltipColor())
-                    .setTooltipDelay(config.getTooltipDelay());
-        }
 
         addDrawableChild(widget);
     }
 
-    public TextDisplayButtonWidget createTextWidget(TextDisplayConfig config) {
+    public TextDisplayButtonWidget createTextWidget(TextDisplayButtonConfig config) {
         if (location == null) {
             return null;
         }
@@ -233,7 +224,7 @@ public abstract class Screen extends WidgetManager {
 
         // Добавляем кнопку возврата для экранов без аннотации @Main
         if (!this.getClass().isAnnotationPresent(Main.class)) {
-            TextDisplayConfig returnConfig = new TextDisplayConfig(
+            TextDisplayButtonConfig returnConfig = new TextDisplayButtonConfig(
                     Component.text("⏴").color(TextColor.fromHexString("#fafeff")),
                     Component.text("⏴").color(TextColor.fromHexString("#aaaeaf")),
                     () -> {
@@ -245,7 +236,7 @@ public abstract class Screen extends WidgetManager {
             )
                     .setPosition(basePosition.clone().addHorizontal(-0.28))
                     .setScale(0.75f, 0.75f, 0.75f)
-                    .setTolerance(0.035)
+                    .setTolerance(0.04)
                     .setBackgroundColor(org.bukkit.Color.fromRGB(30, 30, 30))
                     .setBackgroundAlpha(0)
                     .setHoveredBackgroundAlpha(0)
@@ -254,7 +245,7 @@ public abstract class Screen extends WidgetManager {
             createTextWidget(returnConfig);
         }
 
-        TextDisplayConfig closeConfig = new TextDisplayConfig(
+        TextDisplayButtonConfig closeConfig = new TextDisplayButtonConfig(
                 Component.text("⏺").color(TextColor.fromHexString("#ff2147")),
                 Component.text("⏺").color(TextColor.fromHexString("#af2141")),
                 this::tryClose
@@ -267,7 +258,7 @@ public abstract class Screen extends WidgetManager {
                 .setHoveredBackgroundAlpha(0)
                 .setHoveredBackgroundColor(org.bukkit.Color.fromRGB(60, 60, 60));
 
-        TextDisplayConfig followConfig = new TextDisplayConfig(
+        TextDisplayButtonConfig followConfig = new TextDisplayButtonConfig(
                 Component.text("⏺").color(TextColor.fromHexString("#ffc72c")),
                 Component.text("⏺").color(TextColor.fromHexString("#af802b")),
                 this::toggleFollow
@@ -280,7 +271,7 @@ public abstract class Screen extends WidgetManager {
                 .setHoveredBackgroundAlpha(0)
                 .setHoveredBackgroundColor(org.bukkit.Color.fromRGB(60, 60, 60));
 
-        TextDisplayConfig saveConfig = new TextDisplayConfig(
+        TextDisplayButtonConfig saveConfig = new TextDisplayButtonConfig(
                 Component.text("⏺").color(TextColor.fromHexString("#2aff55")),
                 Component.text("⏺").color(TextColor.fromHexString("#29af48")),
                 this::toggleSave
@@ -502,11 +493,11 @@ public abstract class Screen extends WidgetManager {
      * @param player Игрок, для которого создаются виджеты
      * @return Массив конфигураций виджетов
      */
-    public WidgetConfig[] getBranchWidgets(Player player) {
-        return new WidgetConfig[0];
+    public ItemDisplayButtonConfig[] getBranchWidgets(Player player) {
+        return new ItemDisplayButtonConfig[0];
     }
 
-    public TextDisplayConfig[] getTextWidgets(Player player) {
-        return new TextDisplayConfig[0];
+    public TextDisplayButtonConfig[] getTextWidgets(Player player) {
+        return new TextDisplayButtonConfig[0];
     }
 }

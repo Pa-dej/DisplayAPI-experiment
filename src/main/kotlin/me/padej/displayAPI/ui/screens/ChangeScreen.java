@@ -91,27 +91,7 @@ public class ChangeScreen {
                     screen.getTextDisplay().teleport(displayLoc);
                 }
 
-                Bukkit.getScheduler().runTaskLater(DisplayAPI.getInstance(), () -> {
-                    if (screen.getTextDisplay() == null) {
-                        return;
-                    }
-
-                    Animation.applyTransformationWithInterpolation(
-                            screen.getTextDisplay(),
-                            new Transformation(
-                                    new Vector3f(0, 0, 0),
-                                    new AxisAngle4f(),
-                                    new Vector3f(10, 4, 1),
-                                    new AxisAngle4f()
-                            ),
-                            5
-                    );
-
-                    screen.setOnClose(() -> UIManager.getInstance().unregisterScreen(player));
-                    screen.setupDefaultWidgets(player);
-                }, 2);
-
-                UIManager.getInstance().registerScreen(player, screen);
+                Animation.createDefaultScreenWithAnimation(screen, player);
             } catch (Exception e) {
                 LOGGER.error("Ошибка при переключении с {} на {}", from.getSimpleName(), to.getSimpleName(), e);
             }

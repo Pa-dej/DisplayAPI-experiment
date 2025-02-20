@@ -47,7 +47,7 @@ public class TextDisplayButtonWidget implements Widget {
     
     private TextDisplayButtonWidget() {}
     
-    public static TextDisplayButtonWidget create(Location location, Player viewer, TextDisplayConfig config) {
+    public static TextDisplayButtonWidget create(Location location, Player viewer, TextDisplayButtonConfig config) {
         TextDisplayButtonWidget widget = new TextDisplayButtonWidget();
         widget.location = location;
         widget.viewer = viewer;
@@ -88,7 +88,7 @@ public class TextDisplayButtonWidget implements Widget {
         
         // Начальная трансформация с нулевым масштабом
         Transformation initialTransform = new Transformation(
-            new Vector3f(0, 0, 0),
+            new Vector3f(0, 0, 0.017f),
             new AxisAngle4f(),
             new Vector3f(0, 0, 0),
             new AxisAngle4f()
