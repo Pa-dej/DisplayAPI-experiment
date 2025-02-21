@@ -45,6 +45,11 @@ public class TextDisplayButtonWidget implements Widget {
     
     private WidgetPosition position;
     
+    private org.bukkit.Sound clickSound = org.bukkit.Sound.BLOCK_DISPENSER_FAIL;
+    private boolean soundEnabled = true;
+    private float soundVolume = 0.5f;
+    private float soundPitch = 2.0f;
+    
     private TextDisplayButtonWidget() {}
     
     public static TextDisplayButtonWidget create(Location location, Player viewer, TextDisplayButtonConfig config) {
@@ -69,6 +74,11 @@ public class TextDisplayButtonWidget implements Widget {
             widget.tooltipDelay = config.getTooltipDelay();
             widget.tooltipColor = config.getTooltipColor();
         }
+        
+        widget.clickSound = config.getClickSound();
+        widget.soundEnabled = config.isSoundEnabled();
+        widget.soundVolume = config.getSoundVolume();
+        widget.soundPitch = config.getSoundPitch();
         
         widget.spawn();
         return widget;
@@ -166,8 +176,9 @@ public class TextDisplayButtonWidget implements Widget {
     
     public void handleClick() {
         if (isHovered) {
-            // Проигрываем звук клика
-            viewer.playSound(viewer.getLocation(), Sound.BLOCK_DISPENSER_FAIL, 0.5f, 2.0f);
+            if (soundEnabled) {
+                viewer.playSound(viewer.getLocation(), clickSound, soundVolume, soundPitch);
+            }
             onClick.run();
         }
     }
@@ -276,6 +287,23 @@ public class TextDisplayButtonWidget implements Widget {
 
     public TextDisplayButtonWidget setTooltipColor(TextColor color) {
         this.tooltipColor = color;
+        return this;
+    }
+
+    public TextDisplayButtonWidget setClickSound(org.bukkit.Sound sound) {
+        this.clickSound = sound;
+        return this;
+    }
+
+    public TextDisplayButtonWidget setClickSound(org.bukkit.Sound sound, float volume, float pitch) {
+        this.clickSound = sound;
+        this.soundVolume = volume;
+        this.soundPitch = pitch;
+        return this;
+    }
+
+    public TextDisplayButtonWidget disableClickSound() {
+        this.soundEnabled = false;
         return this;
     }
 } 

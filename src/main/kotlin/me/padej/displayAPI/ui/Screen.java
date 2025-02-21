@@ -49,7 +49,7 @@ public abstract class Screen extends WidgetManager {
         display = new StringRectangle(
                 scale,
                 Color.BLACK,
-                100,
+                160,
                 Display.Billboard.FIXED,
                 false,
                 text
@@ -297,7 +297,7 @@ public abstract class Screen extends WidgetManager {
         }
     }
 
-    private void toggleFollow() {
+    public void toggleFollow() {
         if (isSaved) {
             isSaved = false;
             savedPosition = null;
@@ -315,10 +315,13 @@ public abstract class Screen extends WidgetManager {
             Vector playerPos = viewer.getLocation().toVector();
             Vector displayPos = location.toVector();
             relativePosition = displayPos.subtract(playerPos);
-            updateBackgroundColor("#f9c22b");
+            
+            // Меняем цвет фона на желтый
+            updateBackgroundColor("#af802b"); // Желтый цвет
             viewer.playSound(viewer.getLocation(), org.bukkit.Sound.BLOCK_NOTE_BLOCK_PLING, 0.5f, 2.0f);
         } else {
-            updateBackgroundColor(null);
+            // Возвращаем цвет фона на черный
+            updateBackgroundColor("#000000"); // Черный цвет
             viewer.playSound(viewer.getLocation(), org.bukkit.Sound.BLOCK_NOTE_BLOCK_PLING, 0.5f, 0.5f);
         }
     }
@@ -339,10 +342,13 @@ public abstract class Screen extends WidgetManager {
 
         if (isSaved) {
             savedPosition = location.toVector();
-            updateBackgroundColor("#29e64d");
+            
+            // Меняем цвет фона на зеленый
+            updateBackgroundColor("#29af48"); // Зеленый цвет
             viewer.playSound(viewer.getLocation(), org.bukkit.Sound.BLOCK_ANVIL_USE, 0.5f, 2.0f);
         } else {
-            updateBackgroundColor(null);
+            // Возвращаем цвет фона на черный
+            updateBackgroundColor("#000000"); // Черный цвет
             viewer.playSound(viewer.getLocation(), org.bukkit.Sound.BLOCK_ANVIL_LAND, 0.3f, 1.5f);
         }
     }
@@ -350,12 +356,14 @@ public abstract class Screen extends WidgetManager {
     private void updateBackgroundColor(String hexColor) {
         if (display != null && display.getTextDisplay() != null) {
             TextDisplay textDisplay = display.getTextDisplay();
+            int alpha = (isFollowing || isSaved) ? 100 : 160;
+            
             if (hexColor == null) {
-                textDisplay.setBackgroundColor(org.bukkit.Color.fromARGB(100, 0, 0, 0));
+                textDisplay.setBackgroundColor(org.bukkit.Color.fromARGB(alpha, 0, 0, 0));
             } else {
                 java.awt.Color color = java.awt.Color.decode(hexColor);
                 textDisplay.setBackgroundColor(org.bukkit.Color.fromARGB(
-                        50,
+                        alpha,
                         color.getRed(),
                         color.getGreen(),
                         color.getBlue()

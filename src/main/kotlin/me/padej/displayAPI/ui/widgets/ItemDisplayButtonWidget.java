@@ -39,6 +39,10 @@ public class ItemDisplayButtonWidget implements Widget {
     private double tolerance = 0.06;
     private WidgetPosition position;
     private ItemDisplay.ItemDisplayTransform displayTransform = ItemDisplay.ItemDisplayTransform.NONE;
+    private org.bukkit.Sound clickSound = org.bukkit.Sound.UI_BUTTON_CLICK;
+    private boolean soundEnabled = true;
+    private float soundVolume = 0.5f;
+    private float soundPitch = 1.0f;
     
     private ItemDisplayButtonWidget() {} // Приватный конструктор
     
@@ -62,6 +66,11 @@ public class ItemDisplayButtonWidget implements Widget {
         widget.scaleY = config.getScaleY();
         widget.scaleZ = config.getScaleZ();
         widget.displayTransform = config.getDisplayTransform();
+        
+        widget.clickSound = config.getClickSound();
+        widget.soundEnabled = config.isSoundEnabled();
+        widget.soundVolume = config.getSoundVolume();
+        widget.soundPitch = config.getSoundPitch();
         
         widget.spawn();
         
@@ -180,8 +189,9 @@ public class ItemDisplayButtonWidget implements Widget {
     
     public void handleClick() {
         if (isHovered) {
-            // Проигрываем звук клика
-            viewer.playSound(viewer.getLocation(), org.bukkit.Sound.UI_BUTTON_CLICK, 0.5f, 1.0f);
+            if (soundEnabled) {
+                viewer.playSound(viewer.getLocation(), clickSound, soundVolume, soundPitch);
+            }
             onClick.run();
         }
     }
@@ -275,6 +285,23 @@ public class ItemDisplayButtonWidget implements Widget {
         if (display != null) {
             display.setGlowColorOverride(color);
         }
+        return this;
+    }
+    
+    public ItemDisplayButtonWidget setClickSound(org.bukkit.Sound sound) {
+        this.clickSound = sound;
+        return this;
+    }
+    
+    public ItemDisplayButtonWidget setClickSound(org.bukkit.Sound sound, float volume, float pitch) {
+        this.clickSound = sound;
+        this.soundVolume = volume;
+        this.soundPitch = pitch;
+        return this;
+    }
+    
+    public ItemDisplayButtonWidget disableClickSound() {
+        this.soundEnabled = false;
         return this;
     }
 }

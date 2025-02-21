@@ -20,6 +20,10 @@ public class TextDisplayButtonConfig {
     private float scaleY = .15f;
     private float scaleZ = .15f;
     private double tolerance = 0.06;
+    private org.bukkit.Sound clickSound = org.bukkit.Sound.BLOCK_DISPENSER_FAIL;
+    private boolean soundEnabled = true;
+    private float soundVolume = 0.5f;
+    private float soundPitch = 2.0f;
 
     public TextDisplayButtonConfig(Component text, Component hoveredText, Runnable onClick) {
         this.text = text;
@@ -85,6 +89,23 @@ public class TextDisplayButtonConfig {
         return this;
     }
 
+    public TextDisplayButtonConfig setClickSound(org.bukkit.Sound sound) {
+        this.clickSound = sound;
+        return this;
+    }
+
+    public TextDisplayButtonConfig setClickSound(org.bukkit.Sound sound, float volume, float pitch) {
+        this.clickSound = sound;
+        this.soundVolume = volume;
+        this.soundPitch = pitch;
+        return this;
+    }
+
+    public TextDisplayButtonConfig disableClickSound() {
+        this.soundEnabled = false;
+        return this;
+    }
+
     // Геттеры
     public Component getText() { return text; }
     public Component getHoveredText() { return hoveredText; }
@@ -101,4 +122,8 @@ public class TextDisplayButtonConfig {
     public float getScaleY() { return scaleY; }
     public float getScaleZ() { return scaleZ; }
     public double getTolerance() { return tolerance; }
+    public org.bukkit.Sound getClickSound() { return clickSound; }
+    public boolean isSoundEnabled() { return soundEnabled; }
+    public float getSoundVolume() { return soundVolume; }
+    public float getSoundPitch() { return soundPitch; }
 } 

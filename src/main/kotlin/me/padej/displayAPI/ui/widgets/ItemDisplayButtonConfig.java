@@ -18,6 +18,10 @@ public class ItemDisplayButtonConfig {
     private float scaleY = .15f;
     private float scaleZ = 1e-6f;
     private Color glowColor;
+    private org.bukkit.Sound clickSound = org.bukkit.Sound.UI_BUTTON_CLICK;
+    private boolean soundEnabled = true;
+    private float soundVolume = 0.5f;
+    private float soundPitch = 1.0f;
 
     public ItemDisplayButtonConfig(Material material, Runnable onClick) {
         this.material = material;
@@ -61,6 +65,23 @@ public class ItemDisplayButtonConfig {
 
     public ItemDisplayButtonConfig setGlowColor(Color color) {
         this.glowColor = color;
+        return this;
+    }
+
+    public ItemDisplayButtonConfig setClickSound(org.bukkit.Sound sound) {
+        this.clickSound = sound;
+        return this;
+    }
+
+    public ItemDisplayButtonConfig setClickSound(org.bukkit.Sound sound, float volume, float pitch) {
+        this.clickSound = sound;
+        this.soundVolume = volume;
+        this.soundPitch = pitch;
+        return this;
+    }
+
+    public ItemDisplayButtonConfig disableClickSound() {
+        this.soundEnabled = false;
         return this;
     }
 
@@ -110,5 +131,21 @@ public class ItemDisplayButtonConfig {
 
     public Color getGlowColor() {
         return glowColor;
+    }
+
+    public org.bukkit.Sound getClickSound() {
+        return clickSound;
+    }
+
+    public boolean isSoundEnabled() {
+        return soundEnabled;
+    }
+
+    public float getSoundVolume() {
+        return soundVolume;
+    }
+
+    public float getSoundPitch() {
+        return soundPitch;
     }
 } 
