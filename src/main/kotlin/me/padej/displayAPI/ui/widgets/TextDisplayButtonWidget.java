@@ -50,6 +50,8 @@ public class TextDisplayButtonWidget implements Widget {
     private float soundVolume = 0.5f;
     private float soundPitch = 2.0f;
     
+    private Runnable updateCallback;
+    
     private TextDisplayButtonWidget() {}
     
     public static TextDisplayButtonWidget create(Location location, Player viewer, TextDisplayButtonConfig config) {
@@ -98,7 +100,7 @@ public class TextDisplayButtonWidget implements Widget {
         
         // Начальная трансформация с нулевым масштабом
         Transformation initialTransform = new Transformation(
-            new Vector3f(0, 0, 0.017f),
+            new Vector3f(0, 0, 0),
             new AxisAngle4f(),
             new Vector3f(0, 0, 0),
             new AxisAngle4f()
@@ -128,6 +130,7 @@ public class TextDisplayButtonWidget implements Widget {
         }, 1);
     }
     
+    @Override
     public void update() {
         Vector eye = viewer.getEyeLocation().toVector();
         Vector direction = viewer.getEyeLocation().getDirection();
@@ -139,6 +142,7 @@ public class TextDisplayButtonWidget implements Widget {
             isHovered = isLookingAt;
             display.setGlowing(isHovered);
             
+            // Обновляем текст и цвет фона при изменении состояния наведения
             if (isHovered) {
                 display.text(hoveredText);
                 display.setBackgroundColor(org.bukkit.Color.fromARGB(
@@ -161,7 +165,7 @@ public class TextDisplayButtonWidget implements Widget {
                 }
             }
         }
-
+        
         if (isHovered && tooltip != null) {
             if (tooltipDelay > 0) {
                 hoverTicks++;
@@ -171,6 +175,11 @@ public class TextDisplayButtonWidget implements Widget {
             } else if (!isShowingTooltip) {
                 showTooltip();
             }
+        }
+
+        // Вызываем callback обновления, если он установлен
+        if (updateCallback != null) {
+            updateCallback.run();
         }
     }
     
@@ -305,5 +314,26 @@ public class TextDisplayButtonWidget implements Widget {
     public TextDisplayButtonWidget disableClickSound() {
         this.soundEnabled = false;
         return this;
+    }
+
+    public TextDisplayButtonWidget setText(Component text) {
+        this.text = text;
+        if (display != null && !isHovered) {
+            display.text(text);
+        }
+        return this;
+    }
+
+    public TextDisplayButtonWidget setText(Component text, Component hoveredText) {
+        this.text = text;
+        this.hoveredText = hoveredText;
+        if (display != null) {
+            display.text(isHovered ? hoveredText : text);
+        }
+        return this;
+    }
+
+    public void setUpdateCallback(Runnable callback) {
+        this.updateCallback = callback;
     }
 } 

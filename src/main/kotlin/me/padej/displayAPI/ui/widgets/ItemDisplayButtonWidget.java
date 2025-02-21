@@ -43,6 +43,7 @@ public class ItemDisplayButtonWidget implements Widget {
     private boolean soundEnabled = true;
     private float soundVolume = 0.5f;
     private float soundPitch = 1.0f;
+    private Runnable updateCallback;
     
     private ItemDisplayButtonWidget() {} // Приватный конструктор
     
@@ -123,6 +124,7 @@ public class ItemDisplayButtonWidget implements Widget {
         }, 1);
     }
     
+    @Override
     public void update() {
         Vector eye = viewer.getEyeLocation().toVector();
         Vector direction = viewer.getEyeLocation().getDirection();
@@ -151,6 +153,11 @@ public class ItemDisplayButtonWidget implements Widget {
             } else if (!isShowingTooltip) {
                 showTooltip();
             }
+        }
+
+        // Вызываем callback обновления, если он установлен
+        if (updateCallback != null) {
+            updateCallback.run();
         }
     }
     
@@ -304,5 +311,17 @@ public class ItemDisplayButtonWidget implements Widget {
     public ItemDisplayButtonWidget disableClickSound() {
         this.soundEnabled = false;
         return this;
+    }
+    
+    public ItemDisplayButtonWidget setMaterial(Material material) {
+        this.itemType = material;
+        if (display != null) {
+            display.setItemStack(new ItemStack(material));
+        }
+        return this;
+    }
+
+    public void setUpdateCallback(Runnable callback) {
+        this.updateCallback = callback;
     }
 }

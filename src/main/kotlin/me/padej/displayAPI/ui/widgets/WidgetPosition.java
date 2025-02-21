@@ -3,16 +3,29 @@ package me.padej.displayAPI.ui.widgets;
 public class WidgetPosition {
     private double horizontal;  // rightMultiplier -> horizontal
     private double vertical;    // upMultiplier -> vertical
+    private double depth;       // добавляем depth
 
     public WidgetPosition(double horizontal, double vertical) {
         this.horizontal = horizontal;
         this.vertical = vertical;
+        this.depth = 0;
+    }
+
+    public WidgetPosition(double horizontal, double vertical, double depth) {
+        this.horizontal = horizontal;
+        this.vertical = vertical;
+        this.depth = depth;
+    }
+
+    public WidgetPosition add(double horizontal, double vertical, double depth) {
+        this.horizontal += horizontal;
+        this.vertical += vertical;
+        this.depth += depth;
+        return this;
     }
 
     public WidgetPosition add(double horizontal, double vertical) {
-        this.horizontal += horizontal;
-        this.vertical += vertical;
-        return this;
+        return add(horizontal, vertical, 0);
     }
 
     public WidgetPosition addHorizontal(double value) {
@@ -25,8 +38,13 @@ public class WidgetPosition {
         return this;
     }
 
+    public WidgetPosition addDepth(double value) {
+        this.depth += value;
+        return this;
+    }
+
     public WidgetPosition clone() {
-        return new WidgetPosition(horizontal, vertical);
+        return new WidgetPosition(horizontal, vertical, depth);
     }
 
     public double getHorizontal() {
@@ -37,6 +55,10 @@ public class WidgetPosition {
         return vertical;
     }
 
+    public double getDepth() {
+        return depth;
+    }
+
     public WidgetPosition setHorizontal(double horizontal) {
         this.horizontal = horizontal;
         return this;
@@ -44,6 +66,11 @@ public class WidgetPosition {
 
     public WidgetPosition setVertical(double vertical) {
         this.vertical = vertical;
+        return this;
+    }
+
+    public WidgetPosition setDepth(double depth) {
+        this.depth = depth;
         return this;
     }
 

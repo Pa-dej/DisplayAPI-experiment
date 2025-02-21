@@ -2,9 +2,8 @@ package me.padej.displayAPI.ui;
 
 import me.padej.displayAPI.DisplayAPI;
 import me.padej.displayAPI.render.shapes.StringRectangle;
-import me.padej.displayAPI.ui.annotations.Main;
-import me.padej.displayAPI.ui.annotations.Persistent;
 import me.padej.displayAPI.ui.annotations.AlwaysOnScreen;
+import me.padej.displayAPI.ui.annotations.Main;
 import me.padej.displayAPI.ui.screens.ChangeScreen;
 import me.padej.displayAPI.ui.widgets.*;
 import me.padej.displayAPI.utils.Animation;
@@ -146,7 +145,7 @@ public abstract class Screen extends WidgetManager {
         return display != null ? display.getTextDisplay() : null;
     }
 
-    public void createWidget(ItemDisplayButtonConfig config) {
+    public ItemDisplayButtonWidget createWidget(ItemDisplayButtonConfig config) {
         Location buttonLoc = location.clone();
         Vector direction = buttonLoc.getDirection();
         Vector right = direction.getCrossProduct(new Vector(0, 1, 0)).normalize();
@@ -156,6 +155,7 @@ public abstract class Screen extends WidgetManager {
         if (position != null) {
             buttonLoc.add(right.multiply(position.getRightMultiplier()));
             buttonLoc.add(up.multiply(position.getUpMultiplier()));
+            buttonLoc.add(direction.multiply(position.getDepth()));
         }
 
         ItemDisplayButtonWidget widget = ItemDisplayButtonWidget.create(
@@ -165,6 +165,7 @@ public abstract class Screen extends WidgetManager {
         );
 
         addDrawableChild(widget);
+        return widget;
     }
 
     public TextDisplayButtonWidget createTextWidget(TextDisplayButtonConfig config) {
@@ -181,6 +182,7 @@ public abstract class Screen extends WidgetManager {
         if (position != null) {
             buttonLoc.add(right.multiply(position.getRightMultiplier()));
             buttonLoc.add(up.multiply(position.getUpMultiplier()));
+            buttonLoc.add(direction.multiply(position.getDepth()));
         }
 
         TextDisplayButtonWidget widget = TextDisplayButtonWidget.create(
