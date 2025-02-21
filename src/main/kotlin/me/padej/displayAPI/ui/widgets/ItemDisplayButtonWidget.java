@@ -66,6 +66,7 @@ public class ItemDisplayButtonWidget implements Widget {
         widget.scaleY = config.getScaleY();
         widget.scaleZ = config.getScaleZ();
         widget.displayTransform = config.getDisplayTransform();
+        widget.tolerance = config.getTolerance();
         
         widget.clickSound = config.getClickSound();
         widget.soundEnabled = config.isSoundEnabled();

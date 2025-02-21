@@ -22,6 +22,7 @@ public class ItemDisplayButtonConfig {
     private boolean soundEnabled = true;
     private float soundVolume = 0.5f;
     private float soundPitch = 1.0f;
+    private double tolerance = 0.06;
 
     public ItemDisplayButtonConfig(Material material, Runnable onClick) {
         this.material = material;
@@ -82,6 +83,11 @@ public class ItemDisplayButtonConfig {
 
     public ItemDisplayButtonConfig disableClickSound() {
         this.soundEnabled = false;
+        return this;
+    }
+
+    public ItemDisplayButtonConfig setTolerance(double tolerance) {
+        this.tolerance = tolerance;
         return this;
     }
 
@@ -147,5 +153,9 @@ public class ItemDisplayButtonConfig {
 
     public float getSoundPitch() {
         return soundPitch;
+    }
+
+    public double getTolerance() {
+        return tolerance;
     }
 } 
