@@ -4,7 +4,6 @@ import me.padej.displayAPI.utils.AlignmentType;
 import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.BlockDisplay;
-import org.bukkit.entity.Display;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.Transformation;
 import org.joml.AxisAngle4f;
