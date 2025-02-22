@@ -19,7 +19,8 @@ public class TextDisplayButtonConfig {
     private float scaleX = .15f;
     private float scaleY = .15f;
     private float scaleZ = .15f;
-    private double tolerance = 0.06;
+    private double horizontalTolerance = 0.06;
+    private double verticalTolerance = 0.06;
     private org.bukkit.Sound clickSound = org.bukkit.Sound.BLOCK_DISPENSER_FAIL;
     private boolean soundEnabled = true;
     private float soundVolume = 0.5f;
@@ -85,7 +86,24 @@ public class TextDisplayButtonConfig {
     }
 
     public TextDisplayButtonConfig setTolerance(double tolerance) {
-        this.tolerance = tolerance;
+        this.horizontalTolerance = tolerance;
+        this.verticalTolerance = tolerance;
+        return this;
+    }
+
+    public TextDisplayButtonConfig setTolerance(double horizontalTolerance, double verticalTolerance) {
+        this.horizontalTolerance = horizontalTolerance;
+        this.verticalTolerance = verticalTolerance;
+        return this;
+    }
+
+    public TextDisplayButtonConfig setToleranceHorizontal(double tolerance) {
+        this.horizontalTolerance = tolerance;
+        return this;
+    }
+
+    public TextDisplayButtonConfig setToleranceVertical(double tolerance) {
+        this.verticalTolerance = tolerance;
         return this;
     }
 
@@ -121,9 +139,11 @@ public class TextDisplayButtonConfig {
     public float getScaleX() { return scaleX; }
     public float getScaleY() { return scaleY; }
     public float getScaleZ() { return scaleZ; }
-    public double getTolerance() { return tolerance; }
+    public double getTolerance() { return horizontalTolerance; }
     public org.bukkit.Sound getClickSound() { return clickSound; }
     public boolean isSoundEnabled() { return soundEnabled; }
     public float getSoundVolume() { return soundVolume; }
     public float getSoundPitch() { return soundPitch; }
+    public double getToleranceHorizontal() { return horizontalTolerance; }
+    public double getToleranceVertical() { return verticalTolerance; }
 } 

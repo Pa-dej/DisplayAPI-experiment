@@ -8,4 +8,7 @@ public interface Widget {
     boolean isHovered();
     Widget setScale(float x, float y, float z);
     Widget setTolerance(double tolerance);
+    Widget setTolerance(double horizontalTolerance, double verticalTolerance);
+    Widget setToleranceHorizontal(double tolerance);
+    Widget setToleranceVertical(double tolerance);
 } 

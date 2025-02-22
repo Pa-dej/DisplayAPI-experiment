@@ -22,7 +22,8 @@ public class ItemDisplayButtonConfig {
     private boolean soundEnabled = true;
     private float soundVolume = 0.5f;
     private float soundPitch = 1.0f;
-    private double tolerance = 0.06;
+    private double horizontalTolerance = 0.06;
+    private double verticalTolerance = 0.06;
 
     public ItemDisplayButtonConfig(Material material, Runnable onClick) {
         this.material = material;
@@ -87,7 +88,24 @@ public class ItemDisplayButtonConfig {
     }
 
     public ItemDisplayButtonConfig setTolerance(double tolerance) {
-        this.tolerance = tolerance;
+        this.horizontalTolerance = tolerance;
+        this.verticalTolerance = tolerance;
+        return this;
+    }
+
+    public ItemDisplayButtonConfig setTolerance(double horizontalTolerance, double verticalTolerance) {
+        this.horizontalTolerance = horizontalTolerance;
+        this.verticalTolerance = verticalTolerance;
+        return this;
+    }
+
+    public ItemDisplayButtonConfig setToleranceHorizontal(double tolerance) {
+        this.horizontalTolerance = tolerance;
+        return this;
+    }
+
+    public ItemDisplayButtonConfig setToleranceVertical(double tolerance) {
+        this.verticalTolerance = tolerance;
         return this;
     }
 
@@ -156,6 +174,14 @@ public class ItemDisplayButtonConfig {
     }
 
     public double getTolerance() {
-        return tolerance;
+        return horizontalTolerance;
+    }
+
+    public double getToleranceHorizontal() {
+        return horizontalTolerance;
+    }
+
+    public double getToleranceVertical() {
+        return verticalTolerance;
     }
 } 

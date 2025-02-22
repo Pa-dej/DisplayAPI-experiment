@@ -36,7 +36,8 @@ public class ItemDisplayButtonWidget implements Widget {
     private float scaleX = .15f;
     private float scaleY = .15f;
     private float scaleZ = 1e-6f;
-    private double tolerance = 0.06;
+    private double horizontalTolerance = 0.06;
+    private double verticalTolerance = 0.06;
     private WidgetPosition position;
     private ItemDisplay.ItemDisplayTransform displayTransform = ItemDisplay.ItemDisplayTransform.NONE;
     private org.bukkit.Sound clickSound = org.bukkit.Sound.UI_BUTTON_CLICK;
@@ -67,7 +68,8 @@ public class ItemDisplayButtonWidget implements Widget {
         widget.scaleY = config.getScaleY();
         widget.scaleZ = config.getScaleZ();
         widget.displayTransform = config.getDisplayTransform();
-        widget.tolerance = config.getTolerance();
+        widget.horizontalTolerance = config.getToleranceHorizontal();
+        widget.verticalTolerance = config.getToleranceVertical();
         
         widget.clickSound = config.getClickSound();
         widget.soundEnabled = config.isSoundEnabled();
@@ -130,7 +132,7 @@ public class ItemDisplayButtonWidget implements Widget {
         Vector direction = viewer.getEyeLocation().getDirection();
         Vector point = display.getLocation().toVector();
         
-        boolean isLookingAt = PointDetection.lookingAtPoint(eye, direction, point, tolerance);
+        boolean isLookingAt = PointDetection.lookingAtPoint(eye, direction, point, horizontalTolerance, verticalTolerance);
         
         if (isLookingAt != isHovered) {
             isHovered = isLookingAt;
@@ -268,8 +270,29 @@ public class ItemDisplayButtonWidget implements Widget {
         return this;
     }
     
+    @Override
     public ItemDisplayButtonWidget setTolerance(double tolerance) {
-        this.tolerance = tolerance;
+        this.horizontalTolerance = tolerance;
+        this.verticalTolerance = tolerance;
+        return this;
+    }
+
+    @Override
+    public ItemDisplayButtonWidget setTolerance(double horizontalTolerance, double verticalTolerance) {
+        this.horizontalTolerance = horizontalTolerance;
+        this.verticalTolerance = verticalTolerance;
+        return this;
+    }
+
+    @Override
+    public ItemDisplayButtonWidget setToleranceHorizontal(double tolerance) {
+        this.horizontalTolerance = tolerance;
+        return this;
+    }
+
+    @Override
+    public ItemDisplayButtonWidget setToleranceVertical(double tolerance) {
+        this.verticalTolerance = tolerance;
         return this;
     }
     
