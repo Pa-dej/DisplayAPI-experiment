@@ -45,6 +45,7 @@ public class ItemDisplayButtonWidget implements Widget {
     private float soundVolume = 0.5f;
     private float soundPitch = 1.0f;
     private Runnable updateCallback;
+    private org.bukkit.inventory.meta.ItemMeta itemMeta;
     
     private ItemDisplayButtonWidget() {} // Приватный конструктор
     
@@ -76,6 +77,10 @@ public class ItemDisplayButtonWidget implements Widget {
         widget.soundVolume = config.getSoundVolume();
         widget.soundPitch = config.getSoundPitch();
         
+        if (config.getItemMeta() != null) {
+            widget.setItemMeta(config.getItemMeta());
+        }
+        
         widget.spawn();
         
         if (config.getGlowColor() != null) {
@@ -96,7 +101,11 @@ public class ItemDisplayButtonWidget implements Widget {
     private void spawn() {
         this.display = location.getWorld().spawn(location, ItemDisplay.class);
         
-        display.setItemStack(new ItemStack(itemType));
+        ItemStack itemStack = new ItemStack(itemType);
+        if (itemMeta != null) {
+            itemStack.setItemMeta(itemMeta);
+        }
+        display.setItemStack(itemStack);
         display.setBrightness(new Display.Brightness(15, 15));
         display.setItemDisplayTransform(displayTransform); // Устанавливаем transform до трансформации
         
@@ -336,10 +345,24 @@ public class ItemDisplayButtonWidget implements Widget {
         return this;
     }
     
+    public ItemDisplayButtonWidget setItemMeta(org.bukkit.inventory.meta.ItemMeta meta) {
+        this.itemMeta = meta;
+        if (display != null) {
+            ItemStack itemStack = display.getItemStack();
+            itemStack.setItemMeta(meta);
+            display.setItemStack(itemStack);
+        }
+        return this;
+    }
+
     public ItemDisplayButtonWidget setMaterial(Material material) {
         this.itemType = material;
         if (display != null) {
-            display.setItemStack(new ItemStack(material));
+            ItemStack itemStack = new ItemStack(material);
+            if (itemMeta != null) {
+                itemStack.setItemMeta(itemMeta);
+            }
+            display.setItemStack(itemStack);
         }
         return this;
     }

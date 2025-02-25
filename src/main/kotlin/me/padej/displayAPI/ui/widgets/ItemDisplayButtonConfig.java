@@ -4,6 +4,8 @@ import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.ItemDisplay;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class ItemDisplayButtonConfig {
     private Material material;
@@ -16,7 +18,7 @@ public class ItemDisplayButtonConfig {
     private ItemDisplay.ItemDisplayTransform displayTransform = ItemDisplay.ItemDisplayTransform.GUI;
     private float scaleX = .15f;
     private float scaleY = .15f;
-    private float scaleZ = 1e-6f;
+    private float scaleZ = .03f;
     private Color glowColor;
     private org.bukkit.Sound clickSound = org.bukkit.Sound.UI_BUTTON_CLICK;
     private boolean soundEnabled = true;
@@ -24,6 +26,7 @@ public class ItemDisplayButtonConfig {
     private float soundPitch = 1.0f;
     private double horizontalTolerance = 0.06;
     private double verticalTolerance = 0.06;
+    private ItemMeta itemMeta;
 
     public ItemDisplayButtonConfig(Material material, Runnable onClick) {
         this.material = material;
@@ -109,6 +112,15 @@ public class ItemDisplayButtonConfig {
         return this;
     }
 
+    public ItemDisplayButtonConfig setItemMeta(ItemMetaModifier modifier) {
+        ItemStack tempItem = new ItemStack(material);
+        ItemMeta meta = tempItem.getItemMeta();
+        if (meta != null) {
+            this.itemMeta = modifier.modify(meta);
+        }
+        return this;
+    }
+
     public Material getMaterial() {
         return material;
     }
@@ -184,4 +196,8 @@ public class ItemDisplayButtonConfig {
     public double getToleranceVertical() {
         return verticalTolerance;
     }
-} 
+
+    public ItemMeta getItemMeta() {
+        return itemMeta;
+    }
+}

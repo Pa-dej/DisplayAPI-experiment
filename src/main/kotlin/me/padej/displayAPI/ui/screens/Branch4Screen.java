@@ -89,4 +89,4 @@ public class Branch4Screen extends Screen {
             createTextWidget(config);
         }
     }
-} 
+}
