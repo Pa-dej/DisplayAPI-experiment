@@ -12,6 +12,9 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.util.Transformation;
+import org.joml.AxisAngle4f;
+import org.joml.Vector3f;
 
 @Main
 public class MainScreen extends Screen {
@@ -27,7 +30,7 @@ public class MainScreen extends Screen {
     public void createScreenWidgets(Player player) {
         // Создаем кнопки ветвления
         WidgetPosition basePosition = new WidgetPosition(-0.42f, 0.3f);
-        float step = 0.15f;
+        float step = 0.17f;
 
         ItemDisplayButtonConfig[] branchButtons = {
                 new ItemDisplayButtonConfig(Material.COMPASS, () -> {
@@ -35,14 +38,26 @@ public class MainScreen extends Screen {
                 })
                         .setTooltip("Ветка 1")
                         .setTooltipDelay(30)
-                        .setPosition(basePosition.clone()),
+                        .setPosition(basePosition.clone())
+                        .setHoveredTransformation(new Transformation(
+                        new Vector3f(0, 0, 0),
+                        new AxisAngle4f(),
+                        new Vector3f(0.2f, 0.2f, 0.15f),
+                        new AxisAngle4f()
+                ), 2),
 
                 new ItemDisplayButtonConfig(Material.MAP, () -> {
                     ChangeScreen.switchTo(player, MainScreen.class, Branch2Screen.class);
                 })
                         .setTooltip("Ветка 2")
                         .setTooltipDelay(30)
-                        .setPosition(basePosition.clone().addVertical(step)),
+                        .setPosition(basePosition.clone().addVertical(step))
+                        .setHoveredTransformation(new Transformation(
+                        new Vector3f(0, 0, 0),
+                        new AxisAngle4f(),
+                        new Vector3f(0.2f, 0.2f, 0.15f),
+                        new AxisAngle4f()
+                ), 2),
 
                 new ItemDisplayButtonConfig(Material.PLAYER_HEAD, () -> {
                     ChangeScreen.switchTo(player, MainScreen.class, Branch3Screen.class);
@@ -52,6 +67,12 @@ public class MainScreen extends Screen {
                         .setTooltip("Ветка 3")
                         .setTooltipDelay(30)
                         .setPosition(basePosition.clone().addVertical(step * 2).addDepth(-0.02))
+                        .setHoveredTransformation(new Transformation(
+                                new Vector3f(0, 0, 0),
+                                new AxisAngle4f(),
+                                new Vector3f(0.2f, 0.2f, 0.15f),
+                                new AxisAngle4f()
+                        ), 2)
                         .setItemMeta((meta) -> {
                     SkullMeta skullMeta = (SkullMeta) meta;
                     skullMeta.setOwningPlayer(Bukkit.getOfflinePlayer("Padej_"));
@@ -64,15 +85,23 @@ public class MainScreen extends Screen {
                         .setTooltip("Ветка 4")
                         .setTooltipDelay(30)
                         .setPosition(basePosition.clone().addVertical(step * 3))
-                        .setItemMeta((meta) -> {
-                    meta.addEnchant(Enchantment.BREACH, 1, false);
-                    return meta;
-                }),
+                        .setHoveredTransformation(new Transformation(
+                        new Vector3f(0, 0, 0),
+                        new AxisAngle4f(),
+                        new Vector3f(0.2f, 0.2f, 0.15f),
+                        new AxisAngle4f()
+                ), 2),
 
                 new ItemDisplayButtonConfig(Material.GOLD_INGOT, () -> {
                     ChangeScreen.switchTo(player, MainScreen.class, Branch5Screen.class);
                 })
                         .setPosition(basePosition.clone().addVertical(-step))
+                        .setHoveredTransformation(new Transformation(
+                        new Vector3f(0, 0, 0),
+                        new AxisAngle4f(),
+                        new Vector3f(0.2f, 0.2f, 0.15f),
+                        new AxisAngle4f()
+                ), 2)
         };
 
         for (ItemDisplayButtonConfig config : branchButtons) {

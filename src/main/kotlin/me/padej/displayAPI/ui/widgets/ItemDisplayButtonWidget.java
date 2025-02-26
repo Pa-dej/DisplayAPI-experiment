@@ -83,6 +83,9 @@ public class ItemDisplayButtonWidget implements Widget {
         
         widget.translation = config.getTranslation();
         
+        widget.hoveredTransformation = config.getHoveredTransformation();
+        widget.hoveredTransformationDuration = config.getHoveredTransformationDuration();
+        
         if (config.getItemMeta() != null) {
             widget.setItemMeta(config.getItemMeta());
         }
