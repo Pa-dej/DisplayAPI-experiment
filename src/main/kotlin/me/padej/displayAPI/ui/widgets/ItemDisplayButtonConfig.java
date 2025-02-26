@@ -6,6 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.joml.Vector3f;
 
 public class ItemDisplayButtonConfig {
     private Material material;
@@ -27,6 +28,7 @@ public class ItemDisplayButtonConfig {
     private double horizontalTolerance = 0.06;
     private double verticalTolerance = 0.06;
     private ItemMeta itemMeta;
+    private Vector3f translation;
 
     public ItemDisplayButtonConfig(Material material, Runnable onClick) {
         this.material = material;
@@ -119,6 +121,15 @@ public class ItemDisplayButtonConfig {
             this.itemMeta = modifier.modify(meta);
         }
         return this;
+    }
+
+    public ItemDisplayButtonConfig setTranslation(Vector3f translation) {
+        this.translation = translation;
+        return this;
+    }
+
+    public Vector3f getTranslation() {
+        return translation != null ? translation : new Vector3f(0, -scaleY / 8, 0);
     }
 
     public Material getMaterial() {

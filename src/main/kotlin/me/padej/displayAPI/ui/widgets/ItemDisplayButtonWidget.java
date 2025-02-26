@@ -46,6 +46,7 @@ public class ItemDisplayButtonWidget implements Widget {
     private float soundPitch = 1.0f;
     private Runnable updateCallback;
     private org.bukkit.inventory.meta.ItemMeta itemMeta;
+    private Vector3f translation;
     
     private ItemDisplayButtonWidget() {} // Приватный конструктор
     
@@ -76,6 +77,8 @@ public class ItemDisplayButtonWidget implements Widget {
         widget.soundEnabled = config.isSoundEnabled();
         widget.soundVolume = config.getSoundVolume();
         widget.soundPitch = config.getSoundPitch();
+        
+        widget.translation = config.getTranslation();
         
         if (config.getItemMeta() != null) {
             widget.setItemMeta(config.getItemMeta());
@@ -120,19 +123,22 @@ public class ItemDisplayButtonWidget implements Widget {
         display.setVisibleByDefault(false);
         viewer.showEntity(DisplayAPI.getInstance(), display);
 
-        // Анимация появления с правильным масштабом
-        Bukkit.getScheduler().runTaskLater(DisplayAPI.getInstance(), () -> {
-            Animation.applyTransformationWithInterpolation(
-                display,
-                new Transformation(
-                    new Vector3f(0, 0, -0.001f),
-                    new AxisAngle4f(),
-                    new Vector3f(scaleX, scaleY, scaleZ),
-                    new AxisAngle4f()
-                ),
-                5
-            );
-        }, 1);
+        // Если translation не установлен, используем значение по умолчанию
+        if (translation == null) {
+            translation = new Vector3f(0, -scaleY / 8, 0);
+        }
+
+        // Используем translation в трансформации
+        Animation.applyTransformationWithInterpolation(
+            display,
+            new Transformation(
+                translation,
+                new AxisAngle4f(),
+                new Vector3f(scaleX, scaleY, scaleZ),
+                new AxisAngle4f()
+            ),
+            5
+        );
     }
     
     @Override
@@ -369,5 +375,22 @@ public class ItemDisplayButtonWidget implements Widget {
 
     public void setUpdateCallback(Runnable callback) {
         this.updateCallback = callback;
+    }
+
+    public ItemDisplayButtonWidget setTranslation(Vector3f translation) {
+        this.translation = translation;
+        if (display != null) {
+            Animation.applyTransformationWithInterpolation(
+                display,
+                new Transformation(
+                    translation,
+                    display.getTransformation().getLeftRotation(),
+                    new Vector3f(scaleX, scaleY, scaleZ),
+                    display.getTransformation().getRightRotation()
+                ),
+                5
+            );
+        }
+        return this;
     }
 }

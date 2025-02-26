@@ -3,6 +3,8 @@ package me.padej.displayAPI.ui.widgets;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
+import org.bukkit.entity.TextDisplay;
+import org.joml.Vector3f;
 
 public class TextDisplayButtonConfig {
     private Component text;
@@ -25,6 +27,10 @@ public class TextDisplayButtonConfig {
     private boolean soundEnabled = true;
     private float soundVolume = 0.5f;
     private float soundPitch = 2.0f;
+    private boolean textShadowEnabled = false;
+    private TextDisplay.TextAlignment textAlignment = TextDisplay.TextAlignment.CENTER;
+    private int maxLineWidth = 200;
+    private Vector3f translation;
 
     public TextDisplayButtonConfig(Component text, Component hoveredText, Runnable onClick) {
         this.text = text;
@@ -124,26 +130,124 @@ public class TextDisplayButtonConfig {
         return this;
     }
 
+    public TextDisplayButtonConfig enableTextShadow() {
+        this.textShadowEnabled = true;
+        return this;
+    }
+
+    public TextDisplayButtonConfig setTextAlignment(TextDisplay.TextAlignment alignment) {
+        this.textAlignment = alignment;
+        return this;
+    }
+
+    public TextDisplayButtonConfig setMaxLineWidth(int width) {
+        this.maxLineWidth = width;
+        return this;
+    }
+
+    public TextDisplayButtonConfig setTranslation(Vector3f translation) {
+        this.translation = translation;
+        return this;
+    }
+
+    public Vector3f getTranslation() {
+        return translation != null ? translation : new Vector3f(0, -scaleY / 8, 0);
+    }
+
     // Геттеры
-    public Component getText() { return text; }
-    public Component getHoveredText() { return hoveredText; }
-    public Runnable getOnClick() { return onClick; }
-    public Component getTooltip() { return tooltip; }
-    public TextColor getTooltipColor() { return tooltipColor; }
-    public int getTooltipDelay() { return tooltipDelay; }
-    public WidgetPosition getPosition() { return position; }
-    public Color getBackgroundColor() { return backgroundColor; }
-    public int getBackgroundAlpha() { return backgroundAlpha; }
-    public Color getHoveredBackgroundColor() { return hoveredBackgroundColor; }
-    public int getHoveredBackgroundAlpha() { return hoveredBackgroundAlpha; }
-    public float getScaleX() { return scaleX; }
-    public float getScaleY() { return scaleY; }
-    public float getScaleZ() { return scaleZ; }
-    public double getTolerance() { return horizontalTolerance; }
-    public org.bukkit.Sound getClickSound() { return clickSound; }
-    public boolean isSoundEnabled() { return soundEnabled; }
-    public float getSoundVolume() { return soundVolume; }
-    public float getSoundPitch() { return soundPitch; }
-    public double getToleranceHorizontal() { return horizontalTolerance; }
-    public double getToleranceVertical() { return verticalTolerance; }
+    public Component getText() {
+        return text;
+    }
+
+    public Component getHoveredText() {
+        return hoveredText;
+    }
+
+    public Runnable getOnClick() {
+        return onClick;
+    }
+
+    public Component getTooltip() {
+        return tooltip;
+    }
+
+    public TextColor getTooltipColor() {
+        return tooltipColor;
+    }
+
+    public int getTooltipDelay() {
+        return tooltipDelay;
+    }
+
+    public WidgetPosition getPosition() {
+        return position;
+    }
+
+    public Color getBackgroundColor() {
+        return backgroundColor;
+    }
+
+    public int getBackgroundAlpha() {
+        return backgroundAlpha;
+    }
+
+    public Color getHoveredBackgroundColor() {
+        return hoveredBackgroundColor;
+    }
+
+    public int getHoveredBackgroundAlpha() {
+        return hoveredBackgroundAlpha;
+    }
+
+    public float getScaleX() {
+        return scaleX;
+    }
+
+    public float getScaleY() {
+        return scaleY;
+    }
+
+    public float getScaleZ() {
+        return scaleZ;
+    }
+
+    public double getTolerance() {
+        return horizontalTolerance;
+    }
+
+    public org.bukkit.Sound getClickSound() {
+        return clickSound;
+    }
+
+    public boolean isSoundEnabled() {
+        return soundEnabled;
+    }
+
+    public float getSoundVolume() {
+        return soundVolume;
+    }
+
+    public float getSoundPitch() {
+        return soundPitch;
+    }
+
+    public double getToleranceHorizontal() {
+        return horizontalTolerance;
+    }
+
+    public double getToleranceVertical() {
+        return verticalTolerance;
+    }
+
+    public boolean isTextShadowEnabled() {
+        return textShadowEnabled;
+    }
+
+    public TextDisplay.TextAlignment getTextAlignment() {
+        return textAlignment;
+    }
+
+    public int getMaxLineWidth() {
+        return maxLineWidth;
+    }
 } 

@@ -1,22 +1,21 @@
 package me.padej.displayAPI.ui.widgets;
 
 import me.padej.displayAPI.DisplayAPI;
+import me.padej.displayAPI.utils.Animation;
 import me.padej.displayAPI.utils.PointDetection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Sound;
-import org.bukkit.entity.Display;
-import org.bukkit.entity.TextDisplay;
-import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
-import org.bukkit.util.Transformation;
-import org.joml.AxisAngle4f;
-import org.joml.Vector3f;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
-import me.padej.displayAPI.utils.Animation;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.entity.Display;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.TextDisplay;
+import org.bukkit.util.Transformation;
+import org.bukkit.util.Vector;
+import org.joml.AxisAngle4f;
+import org.joml.Vector3f;
 
 import java.time.Duration;
 
@@ -37,24 +36,31 @@ public class TextDisplayButtonWidget implements Widget {
     private int backgroundAlpha;
     private Color hoveredBackgroundColor;
     private int hoveredBackgroundAlpha;
-    
+
     private float scaleX = .15f;
     private float scaleY = .15f;
     private float scaleZ = .15f;
     private double horizontalTolerance = 0.06;
     private double verticalTolerance = 0.06;
-    
+
     private WidgetPosition position;
-    
+
     private org.bukkit.Sound clickSound = org.bukkit.Sound.BLOCK_DISPENSER_FAIL;
     private boolean soundEnabled = true;
     private float soundVolume = 0.5f;
     private float soundPitch = 2.0f;
-    
+
     private Runnable updateCallback;
-    
-    private TextDisplayButtonWidget() {}
-    
+
+    private boolean textShadowEnabled = false;
+    private TextDisplay.TextAlignment textAlignment = TextDisplay.TextAlignment.CENTER;
+    private int maxLineWidth = 200;
+
+    private Vector3f translation;
+
+    private TextDisplayButtonWidget() {
+    }
+
     public static TextDisplayButtonWidget create(Location location, Player viewer, TextDisplayButtonConfig config) {
         TextDisplayButtonWidget widget = new TextDisplayButtonWidget();
         widget.location = location;
@@ -72,94 +78,106 @@ public class TextDisplayButtonWidget implements Widget {
         widget.horizontalTolerance = config.getToleranceHorizontal();
         widget.verticalTolerance = config.getToleranceVertical();
         widget.position = config.getPosition();
-        
+
         if (config.getTooltip() != null) {
             widget.tooltip = config.getTooltip();
             widget.tooltipDelay = config.getTooltipDelay();
             widget.tooltipColor = config.getTooltipColor();
         }
-        
+
         widget.clickSound = config.getClickSound();
         widget.soundEnabled = config.isSoundEnabled();
         widget.soundVolume = config.getSoundVolume();
         widget.soundPitch = config.getSoundPitch();
-        
+
+        widget.textShadowEnabled = config.isTextShadowEnabled();
+        widget.textAlignment = config.getTextAlignment();
+        widget.maxLineWidth = config.getMaxLineWidth();
+
+        widget.translation = config.getTranslation();
+
         widget.spawn();
         return widget;
     }
-    
+
     private void spawn() {
         this.display = location.getWorld().spawn(location, TextDisplay.class);
-        
+
         display.text(text);
         display.setBackgroundColor(org.bukkit.Color.fromARGB(
-            backgroundAlpha,
-            backgroundColor.getRed(),
-            backgroundColor.getGreen(),
-            backgroundColor.getBlue()
+                backgroundAlpha,
+                backgroundColor.getRed(),
+                backgroundColor.getGreen(),
+                backgroundColor.getBlue()
         ));
         display.setBrightness(new Display.Brightness(15, 15));
-        
+
         // Начальная трансформация с нулевым масштабом
         Transformation initialTransform = new Transformation(
-            new Vector3f(0, 0, 0),
-            new AxisAngle4f(),
-            new Vector3f(0, 0, 0),
-            new AxisAngle4f()
+                new Vector3f(0, 0, 0),
+                new AxisAngle4f(),
+                new Vector3f(0, 0, 0),
+                new AxisAngle4f()
         );
         display.setTransformation(initialTransform);
-        
+
         // Настройка длительности анимаций
         display.setInterpolationDuration(1);
         display.setTeleportDuration(1);
-        
+
         display.setBillboard(Display.Billboard.FIXED);
         display.setVisibleByDefault(false);
         viewer.showEntity(DisplayAPI.getInstance(), display);
 
-        // Анимация появления
-        Bukkit.getScheduler().runTaskLater(DisplayAPI.getInstance(), () -> {
-            Animation.applyTransformationWithInterpolation(
-                display,
-                new Transformation(
-                    new Vector3f(0, -scaleY / 8, 0),
-                    new AxisAngle4f(),
-                    new Vector3f(scaleX, scaleY, scaleZ),
-                    new AxisAngle4f()
-                ),
-                5
-            );
-        }, 1);
+        // Если translation не установлен, используем значение по умолчанию
+        if (translation == null) {
+            translation = new Vector3f(0, -scaleY / 8, 0);
+        }
+
+        Animation.applyTransformationWithInterpolation(
+            display,
+            new Transformation(
+                translation,
+                new AxisAngle4f(),
+                new Vector3f(scaleX, scaleY, scaleZ),
+                new AxisAngle4f()
+            ),
+            5
+        );
+
+        display.setShadowed(textShadowEnabled);
+        display.setAlignment(textAlignment);
+        display.setLineWidth(maxLineWidth);
     }
-    
+
     @Override
     public void update() {
         Vector eye = viewer.getEyeLocation().toVector();
         Vector direction = viewer.getEyeLocation().getDirection();
         Vector point = display.getLocation().toVector();
-        
+
         boolean isLookingAt = PointDetection.lookingAtPoint(eye, direction, point, horizontalTolerance, verticalTolerance);
-        
+
         if (isLookingAt != isHovered) {
             isHovered = isLookingAt;
             display.setGlowing(isHovered);
-            
+
             // Обновляем текст и цвет фона при изменении состояния наведения
             if (isHovered) {
                 display.text(hoveredText);
                 display.setBackgroundColor(org.bukkit.Color.fromARGB(
-                    hoveredBackgroundAlpha,
-                    hoveredBackgroundColor.getRed(),
-                    hoveredBackgroundColor.getGreen(),
-                    hoveredBackgroundColor.getBlue()
+                        hoveredBackgroundAlpha,
+                        hoveredBackgroundColor.getRed(),
+                        hoveredBackgroundColor.getGreen(),
+                        hoveredBackgroundColor.getBlue()
                 ));
             } else {
                 display.text(text);
                 display.setBackgroundColor(org.bukkit.Color.fromARGB(
-                    backgroundAlpha,
-                    backgroundColor.getRed(),
-                    backgroundColor.getGreen(),
-                    backgroundColor.getBlue()
+                        backgroundAlpha,
+                        backgroundColor.getRed(),
+                        backgroundColor.getGreen(),
+                        backgroundColor.getBlue()
                 ));
                 hoverTicks = 0;
                 if (isShowingTooltip) {
@@ -167,7 +185,7 @@ public class TextDisplayButtonWidget implements Widget {
                 }
             }
         }
-        
+
         if (isHovered && tooltip != null) {
             if (tooltipDelay > 0) {
                 hoverTicks++;
@@ -184,7 +202,7 @@ public class TextDisplayButtonWidget implements Widget {
             updateCallback.run();
         }
     }
-    
+
     public void handleClick() {
         if (isHovered) {
             if (soundEnabled) {
@@ -193,7 +211,7 @@ public class TextDisplayButtonWidget implements Widget {
             onClick.run();
         }
     }
-    
+
     @Override
     public void remove() {
         if (display != null) {
@@ -209,16 +227,16 @@ public class TextDisplayButtonWidget implements Widget {
         if (display != null) {
             // Анимация исчезновения
             Animation.applyTransformationWithInterpolation(
-                display,
-                new Transformation(
-                    display.getTransformation().getTranslation(),
-                    display.getTransformation().getLeftRotation(),
-                    new Vector3f(0, 0, 0), // Нулевой масштаб
-                    display.getTransformation().getRightRotation()
-                ),
-                ticks
+                    display,
+                    new Transformation(
+                            display.getTransformation().getTranslation(),
+                            display.getTransformation().getLeftRotation(),
+                            new Vector3f(0, 0, 0), // Нулевой масштаб
+                            display.getTransformation().getRightRotation()
+                    ),
+                    ticks
             );
-            
+
             // Удаляем после анимации
             Bukkit.getScheduler().runTaskLater(DisplayAPI.getInstance(), () -> {
                 if (isShowingTooltip) {
@@ -228,11 +246,11 @@ public class TextDisplayButtonWidget implements Widget {
             }, ticks);
         }
     }
-    
+
     public TextDisplay getDisplay() {
         return display;
     }
-    
+
     public boolean isHovered() {
         return isHovered;
     }
@@ -241,13 +259,13 @@ public class TextDisplayButtonWidget implements Widget {
         this.scaleX = x;
         this.scaleY = y;
         this.scaleZ = z;
-        
+
         if (display != null) {
             Transformation transformation = new Transformation(
-                new Vector3f(0, -y / 2, 0),
-                new AxisAngle4f(),
-                new Vector3f(x, y, z),
-                new AxisAngle4f()
+                    new Vector3f(0, -y / 2, 0),
+                    new AxisAngle4f(),
+                    new Vector3f(x, y, z),
+                    new AxisAngle4f()
             );
             display.setTransformation(transformation);
         }
@@ -290,13 +308,13 @@ public class TextDisplayButtonWidget implements Widget {
 
     private void showTooltip() {
         Title title = Title.title(
-            Component.empty(),
-            tooltip.color(tooltipColor),
-            Title.Times.times(
-                Duration.ofMillis(200),
-                Duration.ofMillis(1000),
-                Duration.ofMillis(200)
-            )
+                Component.empty(),
+                tooltip.color(tooltipColor),
+                Title.Times.times(
+                        Duration.ofMillis(200),
+                        Duration.ofMillis(1000),
+                        Duration.ofMillis(200)
+                )
         );
         viewer.showTitle(title);
         isShowingTooltip = true;
@@ -358,5 +376,46 @@ public class TextDisplayButtonWidget implements Widget {
 
     public void setUpdateCallback(Runnable callback) {
         this.updateCallback = callback;
+    }
+
+    public TextDisplayButtonWidget enableTextShadow() {
+        this.textShadowEnabled = true;
+        if (display != null) {
+            display.setShadowed(true);
+        }
+        return this;
+    }
+
+    public TextDisplayButtonWidget setTextAlignment(TextDisplay.TextAlignment alignment) {
+        this.textAlignment = alignment;
+        if (display != null) {
+            display.setAlignment(alignment);
+        }
+        return this;
+    }
+
+    public TextDisplayButtonWidget setMaxLineWidth(int width) {
+        this.maxLineWidth = width;
+        if (display != null) {
+            display.setLineWidth(width);
+        }
+        return this;
+    }
+
+    public TextDisplayButtonWidget setTranslation(Vector3f translation) {
+        this.translation = translation;
+        if (display != null) {
+            Animation.applyTransformationWithInterpolation(
+                display,
+                new Transformation(
+                    translation,
+                    display.getTransformation().getLeftRotation(),
+                    new Vector3f(scaleX, scaleY, scaleZ),
+                    display.getTransformation().getRightRotation()
+                ),
+                5
+            );
+        }
+        return this;
     }
 } 
