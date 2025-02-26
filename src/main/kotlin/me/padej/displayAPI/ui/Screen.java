@@ -230,7 +230,7 @@ public abstract class Screen extends WidgetManager {
                     Component.text("⏴").color(TextColor.fromHexString("#fafeff")),
                     Component.text("⏴").color(TextColor.fromHexString("#aaaeaf")),
                     () -> {
-                        Screen currentScreen = UIManager.getInstance().getActiveScreen(viewer);
+                        Screen currentScreen = (Screen) UIManager.getInstance().getActiveScreen(viewer);
                         if (currentScreen != null) {
                             ChangeScreen.switchToParent(viewer, currentScreen.getCurrentScreenClass());
                         }

@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
 import org.bukkit.entity.TextDisplay;
+import org.bukkit.util.Transformation;
 import org.joml.Vector3f;
 
 public class TextDisplayButtonConfig {
@@ -31,6 +32,8 @@ public class TextDisplayButtonConfig {
     private TextDisplay.TextAlignment textAlignment = TextDisplay.TextAlignment.CENTER;
     private int maxLineWidth = 200;
     private Vector3f translation;
+    private Transformation hoveredTransformation;
+    private int hoveredTransformationDuration;
 
     public TextDisplayButtonConfig(Component text, Component hoveredText, Runnable onClick) {
         this.text = text;
@@ -152,6 +155,20 @@ public class TextDisplayButtonConfig {
 
     public Vector3f getTranslation() {
         return translation != null ? translation : new Vector3f(0, -scaleY / 8, 0);
+    }
+
+    public TextDisplayButtonConfig setHoveredTransformation(Transformation transformation, int duration) {
+        this.hoveredTransformation = transformation;
+        this.hoveredTransformationDuration = duration;
+        return this;
+    }
+
+    public Transformation getHoveredTransformation() {
+        return hoveredTransformation;
+    }
+
+    public int getHoveredTransformationDuration() {
+        return hoveredTransformationDuration;
     }
 
     // Геттеры

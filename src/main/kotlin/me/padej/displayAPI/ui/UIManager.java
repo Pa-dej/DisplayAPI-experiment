@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class UIManager implements Listener {
     private static UIManager instance;
-    private final Map<Player, Screen> activeScreens = new ConcurrentHashMap<>();
+    private final Map<Player, WidgetManager> activeScreens = new ConcurrentHashMap<>();
     private BukkitTask updateTask;
     private boolean isUpdateTaskRunning = false;
 
@@ -35,12 +35,12 @@ public class UIManager implements Listener {
         return instance;
     }
 
-    public Screen getActiveScreen(Player player) {
+    public WidgetManager getActiveScreen(Player player) {
         return activeScreens.get(player);
     }
 
-    public void registerScreen(Player player, Screen screen) {
-        activeScreens.put(player, screen);
+    public void registerScreen(Player player, WidgetManager manager) {
+        activeScreens.put(player, manager);
         startUpdateTaskIfNeeded();
     }
 
@@ -54,13 +54,13 @@ public class UIManager implements Listener {
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        Screen screen = activeScreens.get(player);
+        WidgetManager manager = activeScreens.get(player);
 
-        if (screen != null) {
+        if (manager != null) {
             if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
-                if (screen.isLookingAtWidget()) {
+                if (manager.isLookingAtWidget()) {
                     event.setCancelled(true);
-                    screen.handleClick();
+                    manager.handleClick();
                 }
             }
         }
@@ -69,10 +69,10 @@ public class UIManager implements Listener {
     private void startUpdateTaskIfNeeded() {
         if (!isUpdateTaskRunning) {
             updateTask = Bukkit.getScheduler().runTaskTimer(DisplayAPI.getInstance(), () -> {
-                for (Map.Entry<Player, Screen> entry : activeScreens.entrySet()) {
-                    Screen screen = entry.getValue();
-                    if (screen != null) {
-                        screen.update();
+                for (Map.Entry<Player, WidgetManager> entry : activeScreens.entrySet()) {
+                    WidgetManager manager = entry.getValue();
+                    if (manager != null) {
+                        manager.update();
                     }
                 }
             }, 0L, 1L);
@@ -90,9 +90,9 @@ public class UIManager implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        Screen screen = activeScreens.get(player);
-        if (screen != null) {
-            screen.remove(); // Мгновенное удаление при выходе
+        WidgetManager manager = activeScreens.get(player);
+        if (manager != null) {
+            manager.remove(); // Мгновенное удаление при выходе
             unregisterScreen(player);
         }
     }
@@ -100,20 +100,20 @@ public class UIManager implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
-        Screen screen = activeScreens.get(player);
-        if (screen != null) {
-            screen.remove(); // Мгновенное удаление при смерти
+        WidgetManager manager = activeScreens.get(player);
+        if (manager != null) {
+            manager.remove(); // Мгновенное удаление при смерти
             unregisterScreen(player);
         }
     }
 
     public void cleanup() {
         // Удаляем все активные экраны
-        for (Map.Entry<Player, Screen> entry : new HashMap<>(activeScreens).entrySet()) {
+        for (Map.Entry<Player, WidgetManager> entry : new HashMap<>(activeScreens).entrySet()) {
             Player player = entry.getKey();
-            Screen screen = entry.getValue();
-            if (screen != null) {
-                screen.remove(); // Мгновенное удаление при выключении
+            WidgetManager manager = entry.getValue();
+            if (manager != null) {
+                manager.remove(); // Мгновенное удаление при выключении
             }
         }
         

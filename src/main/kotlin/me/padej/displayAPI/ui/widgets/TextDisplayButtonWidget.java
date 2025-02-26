@@ -23,6 +23,7 @@ public class TextDisplayButtonWidget implements Widget {
     private TextDisplay display;
     private Player viewer;
     private boolean isHovered = false;
+    private boolean wasHovered = false;
     private Runnable onClick;
     private Location location;
     private Component text;
@@ -58,6 +59,9 @@ public class TextDisplayButtonWidget implements Widget {
 
     private Vector3f translation;
 
+    private Transformation hoveredTransformation;
+    private int hoveredTransformationDuration;
+
     private TextDisplayButtonWidget() {
     }
 
@@ -68,35 +72,40 @@ public class TextDisplayButtonWidget implements Widget {
         widget.onClick = config.getOnClick();
         widget.text = config.getText();
         widget.hoveredText = config.getHoveredText();
-        widget.backgroundColor = config.getBackgroundColor();
-        widget.backgroundAlpha = config.getBackgroundAlpha();
-        widget.hoveredBackgroundColor = config.getHoveredBackgroundColor();
-        widget.hoveredBackgroundAlpha = config.getHoveredBackgroundAlpha();
         widget.scaleX = config.getScaleX();
         widget.scaleY = config.getScaleY();
         widget.scaleZ = config.getScaleZ();
         widget.horizontalTolerance = config.getToleranceHorizontal();
         widget.verticalTolerance = config.getToleranceVertical();
-        widget.position = config.getPosition();
-
-        if (config.getTooltip() != null) {
-            widget.tooltip = config.getTooltip();
-            widget.tooltipDelay = config.getTooltipDelay();
-            widget.tooltipColor = config.getTooltipColor();
-        }
-
+        widget.backgroundColor = config.getBackgroundColor();
+        widget.backgroundAlpha = config.getBackgroundAlpha();
+        widget.hoveredBackgroundColor = config.getHoveredBackgroundColor();
+        widget.hoveredBackgroundAlpha = config.getHoveredBackgroundAlpha();
+        
         widget.clickSound = config.getClickSound();
         widget.soundEnabled = config.isSoundEnabled();
         widget.soundVolume = config.getSoundVolume();
         widget.soundPitch = config.getSoundPitch();
-
+        
         widget.textShadowEnabled = config.isTextShadowEnabled();
         widget.textAlignment = config.getTextAlignment();
         widget.maxLineWidth = config.getMaxLineWidth();
-
+        
         widget.translation = config.getTranslation();
-
+        
+        widget.hoveredTransformation = config.getHoveredTransformation();
+        widget.hoveredTransformationDuration = config.getHoveredTransformationDuration();
+        
         widget.spawn();
+        
+        if (config.getTooltip() != null) {
+            widget.setTooltip(config.getTooltip())
+                 .setTooltipColor(config.getTooltipColor())
+                 .setTooltipDelay(config.getTooltipDelay());
+        }
+        
+        widget.setPosition(config.getPosition());
+        
         return widget;
     }
 
@@ -158,9 +167,31 @@ public class TextDisplayButtonWidget implements Widget {
 
         boolean isLookingAt = PointDetection.lookingAtPoint(eye, direction, point, horizontalTolerance, verticalTolerance);
 
-        if (isLookingAt != isHovered) {
+        if (isLookingAt != wasHovered) {
+            wasHovered = isLookingAt;
             isHovered = isLookingAt;
             display.setGlowing(isHovered);
+
+            // Применяем hoveredTransformation только при изменении состояния
+            if (isHovered && hoveredTransformation != null) {
+                Animation.applyTransformationWithInterpolation(
+                    display,
+                    hoveredTransformation,
+                    hoveredTransformationDuration
+                );
+            } else {
+                // Возвращаем обычную трансформацию
+                Animation.applyTransformationWithInterpolation(
+                    display,
+                    new Transformation(
+                        translation != null ? translation : new Vector3f(0, -scaleY / 8, 0),
+                        new AxisAngle4f(),
+                        new Vector3f(scaleX, scaleY, scaleZ),
+                        new AxisAngle4f()
+                    ),
+                    hoveredTransformationDuration
+                );
+            }
 
             // Обновляем текст и цвет фона при изменении состояния наведения
             if (isHovered) {
@@ -330,6 +361,11 @@ public class TextDisplayButtonWidget implements Widget {
         return this;
     }
 
+    public TextDisplayButtonWidget setTooltip(Component tooltip) {
+        this.tooltip = tooltip;
+        return this;
+    }
+
     public TextDisplayButtonWidget setTooltipDelay(int ticks) {
         this.tooltipDelay = ticks;
         return this;
@@ -416,6 +452,12 @@ public class TextDisplayButtonWidget implements Widget {
                 5
             );
         }
+        return this;
+    }
+
+    public TextDisplayButtonWidget setHoveredTransformation(Transformation transformation, int duration) {
+        this.hoveredTransformation = transformation;
+        this.hoveredTransformationDuration = duration;
         return this;
     }
 } 

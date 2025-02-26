@@ -6,6 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.util.Transformation;
 import org.joml.Vector3f;
 
 public class ItemDisplayButtonConfig {
@@ -29,6 +30,8 @@ public class ItemDisplayButtonConfig {
     private double verticalTolerance = 0.06;
     private ItemMeta itemMeta;
     private Vector3f translation;
+    private Transformation hoveredTransformation;
+    private int hoveredTransformationDuration;
 
     public ItemDisplayButtonConfig(Material material, Runnable onClick) {
         this.material = material;
@@ -210,5 +213,19 @@ public class ItemDisplayButtonConfig {
 
     public ItemMeta getItemMeta() {
         return itemMeta;
+    }
+
+    public ItemDisplayButtonConfig setHoveredTransformation(Transformation transformation, int duration) {
+        this.hoveredTransformation = transformation;
+        this.hoveredTransformationDuration = duration;
+        return this;
+    }
+
+    public Transformation getHoveredTransformation() {
+        return hoveredTransformation;
+    }
+
+    public int getHoveredTransformationDuration() {
+        return hoveredTransformationDuration;
     }
 }

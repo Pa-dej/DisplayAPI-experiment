@@ -9,6 +9,8 @@ import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Transformation;
+import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 
 public class Branch4Screen extends Screen {
@@ -100,6 +102,12 @@ public class Branch4Screen extends Screen {
                         .setHoveredBackgroundColor(Color.fromRGB(60, 60, 60))
                         .setHoveredBackgroundAlpha(180)
                         .setHoveredBackgroundAlpha(180)
+                        .setHoveredTransformation(new Transformation(
+                        new Vector3f(0, -0.25f, 0),
+                        new AxisAngle4f(),
+                        new Vector3f(0.2f, 0.2f, 0.2f),
+                        new AxisAngle4f()
+                ), 5)
         };
 
         for (TextDisplayButtonConfig config : branchButtons) {

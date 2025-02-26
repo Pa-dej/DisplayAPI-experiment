@@ -3,6 +3,7 @@ package me.padej.displayAPI.test_events;
 import me.padej.displayAPI.api.events.DisplayClickEvent;
 import me.padej.displayAPI.ui.Screen;
 import me.padej.displayAPI.ui.UIManager;
+import me.padej.displayAPI.ui.WidgetManager;
 import me.padej.displayAPI.ui.screens.MainScreen;
 import me.padej.displayAPI.utils.Animation;
 import me.padej.displayAPI.utils.ItemUtil;
@@ -23,9 +24,9 @@ public class CreateTestUI implements Listener {
                 ItemUtil.isExperimental(player.getInventory().getItemInMainHand()) &&
                 event.getAction().isRightClick()) {
 
-            Screen currentScreen = UIManager.getInstance().getActiveScreen(player);
-            if (currentScreen != null) {
-                currentScreen.remove();
+            WidgetManager currentManager = UIManager.getInstance().getActiveScreen(player);
+            if (currentManager != null) {
+                currentManager.remove();
             }
 
             Screen screen = new MainScreen(
@@ -42,9 +43,10 @@ public class CreateTestUI implements Listener {
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-        Screen screen = UIManager.getInstance().getActiveScreen(player);
+        WidgetManager manager = UIManager.getInstance().getActiveScreen(player);
 
-        if (screen != null) {
+        if (manager != null && manager instanceof Screen) {
+            Screen screen = (Screen) manager;
             if (Screen.isSaved) return;
             if (!screen.isPlayerInRange() && !Screen.isFollowing) {
                 screen.remove();

@@ -47,6 +47,9 @@ public class ItemDisplayButtonWidget implements Widget {
     private Runnable updateCallback;
     private org.bukkit.inventory.meta.ItemMeta itemMeta;
     private Vector3f translation;
+    private Transformation hoveredTransformation;
+    private int hoveredTransformationDuration;
+    private boolean wasHovered = false;
     
     private ItemDisplayButtonWidget() {} // Приватный конструктор
     
@@ -149,9 +152,31 @@ public class ItemDisplayButtonWidget implements Widget {
         
         boolean isLookingAt = PointDetection.lookingAtPoint(eye, direction, point, horizontalTolerance, verticalTolerance);
         
-        if (isLookingAt != isHovered) {
+        if (isLookingAt != wasHovered) {
+            wasHovered = isLookingAt;
             isHovered = isLookingAt;
             display.setGlowing(isHovered);
+            
+            // Применяем hoveredTransformation только при изменении состояния
+            if (isHovered && hoveredTransformation != null) {
+                Animation.applyTransformationWithInterpolation(
+                    display,
+                    hoveredTransformation,
+                    hoveredTransformationDuration
+                );
+            } else {
+                // Возвращаем обычную трансформацию
+                Animation.applyTransformationWithInterpolation(
+                    display,
+                    new Transformation(
+                        translation != null ? translation : new Vector3f(0, -scaleY / 8, 0),
+                        new AxisAngle4f(),
+                        new Vector3f(scaleX, scaleY, scaleZ),
+                        new AxisAngle4f()
+                    ),
+                    hoveredTransformationDuration
+                );
+            }
             
             if (!isHovered) {
                 hoverTicks = 0;
@@ -391,6 +416,12 @@ public class ItemDisplayButtonWidget implements Widget {
                 5
             );
         }
+        return this;
+    }
+
+    public ItemDisplayButtonWidget setHoveredTransformation(Transformation transformation, int duration) {
+        this.hoveredTransformation = transformation;
+        this.hoveredTransformationDuration = duration;
         return this;
     }
 }
