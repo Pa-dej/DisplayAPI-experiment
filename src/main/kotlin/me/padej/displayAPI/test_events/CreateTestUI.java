@@ -31,7 +31,7 @@ public class CreateTestUI implements Listener {
 
             Screen screen = new MainScreen(
                     player,
-                    player.getEyeLocation().add(player.getLocation().getDirection().multiply(0.8)),
+                    player.getLocation().add(0, player.getHeight() / 2, 0).add(player.getLocation().getDirection().multiply(0.8)),
                     " ",
                     0.1f
             );

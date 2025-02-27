@@ -161,6 +161,7 @@ public class TextDisplayButtonWidget implements Widget {
 
     @Override
     public void update() {
+        // Используем getEyeLocation() для определения точки пересечения взгляда
         Vector eye = viewer.getEyeLocation().toVector();
         Vector direction = viewer.getEyeLocation().getDirection();
         Vector point = display.getLocation().toVector();

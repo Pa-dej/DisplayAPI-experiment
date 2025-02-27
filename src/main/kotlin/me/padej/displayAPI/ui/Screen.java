@@ -66,8 +66,8 @@ public abstract class Screen extends WidgetManager implements IDisplayable, IPar
                 textDisplay.setVisibleByDefault(false); // Делаем невидимым по умолчанию
                 viewer.showEntity(DisplayAPI.getInstance(), textDisplay); // Показываем только создателю
 
-                // Поворачиваем дисплей к игроку при создании
-                Location viewerLoc = viewer.getEyeLocation();
+                // Заменяем viewer.getEyeLocation() на viewer.getLocation().add()
+                Location viewerLoc = viewer.getLocation().add(0, viewer.getHeight() / 2, 0);
                 DisplayUtils.lookAtPos(textDisplay, viewerLoc);
             }
         }

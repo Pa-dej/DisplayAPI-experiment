@@ -73,34 +73,57 @@ public class ChangeScreen {
 
                 // Создаем новый менеджер
                 WidgetManager newManager;
-                if (IDisplayable.class.isAssignableFrom(to)) {
-                    newManager = to.getConstructor(
-                            Player.class,
-                            Location.class,
-                            String.class,
-                            float.class
-                    ).newInstance(
-                            player,
-                            oldLocation,
-                            " ",
-                            0.1f
-                    );
-
-                    // Восстанавливаем параметры отображения
-                    if (backgroundColor != null) {
-                        IDisplayable displayable = (IDisplayable) newManager;
-                        displayable.setBackgroundColor(backgroundColor);
-                        displayable.updateDisplayPosition(oldLocation, yaw, pitch);
-                    }
-                    
-                    if (newManager instanceof Animatable) {
-                        ((Animatable) newManager).createWithAnimation(player);
+                try {
+                    if (IDisplayable.class.isAssignableFrom(to)) {
+                        // Пробуем создать с четырьмя параметрами
+                        newManager = to.getConstructor(
+                                Player.class,
+                                Location.class,
+                                String.class,
+                                float.class
+                        ).newInstance(
+                                player,
+                                oldLocation,
+                                " ",
+                                0.1f
+                        );
                     } else {
-                        UIManager.getInstance().registerScreen(player, newManager);
+                        // Пробуем создать с двумя параметрами
+                        newManager = to.getConstructor(Player.class, Location.class)
+                                .newInstance(player, oldLocation);
                     }
+                } catch (NoSuchMethodException e) {
+                    // Если не нашли нужный конструктор, пробуем другой вариант
+                    if (IDisplayable.class.isAssignableFrom(to)) {
+                        // Пробуем создать с двумя параметрами
+                        newManager = to.getConstructor(Player.class, Location.class)
+                                .newInstance(player, oldLocation);
+                    } else {
+                        // Пробуем создать с четырьмя параметрами
+                        newManager = to.getConstructor(
+                                Player.class,
+                                Location.class,
+                                String.class,
+                                float.class
+                        ).newInstance(
+                                player,
+                                oldLocation,
+                                " ",
+                                0.1f
+                        );
+                    }
+                }
+
+                // Восстанавливаем параметры отображения
+                if (backgroundColor != null && newManager instanceof IDisplayable) {
+                    IDisplayable displayable = (IDisplayable) newManager;
+                    displayable.setBackgroundColor(backgroundColor);
+                    displayable.updateDisplayPosition(oldLocation, yaw, pitch);
+                }
+                
+                if (newManager instanceof Animatable) {
+                    ((Animatable) newManager).createWithAnimation(player);
                 } else {
-                    newManager = to.getConstructor(Player.class, Location.class)
-                            .newInstance(player, oldLocation);
                     UIManager.getInstance().registerScreen(player, newManager);
                 }
             } catch (Exception e) {
