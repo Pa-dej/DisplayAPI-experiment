@@ -1,13 +1,12 @@
 package me.padej.displayAPI.ui.screens;
 
-import me.padej.displayAPI.ui.Screen;
-import me.padej.displayAPI.ui.UIManager;
-import me.padej.displayAPI.ui.WidgetManager;
+import me.padej.displayAPI.ui.*;
 import me.padej.displayAPI.ui.annotations.AlwaysOnScreen;
 import me.padej.displayAPI.ui.widgets.Widget;
 import me.padej.displayAPI.utils.Animation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -49,69 +48,85 @@ public class ChangeScreen {
         }
     }
 
-    public static void switchTo(Player player, Class<? extends Screen> from, Class<? extends Screen> to) {
-        Screen currentScreen = (Screen) UIManager.getInstance().getActiveScreen(player);
-        if (currentScreen != null && currentScreen.getClass() == from) {
+    public static void switchTo(Player player, Class<? extends WidgetManager> from, Class<? extends WidgetManager> to) {
+        WidgetManager currentManager = UIManager.getInstance().getActiveScreen(player);
+        if (currentManager != null && currentManager.getClass() == from) {
             try {
-                // Сохраняем локацию, цвет фона и углы поворота текущего экрана
-                Location oldLocation = currentScreen.getLocation();
-                org.bukkit.Color backgroundColor = null;
+                Location oldLocation = currentManager.location;
+                Color backgroundColor = null;
                 float yaw = 0, pitch = 0;
 
-                if (currentScreen.getTextDisplay() != null) {
-                    backgroundColor = currentScreen.getTextDisplay().getBackgroundColor();
-                    yaw = currentScreen.getTextDisplay().getLocation().getYaw();
-                    pitch = currentScreen.getTextDisplay().getLocation().getPitch();
+                // Сохраняем параметры отображения, если доступны
+                if (currentManager instanceof IDisplayable) {
+                    IDisplayable displayable = (IDisplayable) currentManager;
+                    if (displayable.getTextDisplay() != null) {
+                        backgroundColor = displayable.getTextDisplay().getBackgroundColor();
+                        yaw = displayable.getTextDisplay().getLocation().getYaw();
+                        pitch = displayable.getTextDisplay().getLocation().getPitch();
+                    }
+                    displayable.softRemoveWithAnimation();
+                } else {
+                    currentManager.remove();
                 }
-
-                // Удаляем текущий экран
-                currentScreen.softRemoveWithAnimation();
+                
                 UIManager.getInstance().unregisterScreen(player);
 
-                // Создаем новый экран на месте старого
-                Screen screen = to.getConstructor(
-                        Player.class,
-                        Location.class,
-                        String.class,
-                        float.class
-                ).newInstance(
-                        player,
-                        oldLocation,
-                        " ",
-                        0.1f
-                );
+                // Создаем новый менеджер
+                WidgetManager newManager;
+                if (IDisplayable.class.isAssignableFrom(to)) {
+                    newManager = to.getConstructor(
+                            Player.class,
+                            Location.class,
+                            String.class,
+                            float.class
+                    ).newInstance(
+                            player,
+                            oldLocation,
+                            " ",
+                            0.1f
+                    );
 
-                // Восстанавливаем цвет фона и углы поворота
-                if (screen.getTextDisplay() != null) {
+                    // Восстанавливаем параметры отображения
                     if (backgroundColor != null) {
-                        screen.getTextDisplay().setBackgroundColor(backgroundColor);
+                        IDisplayable displayable = (IDisplayable) newManager;
+                        displayable.setBackgroundColor(backgroundColor);
+                        displayable.updateDisplayPosition(oldLocation, yaw, pitch);
                     }
-                    Location displayLoc = screen.getTextDisplay().getLocation();
-                    displayLoc.setYaw(yaw);
-                    displayLoc.setPitch(pitch);
-                    screen.getTextDisplay().teleport(displayLoc);
+                    
+                    if (newManager instanceof Animatable) {
+                        ((Animatable) newManager).createWithAnimation(player);
+                    } else {
+                        UIManager.getInstance().registerScreen(player, newManager);
+                    }
+                } else {
+                    newManager = to.getConstructor(Player.class, Location.class)
+                            .newInstance(player, oldLocation);
+                    UIManager.getInstance().registerScreen(player, newManager);
                 }
-
-                Animation.createDefaultScreenWithAnimation(screen, player);
             } catch (Exception e) {
                 LOGGER.error("Ошибка при переключении с {} на {}", from.getSimpleName(), to.getSimpleName(), e);
             }
         }
     }
 
-    public static void switchToParent(Player player, Class<? extends Screen> screen) {
+    public static void switchToParent(Player player, Class<? extends WidgetManager> managerClass) {
         try {
-            Screen tempScreen = screen.getDeclaredConstructor().newInstance();
-            Class<? extends Screen> parentClass = tempScreen.getParentScreen();
-
-            if (parentClass != null) {
-                switchTo(player, screen, parentClass);
+            WidgetManager tempManager = managerClass.getDeclaredConstructor().newInstance();
+            
+            if (tempManager instanceof IParentable) {
+                Class<? extends WidgetManager> parentClass = ((IParentable) tempManager).getParentManager();
+                if (parentClass != null) {
+                    switchTo(player, managerClass, parentClass);
+                } else {
+                    LOGGER.warn("Попытка переключения на родительский менеджер для {} не удалась - родительский менеджер не найден",
+                            managerClass.getSimpleName());
+                }
             } else {
-                LOGGER.warn("Попытка переключения на родительский экран для экрана {} не удалась - родительский экран не найден",
-                        screen.getSimpleName());
+                LOGGER.warn("Попытка переключения на родительский менеджер для {} не удалась - тип не поддерживает иерархию",
+                        managerClass.getSimpleName());
             }
         } catch (Exception e) {
-            LOGGER.error("Ошибка при получении родительского экрана для {}", screen.getSimpleName(), e);
+            LOGGER.error("Ошибка при получении родительского менеджера для {}", managerClass.getSimpleName(), e);
         }
     }
 } 

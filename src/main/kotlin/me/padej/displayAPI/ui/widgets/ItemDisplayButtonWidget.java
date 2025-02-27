@@ -50,6 +50,7 @@ public class ItemDisplayButtonWidget implements Widget {
     private Transformation hoveredTransformation;
     private int hoveredTransformationDuration;
     private boolean wasHovered = false;
+    private boolean glowOnHover = true;
     
     private ItemDisplayButtonWidget() {} // Приватный конструктор
     
@@ -89,6 +90,8 @@ public class ItemDisplayButtonWidget implements Widget {
         if (config.getItemMeta() != null) {
             widget.setItemMeta(config.getItemMeta());
         }
+        
+        widget.glowOnHover = config.isGlowOnHover();
         
         widget.spawn();
         
@@ -158,7 +161,9 @@ public class ItemDisplayButtonWidget implements Widget {
         if (isLookingAt != wasHovered) {
             wasHovered = isLookingAt;
             isHovered = isLookingAt;
-            display.setGlowing(isHovered);
+            if (glowOnHover) {
+                display.setGlowing(isHovered);
+            }
             
             // Применяем hoveredTransformation только при изменении состояния
             if (isHovered && hoveredTransformation != null) {
@@ -425,6 +430,14 @@ public class ItemDisplayButtonWidget implements Widget {
     public ItemDisplayButtonWidget setHoveredTransformation(Transformation transformation, int duration) {
         this.hoveredTransformation = transformation;
         this.hoveredTransformationDuration = duration;
+        return this;
+    }
+
+    public ItemDisplayButtonWidget disableHoverGlow() {
+        this.glowOnHover = false;
+        if (display != null) {
+            display.setGlowing(false);
+        }
         return this;
     }
 }

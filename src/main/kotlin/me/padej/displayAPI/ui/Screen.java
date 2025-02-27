@@ -22,7 +22,7 @@ import org.joml.Vector3f;
 
 import java.util.List;
 
-public abstract class Screen extends WidgetManager {
+public abstract class Screen extends WidgetManager implements IDisplayable, IParentable, Animatable {
     private final StringRectangle display;
     private final Class<? extends Screen> CURRENT_SCREEN_CLASS;
 
@@ -104,7 +104,11 @@ public abstract class Screen extends WidgetManager {
         super.remove();
     }
 
+    @Override
     public void softRemoveWithAnimation() {
+        for (Widget widget : children) {
+            widget.removeWithAnimation(5);
+        }
         if (display != null && display.getTextDisplay() != null) {
             Animation.applyTransformationWithInterpolation(
                     display.getTextDisplay(),
@@ -116,15 +120,6 @@ public abstract class Screen extends WidgetManager {
                     ),
                     5
             );
-
-            for (Widget widget : children) {
-                widget.removeWithAnimation(5);
-            }
-
-            Bukkit.getScheduler().runTaskLater(DisplayAPI.getInstance(), () -> {
-                super.remove();
-                display.removeEntity();
-            }, 5);
         }
     }
 
@@ -141,6 +136,7 @@ public abstract class Screen extends WidgetManager {
         return viewer.getLocation().distance(location) <= 5;
     }
 
+    @Override
     public TextDisplay getTextDisplay() {
         return display != null ? display.getTextDisplay() : null;
     }
@@ -509,5 +505,35 @@ public abstract class Screen extends WidgetManager {
 
     public TextDisplayButtonConfig[] getTextWidgets(Player player) {
         return new TextDisplayButtonConfig[0];
+    }
+
+    @Override
+    public void updateDisplayPosition(Location location, float yaw, float pitch) {
+        if (display != null && display.getTextDisplay() != null) {
+            Location displayLoc = display.getTextDisplay().getLocation();
+            displayLoc.setX(location.getX());
+            displayLoc.setY(location.getY());
+            displayLoc.setZ(location.getZ());
+            displayLoc.setYaw(yaw);
+            displayLoc.setPitch(pitch);
+            display.getTextDisplay().teleport(displayLoc);
+        }
+    }
+
+    @Override
+    public void setBackgroundColor(Color color) {
+        if (display != null && display.getTextDisplay() != null) {
+            display.getTextDisplay().setBackgroundColor(color);
+        }
+    }
+
+    @Override
+    public Class<? extends WidgetManager> getParentManager() {
+        return getParentScreen();
+    }
+
+    @Override
+    public void createWithAnimation(Player player) {
+        Animation.createDefaultScreenWithAnimation(this, player);
     }
 }

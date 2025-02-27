@@ -32,6 +32,7 @@ public class ItemDisplayButtonConfig {
     private Vector3f translation;
     private Transformation hoveredTransformation;
     private int hoveredTransformationDuration;
+    private boolean glowOnHover = true;
 
     public ItemDisplayButtonConfig(Material material, Runnable onClick) {
         this.material = material;
@@ -227,5 +228,14 @@ public class ItemDisplayButtonConfig {
 
     public int getHoveredTransformationDuration() {
         return hoveredTransformationDuration;
+    }
+
+    public ItemDisplayButtonConfig disableHoverGlow() {
+        this.glowOnHover = false;
+        return this;
+    }
+
+    public boolean isGlowOnHover() {
+        return glowOnHover;
     }
 }
