@@ -110,6 +110,7 @@ public abstract class Screen extends WidgetManager implements IDisplayable, IPar
             widget.removeWithAnimation(5);
         }
         if (display != null && display.getTextDisplay() != null) {
+            // Анимируем исчезновение
             Animation.applyTransformationWithInterpolation(
                     display.getTextDisplay(),
                     new Transformation(
@@ -120,6 +121,13 @@ public abstract class Screen extends WidgetManager implements IDisplayable, IPar
                     ),
                     5
             );
+            
+            // Удаляем дисплей после завершения анимации
+            Bukkit.getScheduler().runTaskLater(DisplayAPI.getInstance(), () -> {
+                if (display != null && display.getTextDisplay() != null) {
+                    display.removeEntity();
+                }
+            }, 6); // Задержка чуть больше, чем длительность анимации
         }
     }
 
