@@ -1,8 +1,12 @@
 package me.padej.displayAPI.ui;
 
 import me.padej.displayAPI.DisplayAPI;
-import me.padej.displayAPI.utils.PointDetection;
+import me.padej.displayAPI.api.events.DisplayClickEvent;
+import me.padej.displayAPI.ui.widgets.ItemDisplayButtonWidget;
+import me.padej.displayAPI.ui.widgets.TextDisplayButtonWidget;
+import me.padej.displayAPI.ui.widgets.Widget;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -51,6 +55,33 @@ public class UIManager implements Listener {
         }
     }
 
+    private Widget getNearestHoveredWidget(WidgetManager manager) {
+        Widget nearestWidget = null;
+        double nearestDistance = Double.MAX_VALUE;
+
+        for (Widget widget : manager.children) {
+            if (widget.isHovered()) {
+                // Получаем позицию виджета
+                Location widgetLoc = null;
+                if (widget instanceof ItemDisplayButtonWidget) {
+                    widgetLoc = ((ItemDisplayButtonWidget) widget).getDisplay().getLocation();
+                } else if (widget instanceof TextDisplayButtonWidget) {
+                    widgetLoc = ((TextDisplayButtonWidget) widget).getDisplay().getLocation();
+                }
+
+                if (widgetLoc != null) {
+                    // Вычисляем расстояние от глаз игрока до виджета
+                    double distance = manager.viewer.getEyeLocation().distance(widgetLoc);
+                    if (distance < nearestDistance) {
+                        nearestDistance = distance;
+                        nearestWidget = widget;
+                    }
+                }
+            }
+        }
+        return nearestWidget;
+    }
+
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
@@ -58,9 +89,38 @@ public class UIManager implements Listener {
 
         if (manager != null) {
             if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
-                if (manager.isLookingAtWidget()) {
+                Widget nearestWidget = getNearestHoveredWidget(manager);
+                if (nearestWidget != null) {
                     event.setCancelled(true);
-                    manager.handleClick();
+                    // Создаем и вызываем событие клика только для ближайшего виджета
+                    DisplayClickEvent clickEvent = new DisplayClickEvent(player, nearestWidget);
+                    Bukkit.getPluginManager().callEvent(clickEvent);
+                    if (!clickEvent.isCancelled()) {
+                        nearestWidget.handleClick();
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onEntityAttack(org.bukkit.event.entity.EntityDamageByEntityEvent event) {
+        if (!(event.getDamager() instanceof Player)) {
+            return;
+        }
+        
+        Player player = (Player) event.getDamager();
+        WidgetManager manager = activeScreens.get(player);
+
+        if (manager != null) {
+            Widget nearestWidget = getNearestHoveredWidget(manager);
+            if (nearestWidget != null) {
+                event.setCancelled(true);
+                // Создаем и вызываем событие клика только для ближайшего виджета
+                DisplayClickEvent clickEvent = new DisplayClickEvent(player, nearestWidget);
+                Bukkit.getPluginManager().callEvent(clickEvent);
+                if (!clickEvent.isCancelled()) {
+                    nearestWidget.handleClick();
                 }
             }
         }

@@ -206,6 +206,18 @@ public class ItemDisplayButtonWidget implements Widget {
             }
         }
 
+        // Добавляем эффект слабости при наведении
+        if (isHovered) {
+            viewer.addPotionEffect(new org.bukkit.potion.PotionEffect(
+                org.bukkit.potion.PotionEffectType.WEAKNESS, 
+                3, // длительность в тиках
+                9, // уровень (10-1, так как уровни начинаются с 0)
+                false, // ambient
+                false, // particles
+                false  // icon
+            ));
+        }
+
         // Вызываем callback обновления, если он установлен
         if (updateCallback != null) {
             updateCallback.run();
@@ -440,5 +452,34 @@ public class ItemDisplayButtonWidget implements Widget {
             display.setGlowing(false);
         }
         return this;
+    }
+
+    public void forceHoverState(boolean hovered) {
+        if (hovered != wasHovered) {
+            wasHovered = hovered;
+            isHovered = hovered;
+            if (glowOnHover) {
+                display.setGlowing(isHovered);
+            }
+            
+            if (isHovered && hoveredTransformation != null) {
+                Animation.applyTransformationWithInterpolation(
+                    display,
+                    hoveredTransformation,
+                    hoveredTransformationDuration
+                );
+            } else {
+                Animation.applyTransformationWithInterpolation(
+                    display,
+                    new Transformation(
+                        translation != null ? translation : new Vector3f(0, -scaleY / 8, 0),
+                        new AxisAngle4f(),
+                        new Vector3f(scaleX, scaleY, scaleZ),
+                        new AxisAngle4f()
+                    ),
+                    hoveredTransformationDuration
+                );
+            }
+        }
     }
 }

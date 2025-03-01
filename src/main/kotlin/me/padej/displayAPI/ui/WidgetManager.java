@@ -1,6 +1,8 @@
 package me.padej.displayAPI.ui;
 
 import me.padej.displayAPI.api.events.DisplayClickEvent;
+import me.padej.displayAPI.ui.widgets.ItemDisplayButtonWidget;
+import me.padej.displayAPI.ui.widgets.TextDisplayButtonWidget;
 import me.padej.displayAPI.ui.widgets.Widget;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -25,22 +27,47 @@ public class WidgetManager {
     }
     
     public void update() {
-        new ArrayList<>(children).forEach(Widget::update);
+        // Находим ближайший виджет, на который смотрит игрок
+        Widget nearestWidget = null;
+        double nearestDistance = Double.MAX_VALUE;
+
+        for (Widget widget : new ArrayList<>(children)) {
+            // Временно обновляем состояние наведения для определения потенциальных кандидатов
+            widget.update();
+            
+            if (widget.isHovered()) {
+                Location widgetLoc = null;
+                if (widget instanceof ItemDisplayButtonWidget) {
+                    widgetLoc = ((ItemDisplayButtonWidget) widget).getDisplay().getLocation();
+                } else if (widget instanceof TextDisplayButtonWidget) {
+                    widgetLoc = ((TextDisplayButtonWidget) widget).getDisplay().getLocation();
+                }
+
+                if (widgetLoc != null) {
+                    double distance = viewer.getEyeLocation().distance(widgetLoc);
+                    if (distance < nearestDistance) {
+                        nearestDistance = distance;
+                        nearestWidget = widget;
+                    }
+                }
+            }
+        }
+
+        // Сбрасываем состояние наведения для всех виджетов и устанавливаем true только для ближайшего
+        for (Widget widget : children) {
+            if (widget instanceof ItemDisplayButtonWidget) {
+                ((ItemDisplayButtonWidget) widget).forceHoverState(widget == nearestWidget);
+            } else if (widget instanceof TextDisplayButtonWidget) {
+                ((TextDisplayButtonWidget) widget).forceHoverState(widget == nearestWidget);
+            }
+        }
     }
     
     public void handleClick() {
-        new ArrayList<>(children).forEach(child -> {
-            if (child.isHovered()) {
-                // Создаем и вызываем событие клика
-                DisplayClickEvent event = new DisplayClickEvent(viewer, child);
-                Bukkit.getPluginManager().callEvent(event);
-                
-                // Если событие не отменено, обрабатываем клик
-                if (!event.isCancelled()) {
-                    child.handleClick();
-                }
-            }
-        });
+        Widget nearestWidget = getNearestHoveredWidget();
+        if (nearestWidget != null) {
+            nearestWidget.handleClick();
+        }
     }
     
     public void remove() {
@@ -49,6 +76,31 @@ public class WidgetManager {
     }
 
     public boolean isLookingAtWidget() {
-        return children.stream().anyMatch(Widget::isHovered);
+        return getNearestHoveredWidget() != null;
+    }
+
+    private Widget getNearestHoveredWidget() {
+        Widget nearestWidget = null;
+        double nearestDistance = Double.MAX_VALUE;
+
+        for (Widget widget : children) {
+            if (widget.isHovered()) {
+                Location widgetLoc = null;
+                if (widget instanceof ItemDisplayButtonWidget) {
+                    widgetLoc = ((ItemDisplayButtonWidget) widget).getDisplay().getLocation();
+                } else if (widget instanceof TextDisplayButtonWidget) {
+                    widgetLoc = ((TextDisplayButtonWidget) widget).getDisplay().getLocation();
+                }
+
+                if (widgetLoc != null) {
+                    double distance = viewer.getEyeLocation().distance(widgetLoc);
+                    if (distance < nearestDistance) {
+                        nearestDistance = distance;
+                        nearestWidget = widget;
+                    }
+                }
+            }
+        }
+        return nearestWidget;
     }
 } 

@@ -229,6 +229,18 @@ public class TextDisplayButtonWidget implements Widget {
             }
         }
 
+        // Добавляем эффект слабости при наведении
+        if (isHovered) {
+            viewer.addPotionEffect(new org.bukkit.potion.PotionEffect(
+                org.bukkit.potion.PotionEffectType.WEAKNESS, 
+                3, // длительность в тиках
+                9, // уровень (10-1, так как уровни начинаются с 0)
+                false, // ambient
+                false, // particles
+                false  // icon
+            ));
+        }
+
         // Вызываем callback обновления, если он установлен
         if (updateCallback != null) {
             updateCallback.run();
@@ -460,5 +472,54 @@ public class TextDisplayButtonWidget implements Widget {
         this.hoveredTransformation = transformation;
         this.hoveredTransformationDuration = duration;
         return this;
+    }
+
+    public void forceHoverState(boolean hovered) {
+        if (hovered != wasHovered) {
+            wasHovered = hovered;
+            isHovered = hovered;
+            display.setGlowing(isHovered);
+
+            if (isHovered && hoveredTransformation != null) {
+                Animation.applyTransformationWithInterpolation(
+                    display,
+                    hoveredTransformation,
+                    hoveredTransformationDuration
+                );
+            } else {
+                Animation.applyTransformationWithInterpolation(
+                    display,
+                    new Transformation(
+                        translation != null ? translation : new Vector3f(0, -scaleY / 8, 0),
+                        new AxisAngle4f(),
+                        new Vector3f(scaleX, scaleY, scaleZ),
+                        new AxisAngle4f()
+                    ),
+                    hoveredTransformationDuration
+                );
+            }
+
+            if (isHovered) {
+                display.text(hoveredText);
+                display.setBackgroundColor(org.bukkit.Color.fromARGB(
+                    hoveredBackgroundAlpha,
+                    hoveredBackgroundColor.getRed(),
+                    hoveredBackgroundColor.getGreen(),
+                    hoveredBackgroundColor.getBlue()
+                ));
+            } else {
+                display.text(text);
+                display.setBackgroundColor(org.bukkit.Color.fromARGB(
+                    backgroundAlpha,
+                    backgroundColor.getRed(),
+                    backgroundColor.getGreen(),
+                    backgroundColor.getBlue()
+                ));
+                hoverTicks = 0;
+                if (isShowingTooltip) {
+                    hideTooltip();
+                }
+            }
+        }
     }
 } 
