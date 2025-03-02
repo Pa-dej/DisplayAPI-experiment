@@ -430,6 +430,7 @@ public abstract class Screen extends WidgetManager implements IDisplayable, IPar
         if (position != null) {
             buttonLoc.add(right.multiply(position.getRightMultiplier()));
             buttonLoc.add(up.multiply(position.getUpMultiplier()));
+            buttonLoc.add(direction.multiply(position.getDepth()));
         }
 
         Location currentLoc = widget.getDisplay().getLocation();
@@ -449,6 +450,7 @@ public abstract class Screen extends WidgetManager implements IDisplayable, IPar
         if (position != null) {
             buttonLoc.add(right.multiply(position.getRightMultiplier()));
             buttonLoc.add(up.multiply(position.getUpMultiplier()));
+            buttonLoc.add(direction.multiply(position.getDepth()));
         }
 
         Location currentLoc = widget.getDisplay().getLocation();
