@@ -16,6 +16,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Transformation;
+import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 
 import java.util.HashMap;
@@ -55,16 +56,16 @@ public class SmoothMotionAndRotationTest implements Listener {
     }
 
     private void startOrbiting(Player player) {
-        final double radius = 1.2;  // Радиус орбиты
-        final double speed = 0.05; // Скорость вращения
-        final float rotationSpeed = 0.05f; // Скорость вращения вокруг осей
+        final double radius = 1.2;
+        final double speed = 0.05;
+        final float rotationSpeed = 0.05f;
 
         Location center = player.getLocation().add(0, player.getHeight() / 2, 0);
 
         BukkitRunnable task = new BukkitRunnable() {
             private double angle = 0;
             private float rotationAngle = 0;
-            private final boolean CLOCKWISE = new Random().nextBoolean(); // Случайное направление вращения
+            private final boolean CLOCKWISE = new Random().nextBoolean();
 
             @Override
             public void run() {
@@ -97,6 +98,13 @@ public class SmoothMotionAndRotationTest implements Listener {
                                 leftRotation,
                                 cube.getTransformation().getScale(),
                                 rightRotation)
+                        );
+                        Animation.applyTransformationWithInterpolation(blockDisplay,
+                                new Matrix4f()
+                                        .translate(cube.getTransformation().getTranslation())
+                                        .scale(cube.getTransformation().getScale().x, cube.getTransformation().getScale().y, cube.getTransformation().getScale().z)
+                                        .rotate(leftRotation)
+                                        .rotate(rightRotation)
                         );
                     }
                 }

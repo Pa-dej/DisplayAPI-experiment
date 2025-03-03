@@ -34,6 +34,8 @@ public abstract class DefaultDisplay {
                 return new Vector3f(-scale / 2, -scale, -scale / 2);
             case BOTTOM:
                 return new Vector3f(-scale / 2, 0, -scale / 2);
+            case NONE:
+                return new Vector3f(0, 0, 0);
             case CENTER:
             default:
                 return new Vector3f(-scale / 2, -scale / 2, -scale / 2);
