@@ -1,0 +1,11 @@
+name: EventManagerDisplayUI
+version: '1.0-SNAPSHOT'
+main: me.Padej_.eventManagerDisplayUI.EventManagerDisplayUI
+api-version: '1.21'
+authors: [ Padej_ ]
+
+commands:
+  em-ui:
+    description: Команда для создания нового UI
+    usage: /em-ui
+    permission: event_manager.event

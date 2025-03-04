@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="EMDisplayUI">
+    <output-path>$PROJECT_DIR$/../../../../LocalHosts/Paper server 1.21.4 for my plugins/plugins</output-path>
+    <root id="archive" name="EMDisplayUI.jar">
+      <element id="library" level="module" name="Maven: me.padej.displayapi:DisplayAPI:1.0" module-name="EventManagerDisplayUI" />
+      <element id="module-output" name="EventManagerDisplayUI" />
+    </root>
+  </artifact>
+</component>
