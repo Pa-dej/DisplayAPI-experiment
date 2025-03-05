@@ -27,7 +27,7 @@ public class LotusPlatformScreen extends EventManagerScreenTemplate {
         float horizontalOffset = 0.3f;
 
         // Первый столбец
-        createEventerButton("*", "Базовая платформа",
+        createHelperButton("Вся", "Базовая платформа",
                 () -> player.performCommand("stp paste sumo_lotus *"),
                 center.clone().addHorizontal(-horizontalOffset));
 

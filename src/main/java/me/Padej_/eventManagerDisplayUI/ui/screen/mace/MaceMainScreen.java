@@ -61,7 +61,7 @@ public class MaceMainScreen extends EventManagerScreenTemplate {
                 );
             }
         });
-        createEventerButton("✎ Настройки", "Настройки ивента", () -> ChangeScreen.switchTo(player, MaceMainScreen.class, MaceSettingsScreen.class), center.clone().addVertical(step * 3), 0.44);
+        createDefaultButton("Настройки", "Настройки ивента", () -> ChangeScreen.switchTo(player, MaceMainScreen.class, MaceSettingsScreen.class), center.clone().addVertical(step * 3), 0.44);
     }
 
     private boolean isOpen() {

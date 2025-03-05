@@ -27,7 +27,7 @@ public class XmasPlatformScreen extends EventManagerScreenTemplate {
         float horizontalStep = 0.4f;
 
         // Первый столбец (левый)
-        createEventerButton("*", "Базовая платформа",
+        createHelperButton("Вся", "Базовая платформа",
                 () -> player.performCommand("stp paste sumo_xmas *"),
                 center.clone().addHorizontal(-horizontalStep));
 

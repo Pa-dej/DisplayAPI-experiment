@@ -96,4 +96,20 @@ public interface WidgetTemplate {
     default TextDisplayButtonWidget createDevButton(String text, String tooltip, Runnable action, WidgetPosition position, double toleranceX) {
         return createButton(text, tooltip, action, position, TextColor.color(0xff6eaf), TextColor.color(0xff37a2), toleranceX);
     }
-} 
+
+    default TextDisplayButtonWidget createDefaultButton(String text, String tooltip, Runnable action, WidgetPosition position) {
+        return createDefaultButton(text, tooltip, action, position, calculateTolerance(text));
+    }
+
+    default TextDisplayButtonWidget createDefaultButton(String text, String tooltip, Runnable action, WidgetPosition position, double toleranceX) {
+        return createButton(text, tooltip, action, position, TextColor.color(0xdbdbdb), TextColor.color(0x929292), toleranceX);
+    }
+
+    default TextDisplayButtonWidget createDisabledButton(String text, String tooltip, Runnable action, WidgetPosition position) {
+        return createDisabledButton(text, tooltip, action, position, calculateTolerance(text));
+    }
+
+    default TextDisplayButtonWidget createDisabledButton(String text, String tooltip, Runnable action, WidgetPosition position, double toleranceX) {
+        return createButton(text, tooltip, action, position, TextColor.color(0x6d6d6d), TextColor.color(0x494949), toleranceX);
+    }
+}

@@ -75,5 +75,12 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/DisplayAPI.jar</systemPath>
         </dependency>
+        <dependency>
+            <groupId>me.padej.displayapi</groupId>
+            <artifactId>SpleefUtils</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/SpleefUtils.jar</systemPath>
+        </dependency>
     </dependencies>
 </project>

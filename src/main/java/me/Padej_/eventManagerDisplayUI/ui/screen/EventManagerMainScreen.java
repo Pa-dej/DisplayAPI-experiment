@@ -4,8 +4,8 @@ import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
 import me.Padej_.eventManagerDisplayUI.ui.EventManagerScreenTemplate;
 import me.Padej_.eventManagerDisplayUI.ui.screen.mace.MaceMainScreen;
-import me.Padej_.eventManagerDisplayUI.ui.screen.spleef.SpleefScreen;
-import me.Padej_.eventManagerDisplayUI.ui.screen.sumo.SumoScreen;
+import me.Padej_.eventManagerDisplayUI.ui.screen.spleef.SpleefMainScreen;
+import me.Padej_.eventManagerDisplayUI.ui.screen.sumo.SumoMainScreen;
 import me.Padej_.eventManagerDisplayUI.ui.screen.winners.WinnersScreen;
 import me.padej.displayAPI.ui.annotations.Main;
 import me.padej.displayAPI.ui.screens.ChangeScreen;
@@ -38,7 +38,7 @@ public class EventManagerMainScreen extends EventManagerScreenTemplate {
         float step = 0.155f;
         float depthOffset = -0.02f;
 
-        createEventerButton("Mace", "",
+        createDefaultButton("Mace", "",
                 () -> ChangeScreen.switchTo(player, EventManagerMainScreen.class, MaceMainScreen.class),
                 leftTopEdge.clone().addHorizontal(0.01f).addDepth(depthOffset));
 
@@ -52,8 +52,8 @@ public class EventManagerMainScreen extends EventManagerScreenTemplate {
                         .setTolerance(0)
         );
 
-        createEventerButton("Sumo", "",
-                () -> ChangeScreen.switchTo(player, EventManagerMainScreen.class, SumoScreen.class),
+        createDefaultButton("Sumo", "",
+                () -> ChangeScreen.switchTo(player, EventManagerMainScreen.class, SumoMainScreen.class),
                 leftTopEdge.clone().addVertical(-step).addHorizontal(0.01f).addDepth(depthOffset));
 
         createWidget(new ItemDisplayButtonConfig(
@@ -66,8 +66,8 @@ public class EventManagerMainScreen extends EventManagerScreenTemplate {
                         .setTolerance(0)
         );
 
-        createEventerButton("Spleef", "",
-                () -> ChangeScreen.switchTo(player, EventManagerMainScreen.class, SpleefScreen.class),
+        createDefaultButton("Spleef", "",
+                () -> ChangeScreen.switchTo(player, EventManagerMainScreen.class, SpleefMainScreen.class),
                 leftTopEdge.clone().addVertical(-step * 2).addHorizontal(0.06f).addDepth(depthOffset));
 
         createWidget(new ItemDisplayButtonConfig(
@@ -80,7 +80,7 @@ public class EventManagerMainScreen extends EventManagerScreenTemplate {
                         .setTolerance(0)
         );
 
-        createEventerButton("Winners", "",
+        createDefaultButton("Winners", "",
                 () -> ChangeScreen.switchTo(player, EventManagerMainScreen.class, WinnersScreen.class),
                 leftTopEdge.clone().addVertical(-step * 4.5 - 0.1).addHorizontal(0.1f).addDepth(depthOffset));
 

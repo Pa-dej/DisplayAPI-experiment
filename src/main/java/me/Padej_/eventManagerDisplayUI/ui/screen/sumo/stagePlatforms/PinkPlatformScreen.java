@@ -25,7 +25,7 @@ public class PinkPlatformScreen extends EventManagerScreenTemplate {
         WidgetPosition center = new WidgetPosition(0.115, 0.75f);
         float verticalStep = -0.145f;
 
-        createEventerButton("*", "Базовая платформа",
+        createHelperButton("Вся", "Базовая платформа",
                 () -> player.performCommand("stp paste sumo_pink *"),
                 center.clone());
 

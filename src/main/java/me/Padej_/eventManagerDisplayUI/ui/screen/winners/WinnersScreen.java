@@ -20,10 +20,7 @@ import org.bukkit.util.Transformation;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class WinnersScreen extends EventManagerScreenTemplate implements Listener {
@@ -66,8 +63,8 @@ public class WinnersScreen extends EventManagerScreenTemplate implements Listene
         for (int i = 0; i < 6; i++) {
             // Номер позиции
             createTextWidget(new TextDisplayButtonConfig(
-                            Component.text((i + 1) + "."),
-                            Component.text((i + 1) + "."),
+                            Component.text((i + 1) + ".").color(Palette.GRAY_LIGHT),
+                            Component.text((i + 1) + ".").color(Palette.GRAY_LIGHT),
                             () -> {
                             }
                     )
@@ -80,8 +77,8 @@ public class WinnersScreen extends EventManagerScreenTemplate implements Listene
 
             // Имя победителя
             TextDisplayButtonWidget winnerWidget = createTextWidget(new TextDisplayButtonConfig(
-                            Component.text("----------------").color(Palette.GRAY_LIGHT),
-                            Component.text("----------------").color(Palette.GRAY_LIGHT),
+                            Palette.gradient("----------------", Palette.GRAY_DARK, Palette.GRAY_LIGHT, Palette.GRAY_DARK),
+                            Palette.gradient("----------------", Palette.GRAY_DARK, Palette.GRAY_LIGHT, Palette.GRAY_DARK),
                             () -> {
                             }
                     )
@@ -98,8 +95,8 @@ public class WinnersScreen extends EventManagerScreenTemplate implements Listene
             winnerWidget.setUpdateCallback(() -> {
                 if (viewer != null && winners.get(finalI1) != null) {
                     winnerWidget.setText(
-                            Component.text(winners.get(finalI1)).color(Palette.WHITE_LIGHT),
-                            Component.text(winners.get(finalI1)).color(Palette.WHITE_LIGHT)
+                            Component.text(winners.get(finalI1)).color(Palette.GRAY_LIGHT),
+                            Component.text(winners.get(finalI1)).color(Palette.GRAY_LIGHT)
                     );
                 }
             });
@@ -109,8 +106,8 @@ public class WinnersScreen extends EventManagerScreenTemplate implements Listene
             // Кнопка добавления
             int finalI = i;
             createTextWidget(new TextDisplayButtonConfig(
-                            Component.text("+").color(TextColor.fromHexString("0dcf2c")),
-                            Component.text("+").color(TextColor.fromHexString("098b1d")),
+                            Component.text("+").color(Palette.GREEN_LIGHT),
+                            Component.text("+").color(Palette.GREEN_DARK),
                             () -> {
                                 awaitingInput.put(player, true);
                                 awaitingPosition.put(player, finalI);
@@ -139,8 +136,8 @@ public class WinnersScreen extends EventManagerScreenTemplate implements Listene
                                 winners.set(finalI2, null); // Очищаем позицию
                                 TextDisplayButtonWidget widget = winnerWidgets.get(finalI2);
                                 widget.setText(
-                                        Component.text("----------------").color(Palette.GRAY_LIGHT),
-                                        Component.text("----------------").color(Palette.GRAY_LIGHT)
+                                        Palette.gradient("----------------", Palette.GRAY_DARK, Palette.GRAY_LIGHT, Palette.GRAY_DARK),
+                                        Palette.gradient("----------------", Palette.GRAY_DARK, Palette.GRAY_LIGHT, Palette.GRAY_DARK)
                                 );
                             }
                     )
@@ -160,8 +157,8 @@ public class WinnersScreen extends EventManagerScreenTemplate implements Listene
             // Кнопка колокольчика
             int finalI3 = i;
             createTextWidget(new TextDisplayButtonConfig(
-                            Component.text("🔔").color(Palette.YELLOW_LIGHT),
-                            Component.text("🔔").color(Palette.YELLOW_DARK),
+                            Component.text("🔉").color(Palette.YELLOW_LIGHT),
+                            Component.text("🔉").color(Palette.YELLOW_DARK),
                             () -> {
                                 String winner = winners.get(finalI3);
                                 if (winner != null) {
@@ -187,8 +184,8 @@ public class WinnersScreen extends EventManagerScreenTemplate implements Listene
         // После создания 6 обычных строк добавляем финальную строку
         // Буква F для финала
         createTextWidget(new TextDisplayButtonConfig(
-                        Component.text("F.").color(Palette.PURPLE_LIGHT),
-                        Component.text("F.").color(Palette.PURPLE_LIGHT),
+                        Component.text("F").color(Palette.PURPLE_LIGHT),
+                        Component.text("F").color(Palette.PURPLE_LIGHT),
                         () -> {
                         }
                 )
@@ -201,8 +198,8 @@ public class WinnersScreen extends EventManagerScreenTemplate implements Listene
 
         // Имя финального победителя
         finalWinnerWidget = createTextWidget(new TextDisplayButtonConfig(
-                        Component.text("----------------").color(Palette.GRAY_LIGHT),
-                        Component.text("----------------").color(Palette.GRAY_LIGHT),
+                        Palette.gradient("----------------", Palette.PURPLE_DARK, Palette.PURPLE_LIGHT, Palette.PURPLE_DARK),
+                        Palette.gradient("----------------", Palette.PURPLE_DARK, Palette.PURPLE_LIGHT, Palette.PURPLE_DARK),
                         () -> {
                         }
                 )
@@ -218,16 +215,16 @@ public class WinnersScreen extends EventManagerScreenTemplate implements Listene
         finalWinnerWidget.setUpdateCallback(() -> {
             if (viewer != null && finalWinner != null) {
                 finalWinnerWidget.setText(
-                        Component.text(finalWinner).color(Palette.WHITE_LIGHT),
-                        Component.text(finalWinner).color(Palette.WHITE_LIGHT)
+                        Component.text(finalWinner).color(Palette.PURPLE_LIGHT),
+                        Component.text(finalWinner).color(Palette.PURPLE_LIGHT)
                 );
             }
         });
 
         // Кнопка добавления для финала
         createTextWidget(new TextDisplayButtonConfig(
-                        Component.text("+").color(TextColor.fromHexString("0dcf2c")),
-                        Component.text("+").color(TextColor.fromHexString("098b1d")),
+                        Component.text("+").color(Palette.GREEN_LIGHT),
+                        Component.text("+").color(Palette.GREEN_DARK),
                         () -> {
                             awaitingInput.put(player, true);
                             awaitingPosition.put(player, -1);
@@ -254,8 +251,8 @@ public class WinnersScreen extends EventManagerScreenTemplate implements Listene
                         () -> {
                             finalWinner = null;
                             finalWinnerWidget.setText(
-                                    Component.text("----------------").color(Palette.GRAY_LIGHT),
-                                    Component.text("----------------").color(Palette.GRAY_LIGHT)
+                                    Palette.gradient("----------------", Palette.PURPLE_DARK, Palette.PURPLE_LIGHT, Palette.PURPLE_DARK),
+                                    Palette.gradient("----------------", Palette.PURPLE_DARK, Palette.PURPLE_LIGHT, Palette.PURPLE_DARK)
                             );
                         }
                 )
@@ -274,12 +271,12 @@ public class WinnersScreen extends EventManagerScreenTemplate implements Listene
 
         // Кнопка колокольчика для финала
         createTextWidget(new TextDisplayButtonConfig(
-                        Component.text("🔔").color(Palette.YELLOW_LIGHT),
-                        Component.text("🔔").color(Palette.YELLOW_DARK),
+                        Component.text("🔉").color(Palette.YELLOW_LIGHT),
+                        Component.text("🔉").color(Palette.YELLOW_DARK),
                         () -> {
                             if (finalWinner != null) {
                                 String message = String.format("В финале побеждает %s!", finalWinner);
-                                Bukkit.broadcast(Component.text(message).color(Palette.PURPLE_LIGHT));
+                                Bukkit.broadcast(Palette.gradient(message, TextColor.fromHexString("#e91396"), TextColor.fromHexString("#f588b6")));
                             }
                         }
                 )
@@ -336,7 +333,7 @@ public class WinnersScreen extends EventManagerScreenTemplate implements Listene
 
     public static List<String> getWinners() {
         return winners.stream()
-                .filter(name -> name != null)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 

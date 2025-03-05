@@ -16,13 +16,13 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class SumoScreen extends EventManagerScreenTemplate {
+public class SumoMainScreen extends EventManagerScreenTemplate {
 
-    public SumoScreen(Player viewer, Location location, String text, float scale) {
+    public SumoMainScreen(Player viewer, Location location, String text, float scale) {
         super(viewer, location, text, scale);
     }
 
-    public SumoScreen() {
+    public SumoMainScreen() {
         super();
     }
 
@@ -36,29 +36,19 @@ public class SumoScreen extends EventManagerScreenTemplate {
         WidgetPosition center = new WidgetPosition(0.115, 0.8f);
         float step = -0.145f;
 
-        createEventerButton("Only winners", "Оставить только победителей",
-                () -> WinnersManager.teleportNonWinnersFromArea(new Area(146, 143, -556, 160, 149, -542),
-                        new Location(Bukkit.getWorld("world"), 162, 152, -549)), center.clone(), 0.44);
+        createEventerButton("Начать отсчет", "Начать обратный отсчет", () -> startCountdown(player), center.clone().addVertical(step), 0.44);
 
-        createEventerButton("Not winners", "Оставить только не победителей",
-                () -> WinnersManager.teleportWinnersFromArea(new Area(146, 143, -556, 160, 149, -542),
-                        new Location(Bukkit.getWorld("world"), 162, 152, -549)), center.clone().addVertical(step), 0.42);
+        createDefaultButton("Стадии платформ", "Управление платформами",
+                () -> ChangeScreen.switchTo(player, SumoMainScreen.class, StagePlatformsMainScreen.class),
+                center.clone().addVertical(step * 2), 0.44);
 
-        createEventerButton("Start", "Начать игру",
-                () -> startCountdown(player),
-                center.clone().addVertical(step * 2), 0.25);
+        createDefaultButton("Сортировка", "Логика сортировки игроков",
+                () -> ChangeScreen.switchTo(player, SumoMainScreen.class, SumoSortWinnersScreen.class),
+                center.clone().addVertical(step * 3), 0.44);
 
-        createEventerButton("On Sumo Utils", "Включить Sumo Utils",
-                () -> player.performCommand("su enable"),
-                center.clone().addVertical(step * 3), 0.42);
-
-        createEventerButton("Off Sumo Utils", "Выключить Sumo Utils",
-                () -> player.performCommand("su disable"),
-                center.clone().addVertical(step * 4), 0.42);
-
-        createEventerButton("Stage Platforms", "Управление платформами",
-                () -> ChangeScreen.switchTo(player, SumoScreen.class, StagePlatformsMainScreen.class),
-                center.clone().addVertical(step * 5), 0.44);
+        createDefaultButton("Настройки", "Настройки ивента",
+                () -> ChangeScreen.switchTo(player, SumoMainScreen.class, SumoSettingsScreen.class),
+                center.clone().addVertical(step * 4), 0.44);
     }
 
     public void startCountdown(Player whoStarted) {

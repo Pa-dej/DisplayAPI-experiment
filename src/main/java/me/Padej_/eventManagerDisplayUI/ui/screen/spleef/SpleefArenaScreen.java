@@ -7,15 +7,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
-/*
-Очистить
-R = 6 R = 11
-R = 17 R = 35
-Заполнить снегом
-Заполнить бедроком
-Режим кирки вкл
-Режим кирки выкл
- */
 public class SpleefArenaScreen extends EventManagerScreenTemplate {
     public SpleefArenaScreen() {
         super();
@@ -27,7 +18,7 @@ public class SpleefArenaScreen extends EventManagerScreenTemplate {
 
     @Override
     public Class<? extends EventManagerScreenTemplate> getParentScreen() {
-        return SpleefScreen.class;
+        return SpleefMainScreen.class;
     }
 
     @Override
