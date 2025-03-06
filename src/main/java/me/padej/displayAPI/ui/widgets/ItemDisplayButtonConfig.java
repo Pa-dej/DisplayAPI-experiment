@@ -33,6 +33,7 @@ public class ItemDisplayButtonConfig {
     private Transformation hoveredTransformation;
     private int hoveredTransformationDuration;
     private boolean glowOnHover = true;
+    private boolean privateVisible = false;
 
     public ItemDisplayButtonConfig(Material material, Runnable onClick) {
         this.material = material;
@@ -237,5 +238,14 @@ public class ItemDisplayButtonConfig {
 
     public boolean isGlowOnHover() {
         return glowOnHover;
+    }
+
+    public ItemDisplayButtonConfig setPrivateVisible(boolean privateVisible) {
+        this.privateVisible = privateVisible;
+        return this;
+    }
+
+    public boolean isPrivateVisible() {
+        return privateVisible;
     }
 }

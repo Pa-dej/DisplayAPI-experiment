@@ -62,6 +62,8 @@ public class TextDisplayButtonWidget implements Widget {
     private Transformation hoveredTransformation;
     private int hoveredTransformationDuration;
 
+    private TextDisplayButtonConfig config;
+
     private TextDisplayButtonWidget() {
     }
 
@@ -69,6 +71,7 @@ public class TextDisplayButtonWidget implements Widget {
         TextDisplayButtonWidget widget = new TextDisplayButtonWidget();
         widget.location = location;
         widget.viewer = viewer;
+        widget.config = config;
         widget.onClick = config.getOnClick();
         widget.text = config.getText();
         widget.hoveredText = config.getHoveredText();
@@ -135,8 +138,12 @@ public class TextDisplayButtonWidget implements Widget {
         display.setTeleportDuration(1);
 
         display.setBillboard(Display.Billboard.FIXED);
-        display.setVisibleByDefault(false);
-        viewer.showEntity(DisplayAPI.getInstance(), display);
+        
+        // Применяем настройку приватной видимости
+        if (config != null && config.isPrivateVisible()) {
+            display.setVisibleByDefault(false);
+            viewer.showEntity(DisplayAPI.getInstance(), display);
+        }
 
         // Если translation не установлен, используем значение по умолчанию
         if (translation == null) {

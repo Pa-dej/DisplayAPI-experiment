@@ -1,7 +1,6 @@
 package me.padej.displayAPI.ui;
 
 import me.padej.displayAPI.DisplayAPI;
-import me.padej.displayAPI.render.shapes.StringRectangle;
 import me.padej.displayAPI.ui.annotations.AlwaysOnScreen;
 import me.padej.displayAPI.ui.annotations.Main;
 import me.padej.displayAPI.ui.screens.ChangeScreen;
@@ -49,7 +48,8 @@ public abstract class Screen extends WidgetManager implements IDisplayable, IPar
         TextDisplayButtonConfig backgroundConfig = new TextDisplayButtonConfig(
                 Component.text(text),
                 Component.text(text),
-                () -> {}
+                () -> {
+                }
         )
                 .setScale(scale, scale, scale)
                 .setBackgroundColor(Color.fromRGB(0, 0, 0))
@@ -57,18 +57,12 @@ public abstract class Screen extends WidgetManager implements IDisplayable, IPar
                 .setPosition(new WidgetPosition(0, 0, 0));
 
         background = createTextWidget(backgroundConfig);
-        if (background != null && background.getDisplay() != null) {
-            background.getDisplay().setBrightness(new Display.Brightness(15, 15));
-        }
 
         spawn();
     }
 
     private void spawn() {
         if (background != null && background.getDisplay() != null) {
-            background.getDisplay().setVisibleByDefault(false);
-            viewer.showEntity(DisplayAPI.getInstance(), background.getDisplay());
-
             Location viewerLoc = viewer.getLocation().add(0, viewer.getHeight() / 2, 0);
             DisplayUtils.lookAtPos(background.getDisplay(), viewerLoc);
         }
@@ -107,18 +101,6 @@ public abstract class Screen extends WidgetManager implements IDisplayable, IPar
         softRemoveWithAnimation();
     }
 
-    public void softRemove() {
-        for (Widget widget : children) {
-            if (widget != background) {
-                widget.remove();
-            }
-        }
-        if (background != null) {
-            background.remove();
-        }
-        super.remove();
-    }
-
     @Override
     public void softRemoveWithAnimation() {
         for (Widget widget : children) {
@@ -126,7 +108,7 @@ public abstract class Screen extends WidgetManager implements IDisplayable, IPar
                 widget.removeWithAnimation(5);
             }
         }
-        
+
         if (background != null && background.getDisplay() != null) {
             Animation.applyTransformationWithInterpolation(
                     background.getDisplay(),
@@ -138,7 +120,7 @@ public abstract class Screen extends WidgetManager implements IDisplayable, IPar
                     ),
                     5
             );
-            
+
             Bukkit.getScheduler().runTaskLater(DisplayAPI.getInstance(), () -> {
                 if (background != null && background.getDisplay() != null) {
                     background.remove();
@@ -329,11 +311,11 @@ public abstract class Screen extends WidgetManager implements IDisplayable, IPar
 
         children.removeIf(widget -> {
             if (widget instanceof ItemDisplayButtonWidget) {
-                return ((ItemDisplayButtonWidget) widget).getDisplay() == null || 
-                       !((ItemDisplayButtonWidget) widget).getDisplay().isValid();
+                return ((ItemDisplayButtonWidget) widget).getDisplay() == null ||
+                        !((ItemDisplayButtonWidget) widget).getDisplay().isValid();
             } else if (widget instanceof TextDisplayButtonWidget) {
-                return ((TextDisplayButtonWidget) widget).getDisplay() == null || 
-                       !((TextDisplayButtonWidget) widget).getDisplay().isValid();
+                return ((TextDisplayButtonWidget) widget).getDisplay() == null ||
+                        !((TextDisplayButtonWidget) widget).getDisplay().isValid();
             }
             return false;
         });
@@ -347,7 +329,7 @@ public abstract class Screen extends WidgetManager implements IDisplayable, IPar
             Vector playerPos = viewer.getLocation().toVector();
             Vector displayPos = location.toVector();
             relativePosition = displayPos.subtract(playerPos);
-            
+
             updateBackgroundColor("#af802b");
             viewer.playSound(viewer.getLocation(), org.bukkit.Sound.BLOCK_NOTE_BLOCK_PLING, 0.5f, 2.0f);
         } else {
@@ -372,7 +354,7 @@ public abstract class Screen extends WidgetManager implements IDisplayable, IPar
 
         if (isSaved) {
             savedPosition = location.toVector();
-            
+
             updateBackgroundColor("#29af48");
             viewer.playSound(viewer.getLocation(), org.bukkit.Sound.BLOCK_ANVIL_USE, 0.5f, 2.0f);
         } else {
@@ -384,7 +366,7 @@ public abstract class Screen extends WidgetManager implements IDisplayable, IPar
     private void updateBackgroundColor(String hexColor) {
         if (background != null && background.getDisplay() != null) {
             int alpha = (isFollowing || isSaved) ? 100 : 160;
-            
+
             if (hexColor == null) {
                 background.getDisplay().setBackgroundColor(Color.fromARGB(alpha, 0, 0, 0));
             } else {
@@ -439,7 +421,7 @@ public abstract class Screen extends WidgetManager implements IDisplayable, IPar
         // Обновляем позиции всех виджетов
         for (Widget widget : new ArrayList<>(children)) {
             if (widget == background) continue;
-            
+
             if (widget instanceof ItemDisplayButtonWidget) {
                 updateWidgetPosition((ItemDisplayButtonWidget) widget);
             } else if (widget instanceof TextDisplayButtonWidget) {

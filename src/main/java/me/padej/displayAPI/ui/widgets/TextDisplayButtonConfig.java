@@ -34,6 +34,7 @@ public class TextDisplayButtonConfig {
     private Vector3f translation;
     private Transformation hoveredTransformation;
     private int hoveredTransformationDuration;
+    private boolean privateVisible = false;
 
     public TextDisplayButtonConfig(Component text, Component hoveredText, Runnable onClick) {
         this.text = text;
@@ -169,6 +170,15 @@ public class TextDisplayButtonConfig {
 
     public int getHoveredTransformationDuration() {
         return hoveredTransformationDuration;
+    }
+
+    public TextDisplayButtonConfig setPrivateVisible(boolean privateVisible) {
+        this.privateVisible = privateVisible;
+        return this;
+    }
+
+    public boolean isPrivateVisible() {
+        return privateVisible;
     }
 
     // Геттеры

@@ -51,6 +51,7 @@ public class ItemDisplayButtonWidget implements Widget {
     private int hoveredTransformationDuration;
     private boolean wasHovered = false;
     private boolean glowOnHover = true;
+    private ItemDisplayButtonConfig config;
     
     private ItemDisplayButtonWidget() {} // Приватный конструктор
     
@@ -68,6 +69,7 @@ public class ItemDisplayButtonWidget implements Widget {
         ItemDisplayButtonWidget widget = new ItemDisplayButtonWidget();
         widget.location = location;
         widget.viewer = viewer;
+        widget.config = config;
         widget.onClick = config.getOnClick();
         widget.itemType = config.getMaterial();
         widget.scaleX = config.getScaleX();
@@ -119,7 +121,7 @@ public class ItemDisplayButtonWidget implements Widget {
         }
         display.setItemStack(itemStack);
         display.setBrightness(new Display.Brightness(15, 15));
-        display.setItemDisplayTransform(displayTransform); // Устанавливаем transform до трансформации
+        display.setItemDisplayTransform(displayTransform);
         
         // Начальная трансформация с нулевым масштабом
         display.setTransformationMatrix(new Matrix4f().translate(0, 0, 0.017f).scale(0, 0, 0));
@@ -128,9 +130,11 @@ public class ItemDisplayButtonWidget implements Widget {
         display.setInterpolationDuration(1);
         display.setTeleportDuration(1);
         
-        // Делаем виджет видимым только для создателя
-        display.setVisibleByDefault(false);
-        viewer.showEntity(DisplayAPI.getInstance(), display);
+        // Применяем настройку приватной видимости
+        if (config != null && config.isPrivateVisible()) {
+            display.setVisibleByDefault(false);
+            viewer.showEntity(DisplayAPI.getInstance(), display);
+        }
 
         // Если translation не установлен, используем значение по умолчанию
         if (translation == null) {
