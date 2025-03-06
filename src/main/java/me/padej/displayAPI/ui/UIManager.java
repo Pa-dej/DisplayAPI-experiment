@@ -12,6 +12,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -104,7 +105,7 @@ public class UIManager implements Listener {
     }
 
     @EventHandler
-    public void onEntityAttack(org.bukkit.event.entity.EntityDamageByEntityEvent event) {
+    public void onEntityAttack(EntityDamageByEntityEvent event) {
         if (!(event.getDamager() instanceof Player)) {
             return;
         }
@@ -168,18 +169,21 @@ public class UIManager implements Listener {
     }
 
     public void cleanup() {
+        // Создаем копию для безопасной итерации
+        Map<Player, WidgetManager> screensToRemove = new HashMap<>(activeScreens);
+        
         // Удаляем все активные экраны
-        for (Map.Entry<Player, WidgetManager> entry : new HashMap<>(activeScreens).entrySet()) {
-            Player player = entry.getKey();
+        for (Map.Entry<Player, WidgetManager> entry : screensToRemove.entrySet()) {
             WidgetManager manager = entry.getValue();
             if (manager != null) {
-                manager.remove(); // Мгновенное удаление при выключении
+                // Принудительно удаляем все виджеты
+                manager.remove();
+                unregisterScreen(entry.getKey());
             }
         }
         
-        // Останавливаем задачу обновления и очищаем список
+        // Останавливаем задачу обновления
         stopUpdateTask();
-        activeScreens.clear();
     }
 
     // Добавим метод для проверки наличия активных экранов

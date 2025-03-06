@@ -45,10 +45,10 @@ public class CreateTestUI implements Listener {
         Player player = event.getPlayer();
         WidgetManager manager = UIManager.getInstance().getActiveScreen(player);
 
-        if (manager != null && manager instanceof Screen) {
+        if (manager instanceof Screen) {
             Screen screen = (Screen) manager;
             if (Screen.isSaved) return;
-            if (!screen.isPlayerInRange() && !Screen.isFollowing) {
+            if (!screen.isPlayerInRange() && !screen.isFollowing()) {
                 screen.remove();
                 UIManager.getInstance().unregisterScreen(player);
             } else {

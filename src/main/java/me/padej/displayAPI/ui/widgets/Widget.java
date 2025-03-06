@@ -12,4 +12,8 @@ public interface Widget {
     Widget setTolerance(double horizontalTolerance, double verticalTolerance);
     Widget setToleranceHorizontal(double tolerance);
     Widget setToleranceVertical(double tolerance);
+    
+    default boolean isValid() {
+        return true;
+    }
 } 

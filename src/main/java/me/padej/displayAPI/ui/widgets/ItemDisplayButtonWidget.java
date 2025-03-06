@@ -206,18 +206,6 @@ public class ItemDisplayButtonWidget implements Widget {
             }
         }
 
-        // Добавляем эффект слабости при наведении
-        if (isHovered) {
-            viewer.addPotionEffect(new org.bukkit.potion.PotionEffect(
-                org.bukkit.potion.PotionEffectType.WEAKNESS, 
-                3, // длительность в тиках
-                9, // уровень (10-1, так как уровни начинаются с 0)
-                false, // ambient
-                false, // particles
-                false  // icon
-            ));
-        }
-
         // Вызываем callback обновления, если он установлен
         if (updateCallback != null) {
             updateCallback.run();
@@ -481,5 +469,10 @@ public class ItemDisplayButtonWidget implements Widget {
                 );
             }
         }
+    }
+
+    @Override
+    public boolean isValid() {
+        return display != null && display.isValid() && !display.isDead();
     }
 }

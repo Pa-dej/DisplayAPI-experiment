@@ -20,15 +20,16 @@ import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.joml.Vector3f;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Screen extends WidgetManager implements IDisplayable, IParentable, Animatable {
-    private final StringRectangle display;
+    private TextDisplayButtonWidget background;
     private final Class<? extends Screen> CURRENT_SCREEN_CLASS;
 
-    public static boolean isFollowing = false;
+    private boolean isFollowing = false;
     public static boolean isSaved = false;
-    private static Vector relativePosition;
+    private Vector relativePosition;
     private static Vector savedPosition;
 
     @AlwaysOnScreen(Screen.class)
@@ -45,31 +46,31 @@ public abstract class Screen extends WidgetManager implements IDisplayable, IPar
         this.viewer = viewer;
         CURRENT_SCREEN_CLASS = this.getClass();
 
-        display = new StringRectangle(
-                scale,
-                Color.BLACK,
-                160,
-                Display.Billboard.FIXED,
-                false,
-                text
-        ) {
-        };
+        TextDisplayButtonConfig backgroundConfig = new TextDisplayButtonConfig(
+                Component.text(text),
+                Component.text(text),
+                () -> {}
+        )
+                .setScale(scale, scale, scale)
+                .setBackgroundColor(Color.fromRGB(0, 0, 0))
+                .setBackgroundAlpha(160)
+                .setPosition(new WidgetPosition(0, 0, 0));
+
+        background = createTextWidget(backgroundConfig);
+        if (background != null && background.getDisplay() != null) {
+            background.getDisplay().setBrightness(new Display.Brightness(15, 15));
+        }
 
         spawn();
     }
 
     private void spawn() {
-        if (display != null) {
-            TextDisplay textDisplay = display.spawn(location);
-            if (textDisplay != null) {
-                textDisplay.setBrightness(new Display.Brightness(15, 15));
-                textDisplay.setVisibleByDefault(false); // Делаем невидимым по умолчанию
-                viewer.showEntity(DisplayAPI.getInstance(), textDisplay); // Показываем только создателю
+        if (background != null && background.getDisplay() != null) {
+            background.getDisplay().setVisibleByDefault(false);
+            viewer.showEntity(DisplayAPI.getInstance(), background.getDisplay());
 
-                // Заменяем viewer.getEyeLocation() на viewer.getLocation().add()
-                Location viewerLoc = viewer.getLocation().add(0, viewer.getHeight() / 2, 0);
-                DisplayUtils.lookAtPos(textDisplay, viewerLoc);
-            }
+            Location viewerLoc = viewer.getLocation().add(0, viewer.getHeight() / 2, 0);
+            DisplayUtils.lookAtPos(background.getDisplay(), viewerLoc);
         }
     }
 
@@ -81,7 +82,19 @@ public abstract class Screen extends WidgetManager implements IDisplayable, IPar
 
         resetVarsAndBackground();
 
-        softRemove();
+        // Удаляем все виджеты, включая фон
+        List<Widget> toRemove = new ArrayList<>(children);
+        for (Widget widget : toRemove) {
+            widget.remove();
+        }
+        children.clear();
+
+        // Явно удаляем фон, если он еще существует
+        if (background != null) {
+            background.remove();
+            background = null;
+        }
+
         super.remove();
     }
 
@@ -96,10 +109,12 @@ public abstract class Screen extends WidgetManager implements IDisplayable, IPar
 
     public void softRemove() {
         for (Widget widget : children) {
-            widget.remove();
+            if (widget != background) {
+                widget.remove();
+            }
         }
-        if (display != null) {
-            display.removeEntity();
+        if (background != null) {
+            background.remove();
         }
         super.remove();
     }
@@ -107,27 +122,28 @@ public abstract class Screen extends WidgetManager implements IDisplayable, IPar
     @Override
     public void softRemoveWithAnimation() {
         for (Widget widget : children) {
-            widget.removeWithAnimation(5);
+            if (widget != background) {
+                widget.removeWithAnimation(5);
+            }
         }
-        if (display != null && display.getTextDisplay() != null) {
-            // Анимируем исчезновение
+        
+        if (background != null && background.getDisplay() != null) {
             Animation.applyTransformationWithInterpolation(
-                    display.getTextDisplay(),
+                    background.getDisplay(),
                     new Transformation(
-                            display.getTextDisplay().getTransformation().getTranslation().add(0, 0.5f, -1f),
-                            display.getTextDisplay().getTransformation().getLeftRotation(),
+                            background.getDisplay().getTransformation().getTranslation().add(0, 0.5f, -1f),
+                            background.getDisplay().getTransformation().getLeftRotation(),
                             new Vector3f(0, 0, 0),
-                            display.getTextDisplay().getTransformation().getRightRotation()
+                            background.getDisplay().getTransformation().getRightRotation()
                     ),
                     5
             );
             
-            // Удаляем дисплей после завершения анимации
             Bukkit.getScheduler().runTaskLater(DisplayAPI.getInstance(), () -> {
-                if (display != null && display.getTextDisplay() != null) {
-                    display.removeEntity();
+                if (background != null && background.getDisplay() != null) {
+                    background.remove();
                 }
-            }, 6); // Задержка чуть больше, чем длительность анимации
+            }, 6);
         }
     }
 
@@ -146,7 +162,7 @@ public abstract class Screen extends WidgetManager implements IDisplayable, IPar
 
     @Override
     public TextDisplay getTextDisplay() {
-        return display != null ? display.getTextDisplay() : null;
+        return background != null ? background.getDisplay() : null;
     }
 
     public ItemDisplayButtonWidget createWidget(ItemDisplayButtonConfig config) {
@@ -195,10 +211,10 @@ public abstract class Screen extends WidgetManager implements IDisplayable, IPar
                 config
         );
 
-        if (display != null && display.getTextDisplay() != null) {
+        if (background != null && background.getDisplay() != null) {
             widget.getDisplay().setRotation(
-                    display.getTextDisplay().getLocation().getYaw(),
-                    display.getTextDisplay().getLocation().getPitch()
+                    background.getDisplay().getLocation().getYaw(),
+                    background.getDisplay().getLocation().getPitch()
             );
             widget.getDisplay().setBillboard(Display.Billboard.FIXED);
         }
@@ -228,7 +244,6 @@ public abstract class Screen extends WidgetManager implements IDisplayable, IPar
 
         WidgetPosition basePosition = new WidgetPosition(0.52, 0.92);
 
-        // Добавляем кнопку возврата для экранов без аннотации @Main
         if (!this.getClass().isAnnotationPresent(Main.class)) {
             TextDisplayButtonConfig returnConfig = new TextDisplayButtonConfig(
                     Component.text("⏴").color(TextColor.fromHexString("#fafeff")),
@@ -312,6 +327,17 @@ public abstract class Screen extends WidgetManager implements IDisplayable, IPar
             }
         }
 
+        children.removeIf(widget -> {
+            if (widget instanceof ItemDisplayButtonWidget) {
+                return ((ItemDisplayButtonWidget) widget).getDisplay() == null || 
+                       !((ItemDisplayButtonWidget) widget).getDisplay().isValid();
+            } else if (widget instanceof TextDisplayButtonWidget) {
+                return ((TextDisplayButtonWidget) widget).getDisplay() == null || 
+                       !((TextDisplayButtonWidget) widget).getDisplay().isValid();
+            }
+            return false;
+        });
+
         isFollowing = !isFollowing;
         if (followButton != null) {
             followButton.getDisplay().setGlowing(isFollowing);
@@ -322,12 +348,10 @@ public abstract class Screen extends WidgetManager implements IDisplayable, IPar
             Vector displayPos = location.toVector();
             relativePosition = displayPos.subtract(playerPos);
             
-            // Меняем цвет фона на желтый
-            updateBackgroundColor("#af802b"); // Желтый цвет
+            updateBackgroundColor("#af802b");
             viewer.playSound(viewer.getLocation(), org.bukkit.Sound.BLOCK_NOTE_BLOCK_PLING, 0.5f, 2.0f);
         } else {
-            // Возвращаем цвет фона на черный
-            updateBackgroundColor("#000000"); // Черный цвет
+            updateBackgroundColor("#000000");
             viewer.playSound(viewer.getLocation(), org.bukkit.Sound.BLOCK_NOTE_BLOCK_PLING, 0.5f, 0.5f);
         }
     }
@@ -349,26 +373,23 @@ public abstract class Screen extends WidgetManager implements IDisplayable, IPar
         if (isSaved) {
             savedPosition = location.toVector();
             
-            // Меняем цвет фона на зеленый
-            updateBackgroundColor("#29af48"); // Зеленый цвет
+            updateBackgroundColor("#29af48");
             viewer.playSound(viewer.getLocation(), org.bukkit.Sound.BLOCK_ANVIL_USE, 0.5f, 2.0f);
         } else {
-            // Возвращаем цвет фона на черный
-            updateBackgroundColor("#000000"); // Черный цвет
+            updateBackgroundColor("#000000");
             viewer.playSound(viewer.getLocation(), org.bukkit.Sound.BLOCK_ANVIL_LAND, 0.3f, 1.5f);
         }
     }
 
     private void updateBackgroundColor(String hexColor) {
-        if (display != null && display.getTextDisplay() != null) {
-            TextDisplay textDisplay = display.getTextDisplay();
+        if (background != null && background.getDisplay() != null) {
             int alpha = (isFollowing || isSaved) ? 100 : 160;
             
             if (hexColor == null) {
-                textDisplay.setBackgroundColor(org.bukkit.Color.fromARGB(alpha, 0, 0, 0));
+                background.getDisplay().setBackgroundColor(Color.fromARGB(alpha, 0, 0, 0));
             } else {
                 java.awt.Color color = java.awt.Color.decode(hexColor);
-                textDisplay.setBackgroundColor(org.bukkit.Color.fromARGB(
+                background.getDisplay().setBackgroundColor(Color.fromARGB(
                         alpha,
                         color.getRed(),
                         color.getGreen(),
@@ -396,14 +417,18 @@ public abstract class Screen extends WidgetManager implements IDisplayable, IPar
     public void updatePosition() {
         if (!isFollowing) return;
 
+        // Удаляем недействительные виджеты перед обновлением позиции
+        children.removeIf(widget -> !widget.isValid());
+
         Location newLoc = viewer.getLocation().clone();
         Vector newPos = newLoc.toVector().add(relativePosition);
         location.setX(newPos.getX());
         location.setY(newPos.getY());
         location.setZ(newPos.getZ());
 
-        if (display != null && display.getTextDisplay() != null) {
-            TextDisplay textDisplay = display.getTextDisplay();
+        // Обновляем позицию фона
+        if (background != null && background.isValid()) {
+            TextDisplay textDisplay = background.getDisplay();
             Location displayLoc = textDisplay.getLocation();
             displayLoc.setX(location.getX());
             displayLoc.setY(location.getY());
@@ -411,7 +436,10 @@ public abstract class Screen extends WidgetManager implements IDisplayable, IPar
             textDisplay.teleport(displayLoc);
         }
 
-        for (Widget widget : children) {
+        // Обновляем позиции всех виджетов
+        for (Widget widget : new ArrayList<>(children)) {
+            if (widget == background) continue;
+            
             if (widget instanceof ItemDisplayButtonWidget) {
                 updateWidgetPosition((ItemDisplayButtonWidget) widget);
             } else if (widget instanceof TextDisplayButtonWidget) {
@@ -470,28 +498,25 @@ public abstract class Screen extends WidgetManager implements IDisplayable, IPar
         return children;
     }
 
-    public Location getLocation() {
-        return location;
-    }
-
+    @Override
     public void setLocation(Location location) {
-        this.location = location;
-        if (display != null && display.getTextDisplay() != null) {
-            display.getTextDisplay().teleport(location);
+        super.setLocation(location);
+        if (background != null && background.getDisplay() != null) {
+            background.getDisplay().teleport(location);
         }
     }
 
     protected Screen() {
         super(null, new Location(Bukkit.getWorlds().get(0), 0, 0, 0));
         this.viewer = null;
-        display = null;
+        background = null;
         CURRENT_SCREEN_CLASS = this.getClass();
     }
 
     protected Screen(Player viewer, Location location) {
         super(viewer, location);
         this.viewer = viewer;
-        display = null;
+        background = null;
         CURRENT_SCREEN_CLASS = this.getClass();
     }
 
@@ -500,15 +525,9 @@ public abstract class Screen extends WidgetManager implements IDisplayable, IPar
     }
 
     public Class<? extends Screen> getParentScreen() {
-        return null; // По умолчанию null - для главного экрана
+        return null;
     }
 
-    /**
-     * Возвращает конфигурации виджетов для данного экрана
-     *
-     * @param player Игрок, для которого создаются виджеты
-     * @return Массив конфигураций виджетов
-     */
     public ItemDisplayButtonConfig[] getBranchWidgets(Player player) {
         return new ItemDisplayButtonConfig[0];
     }
@@ -519,21 +538,21 @@ public abstract class Screen extends WidgetManager implements IDisplayable, IPar
 
     @Override
     public void updateDisplayPosition(Location location, float yaw, float pitch) {
-        if (display != null && display.getTextDisplay() != null) {
-            Location displayLoc = display.getTextDisplay().getLocation();
+        if (background != null && background.getDisplay() != null) {
+            Location displayLoc = background.getDisplay().getLocation();
             displayLoc.setX(location.getX());
             displayLoc.setY(location.getY());
             displayLoc.setZ(location.getZ());
             displayLoc.setYaw(yaw);
             displayLoc.setPitch(pitch);
-            display.getTextDisplay().teleport(displayLoc);
+            background.getDisplay().teleport(displayLoc);
         }
     }
 
     @Override
     public void setBackgroundColor(Color color) {
-        if (display != null && display.getTextDisplay() != null) {
-            display.getTextDisplay().setBackgroundColor(color);
+        if (background != null && background.getDisplay() != null) {
+            background.getDisplay().setBackgroundColor(color);
         }
     }
 
@@ -545,5 +564,9 @@ public abstract class Screen extends WidgetManager implements IDisplayable, IPar
     @Override
     public void createWithAnimation(Player player) {
         Animation.createDefaultScreenWithAnimation(this, player);
+    }
+
+    public boolean isFollowing() {
+        return isFollowing;
     }
 }

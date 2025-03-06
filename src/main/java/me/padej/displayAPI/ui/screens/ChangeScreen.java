@@ -52,7 +52,7 @@ public class ChangeScreen {
         WidgetManager currentManager = UIManager.getInstance().getActiveScreen(player);
         if (currentManager != null && currentManager.getClass() == from) {
             try {
-                Location oldLocation = currentManager.location;
+                Location oldLocation = currentManager.getLocation();
                 Color backgroundColor = null;
                 float yaw = 0, pitch = 0;
 

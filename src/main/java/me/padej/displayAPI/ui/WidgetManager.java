@@ -11,10 +11,10 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WidgetManager {
+public abstract class WidgetManager {
     protected final List<Widget> children = new ArrayList<>();
-    public Player viewer;
-    public Location location;
+    protected final Player viewer;
+    protected Location location;
     
     public WidgetManager(Player viewer, Location location) {
         this.viewer = viewer;
@@ -27,39 +27,12 @@ public class WidgetManager {
     }
     
     public void update() {
-        // Находим ближайший виджет, на который смотрит игрок
-        Widget nearestWidget = null;
-        double nearestDistance = Double.MAX_VALUE;
-
-        for (Widget widget : new ArrayList<>(children)) {
-            // Временно обновляем состояние наведения для определения потенциальных кандидатов
-            widget.update();
-            
-            if (widget.isHovered()) {
-                Location widgetLoc = null;
-                if (widget instanceof ItemDisplayButtonWidget) {
-                    widgetLoc = ((ItemDisplayButtonWidget) widget).getDisplay().getLocation();
-                } else if (widget instanceof TextDisplayButtonWidget) {
-                    widgetLoc = ((TextDisplayButtonWidget) widget).getDisplay().getLocation();
-                }
-
-                if (widgetLoc != null) {
-                    double distance = viewer.getEyeLocation().distance(widgetLoc);
-                    if (distance < nearestDistance) {
-                        nearestDistance = distance;
-                        nearestWidget = widget;
-                    }
-                }
-            }
-        }
-
-        // Сбрасываем состояние наведения для всех виджетов и устанавливаем true только для ближайшего
+        // Удаляем недействительные виджеты перед обновлением
+        children.removeIf(widget -> !widget.isValid());
+        
+        // Обновляем оставшиеся виджеты
         for (Widget widget : children) {
-            if (widget instanceof ItemDisplayButtonWidget) {
-                ((ItemDisplayButtonWidget) widget).forceHoverState(widget == nearestWidget);
-            } else if (widget instanceof TextDisplayButtonWidget) {
-                ((TextDisplayButtonWidget) widget).forceHoverState(widget == nearestWidget);
-            }
+            widget.update();
         }
     }
     
@@ -71,7 +44,11 @@ public class WidgetManager {
     }
     
     public void remove() {
-        new ArrayList<>(children).forEach(Widget::remove);
+        // Создаем копию списка для безопасной итерации
+        List<Widget> toRemove = new ArrayList<>(children);
+        for (Widget widget : toRemove) {
+            widget.remove();
+        }
         children.clear();
     }
 
@@ -102,5 +79,13 @@ public class WidgetManager {
             }
         }
         return nearestWidget;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
     }
 } 
