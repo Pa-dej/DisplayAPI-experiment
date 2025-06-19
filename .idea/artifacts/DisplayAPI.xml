@@ -1,0 +1,12 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="DisplayAPI">
+    <output-path>$PROJECT_DIR$/../../../../LocalHosts/Paper server 1.21.4 for my plugins/plugins</output-path>
+    <root id="archive" name="DisplayAPI.jar">
+      <element id="module-output" name="DisplayAPI" />
+      <element id="library" level="project" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.24" />
+      <element id="library" level="project" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.24" />
+      <element id="library" level="project" name="Maven: org.jetbrains.kotlin:kotlin-stdlib:1.9.24" />
+      <element id="library" level="project" name="Maven: org.jetbrains:annotations:13.0" />
+    </root>
+  </artifact>
+</component>

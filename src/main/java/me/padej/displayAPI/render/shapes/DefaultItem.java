@@ -40,7 +40,7 @@ public abstract class DefaultItem extends DefaultDisplay {
         this.scale = scale;
     }
 
-    public ItemStack getBlock() {
+    public ItemStack getItemStack() {
         return itemStack;
     }
 
@@ -66,8 +66,8 @@ public abstract class DefaultItem extends DefaultDisplay {
             this.itemDisplay = null;
             return null;
         } else {
-            this.itemDisplay = (ItemDisplay) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.BLOCK_DISPLAY);
-            this.itemDisplay.setItemStack(this.getBlock());
+            this.itemDisplay = (ItemDisplay) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.ITEM_DISPLAY);
+            this.itemDisplay.setItemStack(this.getItemStack());
             this.itemDisplay.setRotation(0.0F, 0.0F);
             Vector3f offset = getOffset(this.alignmentType, this.getScale());
             this.itemDisplay.setTransformation(new Transformation(offset, new AxisAngle4f(), new Vector3f(this.getScale(), this.getScale(), this.getScale()), new AxisAngle4f()));
