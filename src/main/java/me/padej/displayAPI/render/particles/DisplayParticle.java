@@ -1,5 +1,5 @@
 package me.padej.displayAPI.render.particles;
 
-public interface Particle {
+public interface DisplayParticle {
     void update();
 }

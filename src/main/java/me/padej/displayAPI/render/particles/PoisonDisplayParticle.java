@@ -12,9 +12,9 @@ import org.joml.Vector3f;
 
 import java.util.Random;
 
-import static me.padej.displayAPI.DisplayAPI.particles;
+import static me.padej.displayAPI.DisplayAPI.DISPLAY_PARTICLES;
 
-public class PoisonParticle implements Particle {
+public class PoisonDisplayParticle implements DisplayParticle {
     private int age;
     private static final Random random = new Random();
     private static final int MAX_AGE = 80;
@@ -27,7 +27,7 @@ public class PoisonParticle implements Particle {
     private final DefaultSquare square;
     private double velocityY;
 
-    public PoisonParticle(Location spawnLocation) {
+    public PoisonDisplayParticle(Location spawnLocation) {
         this.age = 0;
         this.velocityY = INITIAL_VELOCITY;
 
@@ -55,7 +55,7 @@ public class PoisonParticle implements Particle {
         age++;
         if (age > MAX_AGE) {
             square.removeEntity();
-            particles.remove(this);
+            DISPLAY_PARTICLES.remove(this);
             return;
         }
 

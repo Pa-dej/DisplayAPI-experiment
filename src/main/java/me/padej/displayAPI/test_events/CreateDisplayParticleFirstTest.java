@@ -1,6 +1,6 @@
 package me.padej.displayAPI.test_events;
 
-import me.padej.displayAPI.render.particles.ExampleSquareParticle;
+import me.padej.displayAPI.render.particles.ExampleSquareDisplayParticle;
 import me.padej.displayAPI.utils.ItemUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -10,7 +10,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-import static me.padej.displayAPI.DisplayAPI.particles;
+import static me.padej.displayAPI.DisplayAPI.DISPLAY_PARTICLES;
 
 public class CreateDisplayParticleFirstTest implements Listener {
 
@@ -25,8 +25,8 @@ public class CreateDisplayParticleFirstTest implements Listener {
             Action action = event.getAction();
 
             if (action.isRightClick()) {
-                ExampleSquareParticle particle = new ExampleSquareParticle(spawnLocation);
-                particles.add(particle);
+                ExampleSquareDisplayParticle particle = new ExampleSquareDisplayParticle(spawnLocation);
+                DISPLAY_PARTICLES.add(particle);
             }
         }
     }

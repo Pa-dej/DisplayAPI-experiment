@@ -13,9 +13,9 @@ import org.bukkit.util.Vector;
 
 import java.util.Random;
 
-import static me.padej.displayAPI.DisplayAPI.particles;
+import static me.padej.displayAPI.DisplayAPI.DISPLAY_PARTICLES;
 
-public class ExampleComponentParticle implements Particle {
+public class ExampleComponentDisplayParticle implements DisplayParticle {
     private int age;
     private static final Random random = new Random();
     private static final int MIN_LIFE = 200;
@@ -36,7 +36,7 @@ public class ExampleComponentParticle implements Particle {
     private final int maxAge;
     private boolean isRapidSpeed;  // Переменная для отслеживания первых 10 тиков
 
-    public ExampleComponentParticle(Player player, Location spawnLocation) {
+    public ExampleComponentDisplayParticle(Player player, Location spawnLocation) {
         this.age = 0;
         this.source = spawnLocation.clone();
         this.position = spawnLocation.clone();
@@ -96,7 +96,7 @@ public class ExampleComponentParticle implements Particle {
         age++;
         if (age > maxAge) {
             square.removeEntity();
-            particles.remove(this);
+            DISPLAY_PARTICLES.remove(this);
             return;
         }
 

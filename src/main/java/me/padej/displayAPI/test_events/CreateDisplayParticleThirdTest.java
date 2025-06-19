@@ -1,7 +1,7 @@
 package me.padej.displayAPI.test_events;
 
 import me.padej.displayAPI.DisplayAPI;
-import me.padej.displayAPI.render.particles.PoisonParticle;
+import me.padej.displayAPI.render.particles.PoisonDisplayParticle;
 import me.padej.displayAPI.render.shapes.StringRectangle;
 import me.padej.displayAPI.utils.ItemUtil;
 import org.bukkit.Location;
@@ -50,9 +50,9 @@ public class CreateDisplayParticleThirdTest implements Listener {
 //                    ), 20);
 //
 //                    playerCubes.put(player, cube);
-//                    PoisonParticle particle = new PoisonParticle(player, spawnLocation);
-                    PoisonParticle particle = new PoisonParticle(player.getLocation());
-                    DisplayAPI.particles.add(particle);
+//                    PoisonDisplayParticle particle = new PoisonDisplayParticle(player, spawnLocation);
+                    PoisonDisplayParticle particle = new PoisonDisplayParticle(player.getLocation());
+                    DisplayAPI.DISPLAY_PARTICLES.add(particle);
                 }
             }
         }

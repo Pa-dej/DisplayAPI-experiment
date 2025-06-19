@@ -1,6 +1,6 @@
 package me.padej.displayAPI;
 
-import me.padej.displayAPI.render.particles.Particle;
+import me.padej.displayAPI.render.particles.DisplayParticle;
 import me.padej.displayAPI.render.shapes.Highlight;
 import me.padej.displayAPI.test_events.*;
 import me.padej.displayAPI.ui.UIManager;
@@ -14,7 +14,7 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class DisplayAPI extends JavaPlugin {
 
-    public static final List<Particle> particles = new ArrayList<>();
+    public static final List<DisplayParticle> DISPLAY_PARTICLES = new ArrayList<>();
 
     @Override
     public void onEnable() {
@@ -49,7 +49,7 @@ public class DisplayAPI extends JavaPlugin {
         
         // Очищаем другие ресурсы плагина
         Highlight.removeAllSelections();
-        particles.clear();
+        DISPLAY_PARTICLES.clear();
     }
 
     public static JavaPlugin getInstance() {
@@ -60,9 +60,9 @@ public class DisplayAPI extends JavaPlugin {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (particles.isEmpty()) return;
-                for (Particle particle : new ArrayList<>(particles)) {
-                    particle.update();
+                if (DISPLAY_PARTICLES.isEmpty()) return;
+                for (DisplayParticle displayParticle : new ArrayList<>(DISPLAY_PARTICLES)) {
+                    displayParticle.update();
                 }
             }
         }.runTaskTimer(this, 0L, 1L);

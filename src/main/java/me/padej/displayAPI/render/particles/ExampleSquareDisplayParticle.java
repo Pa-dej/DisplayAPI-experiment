@@ -8,9 +8,9 @@ import org.bukkit.util.Vector;
 
 import java.util.Random;
 
-import static me.padej.displayAPI.DisplayAPI.particles;
+import static me.padej.displayAPI.DisplayAPI.DISPLAY_PARTICLES;
 
-public class ExampleSquareParticle implements Particle {
+public class ExampleSquareDisplayParticle implements DisplayParticle {
     private int age;
     private static final Random random = new Random();
     private static final int MIN_LIFE = 200;
@@ -29,7 +29,7 @@ public class ExampleSquareParticle implements Particle {
     private final DefaultSquare square;
     private final int maxAge;
 
-    public ExampleSquareParticle(Location spawnLocation) {
+    public ExampleSquareDisplayParticle(Location spawnLocation) {
         this.age = 0;
         this.source = spawnLocation.clone();
         this.position = spawnLocation.clone();
@@ -70,7 +70,7 @@ public class ExampleSquareParticle implements Particle {
         age++;
         if (age > maxAge) {
             square.removeEntity();
-            particles.remove(this);
+            DISPLAY_PARTICLES.remove(this);
             return;
         }
 

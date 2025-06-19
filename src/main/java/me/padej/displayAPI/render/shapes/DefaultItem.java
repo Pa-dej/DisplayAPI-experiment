@@ -2,8 +2,6 @@ package me.padej.displayAPI.render.shapes;
 
 import me.padej.displayAPI.utils.AlignmentType;
 import org.bukkit.Location;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.inventory.ItemStack;
@@ -69,8 +67,16 @@ public abstract class DefaultItem extends DefaultDisplay {
             this.itemDisplay = (ItemDisplay) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.ITEM_DISPLAY);
             this.itemDisplay.setItemStack(this.getItemStack());
             this.itemDisplay.setRotation(0.0F, 0.0F);
-            Vector3f offset = getOffset(this.alignmentType, this.getScale());
-            this.itemDisplay.setTransformation(new Transformation(offset, new AxisAngle4f(), new Vector3f(this.getScale(), this.getScale(), this.getScale()), new AxisAngle4f()));
+
+            Vector3f offset = getOffset(this.alignmentType, this.getScale() * 2);
+            Transformation transformation = new Transformation(
+                    offset,
+                    new AxisAngle4f(),
+                    new Vector3f(this.scale, this.scale, this.scale),
+                    new AxisAngle4f()
+            );
+
+            this.itemDisplay.setTransformation(transformation);
             this.itemDisplay.setInterpolationDuration(1);
             this.itemDisplay.setTeleportDuration(1);
 
