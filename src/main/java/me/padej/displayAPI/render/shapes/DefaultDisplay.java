@@ -9,36 +9,40 @@ import org.joml.Vector3f;
 
 public abstract class DefaultDisplay {
     private Display display;
-    public Transformation emptyTransformation = new Transformation(
-            new Vector3f(),
-            new AxisAngle4f(),
-            new Vector3f(),
-            new AxisAngle4f()
-    );
+    public Transformation emptyTransformation = new Transformation(new Vector3f(), new AxisAngle4f(), new Vector3f(), new AxisAngle4f());
+
+    public DefaultDisplay() {}
 
     public Display getDisplay() {
-        return display;
+        return this.display;
     }
 
     public Transformation getTransformation() {
-        return display != null ? display.getTransformation() : new Transformation(new Vector3f(), new AxisAngle4f(), new Vector3f(), new AxisAngle4f());
+        return this.display != null ? this.display.getTransformation() : new Transformation(new Vector3f(), new AxisAngle4f(), new Vector3f(), new AxisAngle4f());
     }
 
     public Location getLocation() {
-        return display != null ? display.getLocation() : null;
+        return this.display != null ? this.display.getLocation() : null;
+    }
+
+    public void removeEntity() {
+        if (this.display != null && !this.display.isDead()) {
+            this.display.remove();
+            this.display = null;
+        }
     }
 
     public static Vector3f getOffset(AlignmentType type, float scale) {
         switch (type) {
-            case TOP:
-                return new Vector3f(-scale / 2, -scale, -scale / 2);
-            case BOTTOM:
-                return new Vector3f(-scale / 2, 0, -scale / 2);
-            case NONE:
-                return new Vector3f(0, 0, 0);
             case CENTER:
             default:
-                return new Vector3f(-scale / 2, -scale / 2, -scale / 2);
+                return new Vector3f(-scale / 2.0F, -scale / 2.0F, -scale / 2.0F);
+            case TOP:
+                return new Vector3f(-scale / 2.0F, -scale, -scale / 2.0F);
+            case BOTTOM:
+                return new Vector3f(-scale / 2.0F, 0.0F, -scale / 2.0F);
+            case NONE:
+                return new Vector3f(0.0F, 0.0F, 0.0F);
         }
     }
 }
