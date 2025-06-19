@@ -103,13 +103,4 @@ public abstract class DefaultSquare extends DefaultDisplay {
 
         return textDisplay;
     }
-
-    public void removeEntity() {
-        if (textDisplay != null) {
-            if (!textDisplay.isDead()) {
-                textDisplay.remove();
-            }
-            textDisplay = null;
-        }
-    }
 }
