@@ -8,7 +8,7 @@ import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 
 public abstract class DefaultDisplay {
-    private Display display;
+    protected Display display;
     public Transformation emptyTransformation = new Transformation(new Vector3f(), new AxisAngle4f(), new Vector3f(), new AxisAngle4f());
 
     public DefaultDisplay() {}

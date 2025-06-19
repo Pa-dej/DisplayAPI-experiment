@@ -59,25 +59,23 @@ public abstract class DefaultCube extends DefaultDisplay {
     }
 
     public BlockDisplay spawn(Location spawnLocation) {
-        if (blockDisplay != null && !blockDisplay.isDead()) {
-            blockDisplay.remove();
-            blockDisplay = null;
+        if (this.blockDisplay != null && !this.blockDisplay.isDead()) {
+            this.blockDisplay.remove();
+            this.blockDisplay = null;
             return null;
-        }
-        blockDisplay = (BlockDisplay) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.BLOCK_DISPLAY);
-        blockDisplay.setBlock(getBlock());
-        blockDisplay.setRotation(0, 0);
-        Vector3f offset = getOffset(alignmentType, getScale());
-        blockDisplay.setTransformation(new Transformation(
-                offset,
-                new AxisAngle4f(),
-                new Vector3f(getScale(), getScale(), getScale()),
-                new AxisAngle4f()
-        ));
-        blockDisplay.setInterpolationDuration(1);
-        blockDisplay.setTeleportDuration(1);
+        } else {
+            this.blockDisplay = (BlockDisplay)spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.BLOCK_DISPLAY);
+            this.blockDisplay.setBlock(this.getBlock());
+            this.blockDisplay.setRotation(0.0F, 0.0F);
+            Vector3f offset = getOffset(this.alignmentType, this.getScale());
+            this.blockDisplay.setTransformation(new Transformation(offset, new AxisAngle4f(), new Vector3f(this.getScale(), this.getScale(), this.getScale()), new AxisAngle4f()));
+            this.blockDisplay.setInterpolationDuration(1);
+            this.blockDisplay.setTeleportDuration(1);
 
-        return blockDisplay;
+            this.display = this.blockDisplay;
+
+            return this.blockDisplay;
+        }
     }
 }
 
