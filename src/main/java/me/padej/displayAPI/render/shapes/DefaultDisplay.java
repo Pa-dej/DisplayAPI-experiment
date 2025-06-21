@@ -32,6 +32,12 @@ public abstract class DefaultDisplay {
         }
     }
 
+    public void moveTo(Location location) {
+        if (this.display != null && location != null) {
+            this.display.teleport(location);
+        }
+    }
+
     public static Vector3f getOffset(AlignmentType type, float scale) {
         switch (type) {
             case CENTER:
